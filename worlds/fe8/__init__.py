@@ -90,11 +90,16 @@ class FE8World(World):
         )
 
     def create_items(self) -> None:
+        smooth_level_caps = self.multiworld.smooth_level_caps[self.player]
         min_endgame_level_cap = self.multiworld.min_endgame_level_cap[self.player]
         exclude_latona = self.multiworld.exclude_latona[self.player]
         required_holy_weapons = self.multiworld.required_holy_weapons[self.player]
 
-        needed_level_uncaps = (min_endgame_level_cap - 10) // 5
+        smooth_levelcap_max = 25 if smooth_level_caps else 10
+
+        needed_level_uncaps = (
+            max(min_endgame_level_cap, smooth_levelcap_max) - 10
+        ) // 5
 
         for i in range(NUM_LEVELCAPS):
             self.multiworld.itempool.append(
@@ -111,7 +116,7 @@ class FE8World(World):
         if exclude_latona:
             holy_weapon_pool.remove("Latona")
 
-        progression_holy_weapons = self.random.choices(
+        progression_holy_weapons = self.random.sample(
             list(holy_weapon_pool), k=required_holy_weapons
         )
         progression_weapon_types = {HOLY_WEAPONS[w] for w in progression_holy_weapons}
@@ -162,7 +167,7 @@ class FE8World(World):
 
         def level_cap_at_least(n: int) -> Callable[CollectionState, bool]:
             def wrapped(state: CollectionState) -> bool:
-                return 10 + state.prog_items["Progressive Level Cap"] * 5 >= n
+                return 10 + state.count("Progressive Level Cap", self.player) * 5 >= n
 
             return wrapped
 
@@ -173,14 +178,15 @@ class FE8World(World):
             weapon_types_needed = {HOLY_WEAPONS[weapon] for weapon in weapons_needed}
 
             for weapon in weapons_needed:
-                if not state[weapon]:
+                if not state.has(weapon, self.player):
                     return False
 
             for weapon_type in weapon_types_needed:
                 if (
-                    state.prog_items[
-                        "Progressive Weapon Level ({})".format(weapon_type)
-                    ]
+                    state.count(
+                        "Progressive Weapon Level ({})".format(weapon_type),
+                        self.player
+                        )
                     < NUM_WEAPON_LEVELS
                 ):
                     return False
@@ -224,6 +230,7 @@ class FE8World(World):
             self.add_location_to_region("Complete Chapter 18", None, lategame)
             self.add_location_to_region("Complete Chapter 19", None, lategame)
             self.add_location_to_region("Complete Chapter 20", None, lategame)
+            self.add_location_to_region("Defeat Lyon", None, lategame)
             self.add_location_to_region("Sieglinde Received", None, lategame)
             self.add_location_to_region("Siegmund Received", None, lategame)
             self.add_location_to_region("Nidhogg Received", None, lategame)
