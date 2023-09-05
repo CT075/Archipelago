@@ -2,11 +2,23 @@
 Archipelago World definition for Fire Emblem: Sacred Stones
 """
 
+import os
+import logging
+import hashlib
+import pkgutil
 from typing import ClassVar, Optional, Callable, Set
 
-from ..AutoWorld import World, WebWorld
+from worlds.AutoWorld import World, WebWorld
+from worlds.LauncherComponents import (
+    components,
+    Component,
+    Type as ComponentType,
+    SuffixIdentifier,
+    launch_subprocess,
+)
 from BaseClasses import Region, ItemClassification, CollectionState
 import settings
+from Utils import user_path
 
 from .options import fe8_options
 from .constants import (
@@ -16,21 +28,61 @@ from .constants import (
     WEAPON_TYPES,
     NUM_WEAPON_LEVELS,
     HOLY_WEAPONS,
+    CLIENT_TITLE,
 )
 from .locations import FE8Location
 from .items import FE8Item
 from .data import locations, items
 
-# from .rom import FE8DeltaPatch
+from .rom import FE8DeltaPatch, generate_output
+
+
+def launch_client(*args) -> None:
+    from .client import launch
+
+    launch_subprocess(launch, name=CLIENT_TITLE)
+
+
+components.append(
+    Component(
+        "FE8 Client",
+        CLIENT_TITLE,
+        component_type=ComponentType.CLIENT,
+        func=launch_client,
+        file_identifier=SuffixIdentifier(".apfe8"),
+    )
+)
+
+try:
+    connector_script_path = os.path.join(user_path("data", "lua"), "fe8_connector.lua")
+
+    if not os.path.exists(connector_script_path):
+        with open(connector_script_path, "wb") as connector_script_file:
+            connector_script_file.write(
+                pkgutil.get_data(__name__, "data/fe8_connector.lua")
+            )
+    else:
+        with open(connector_script_path, "rb+") as connector_script_file:
+            expected_script = pkgutil.get_data(__name__, "data/fe8_connector.lua")
+
+            expected_hash = hashlib.md5(expected_script).digest()
+            existing_hash = hashlib.md5(connector_script_file.read()).digest()
+
+            if existing_hash != expected_hash:
+                connector_script_file.seek(0)
+                connector_script_file.truncate()
+                connector_script_file.write(expected_script)
+except IOError:
+    logging.warning(
+        "Unable to copy fe8_connector.lua to /data/lua in your Archipelago install."
+    )
 
 
 class FE8WebWorld(WebWorld):
     tutorials = []
 
 
-# CR cam: .
 class FE8Settings(settings.Group):
-    '''
     class FE8RomFile(settings.UserFilePath):
         """File name of your Fire Emblem: The Sacred Stones (U) ROM"""
 
@@ -38,10 +90,7 @@ class FE8Settings(settings.Group):
         copy_to = "Fire Emblem: The Sacred Stones (U).gba"
         md5s = [FE8DeltaPatch.hash]
 
-    rom_file: FE8RomFile(FE8RomFile.copy_to)
-    '''
-
-    pass
+    rom_file: FE8RomFile = FE8RomFile(FE8RomFile.copy_to)
 
 
 class FE8World(World):
@@ -63,12 +112,12 @@ class FE8World(World):
     settings: ClassVar[FE8Settings]
     topology_present = False
     web = FE8WebWorld()
-    progression_holy_weapons: Set[str] = {}
+    progression_holy_weapons: Set[str] = set()
 
     # TODO: populate for real
     item_name_to_id = {name: id + FE8_ID_PREFIX for name, id in items}
     location_name_to_id = {name: id + FE8_ID_PREFIX for name, id in locations}
-    item_name_groups = {"holy weapons": list(HOLY_WEAPONS.keys())}
+    item_name_groups = {"holy weapons": set(HOLY_WEAPONS.keys())}
 
     def create_item_with_classification(
         self, item: str, cls: ItemClassification
@@ -82,7 +131,6 @@ class FE8World(World):
 
     def create_item(self, item: str) -> FE8Item:
         return self.create_item_with_classification(
-            self,
             item,
             # specific progression items are set during `create_items`, so we
             # can safely assume that they're filler if created here.
@@ -121,7 +169,7 @@ class FE8World(World):
         )
         progression_weapon_types = {HOLY_WEAPONS[w] for w in progression_holy_weapons}
 
-        self.progression_holy_weapons = progression_holy_weapons
+        self.progression_holy_weapons = set(progression_holy_weapons)
 
         for wtype in WEAPON_TYPES:
             for _ in range(NUM_WEAPON_LEVELS):
@@ -165,7 +213,7 @@ class FE8World(World):
 
         self.add_location_to_region("Defeat Formortiis", None, finalboss)
 
-        def level_cap_at_least(n: int) -> Callable[CollectionState, bool]:
+        def level_cap_at_least(n: int) -> Callable[[CollectionState], bool]:
             def wrapped(state: CollectionState) -> bool:
                 return 10 + state.count("Progressive Level Cap", self.player) * 5 >= n
 
@@ -184,9 +232,8 @@ class FE8World(World):
             for weapon_type in weapon_types_needed:
                 if (
                     state.count(
-                        "Progressive Weapon Level ({})".format(weapon_type),
-                        self.player
-                        )
+                        "Progressive Weapon Level ({})".format(weapon_type), self.player
+                    )
                     < NUM_WEAPON_LEVELS
                 ):
                     return False
@@ -265,3 +312,7 @@ class FE8World(World):
             )
 
             self.multiworld.regions.append(campaign)
+
+    def generate_output(self, output_directory: str) -> None:
+        generate_output(self.multiworld, self.player, output_directory, self.random)
+

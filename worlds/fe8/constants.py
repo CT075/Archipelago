@@ -1,5 +1,7 @@
-FE8_NAME: str = "Fire Emblem Sacred Stones"
-FE8_ID_PREFIX: int = 0xFE8_000
+CLIENT_TITLE = "FE8Client"
+FE8_NAME = "Fire Emblem Sacred Stones"
+
+FE8_ID_PREFIX = 0xFE8_000
 NUM_LEVELCAPS: int = (40 - 10) // 5
 
 HOLY_WEAPONS = {
