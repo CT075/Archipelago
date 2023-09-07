@@ -315,4 +315,3 @@ class FE8World(World):
 
     def generate_output(self, output_directory: str) -> None:
         generate_output(self.multiworld, self.player, output_directory, self.random)
-

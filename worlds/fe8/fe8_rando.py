@@ -186,11 +186,13 @@ class FE8Randomizer:
         ).id
 
     def randomize_chapter_unit(self, data_offset: int) -> None:
-        # We *could* load the full struct with python's [struct] module, but we
-        # only need a few individual bytes, so we may as well not.
+        # We *could* read the full struct, but we only need a few individual
+        # bytes, so we may as well extract them ad-hoc.
         unit = self.rom[data_offset : data_offset + 20]
         job_id = unit[1]
 
+        # If the unit's class is is not a "standard" class that can be given to
+        # players, it's probably some NPC or enemy that shouldn't be touched.
         if job_id not in self.jobs_by_id:
             return
 
