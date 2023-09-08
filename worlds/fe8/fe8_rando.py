@@ -1,4 +1,5 @@
 import pkgutil
+
 # We deliberately do not import [random] directly to ensure that all random
 # functions go through the multiworld rng seed.
 from random import Random
@@ -8,6 +9,7 @@ from dataclasses import dataclass
 from typing import Any, Self, Optional
 from enum import IntEnum
 
+# CR cam: Maybe these should go into [constants]?
 
 WEAPON_DATA_JSON = "data/weapondata.json"
 JOB_DATA_JSON = "data/jobdata.json"
@@ -18,14 +20,31 @@ INVENTORY_INDEX = 0xC
 INVENTORY_SIZE = 0x4
 CHARACTER_TABLE_OFFSET = 0x803D30
 
+# The named character offsets are used outside of `NOTABLE_NPCS`
+EIRIKA = 0x1
+# CR cam: TODO
+DOZLA_APPEARANCES = []
 ORSON_5X = 0x42
 ORSON_BOSS = 0x6D
+GLEN = 0x25
+VALTER_PROLOGUE = 0x45
+VALTER_BOSS = 0x43
 PABLO_10 = 0x4F
 PABLO_13 = 0x54
 LYON_17 = 0x40
 LYON_ENDGAME = 0x6C
 
-EIRIKA = 0x1
+NOTABLE_NPCS = {
+    GLEN,
+    0x57,  # Riev
+    0x44,  # Selena
+    0x53,  # Caellach
+    VALTER_PROLOGUE,
+    PABLO_10,
+    LYON_17,
+}
+
+SETH_PROLOGUE_UNIT = 0x8B3C14
 EIRIKA_RAPIER_OFFSET = 0x9EF088
 
 STEEL_BLADE = 0x6
@@ -194,7 +213,45 @@ class FE8Randomizer:
         # Dark has no E-ranked weapons, so we add Flux
         self.weapons_by_rank[WeaponRank.E].append(self.weapons_by_id[FLUX])
 
-    def select_new_item(self, job: JobData, item_id: int) -> int:
+    def unit_must_fight(self, offset: int, char: int) -> bool:
+        # It is clearer to check character id when possible, but sometimes we
+        # need to disambiguate between different instances of the same
+        # character (most frequently player characters that appear in unit maps
+        # later in the game).
+
+        # Prologue Valter must be able to fight Seth, and Seth must be able to
+        # fight back
+        if char == VALTER_PROLOGUE:
+            return True
+        if offset == SETH_PROLOGUE_UNIT:
+            return True
+        # At least one of Ephraim, Forde, Kyle and Orson should be able to
+        # fight. Orson is the natural choice, as he cannot be randomized into
+        # a staff-only class anyway.
+        #
+        # CR cam: In theory, if Ephraim/Forde/Kyle are all combatants, Orson
+        # may not have enough weapon uses to get through 5x..
+        if char == ORSON_5X:
+            return True
+        if char == GLEN:
+            return True
+        if offset in DOZLA_APPEARANCES:
+            return True
+        return False
+
+    def select_new_inventory(
+        self, job: JobData, items: bytes, at_least_one_weapon: bool
+    ) -> list[int]:
+        return [
+            # If `at_least_one_weapon`, we force the first item in inventory to
+            # be a weapon. In theory, this could be a vulnerary or some such,
+            # but all cases in which this would matter have a proper weapon
+            # there.
+            self.select_new_item(job, item_id, at_least_one_weapon and i != 0)
+            for i, item_id in enumerate(items)
+        ]
+
+    def select_new_item(self, job: JobData, item_id: int, force_weapon: bool):
         if item_id not in self.weapons_by_id:
             return item_id
 
@@ -205,6 +262,9 @@ class FE8Randomizer:
             for weap in self.weapons_by_rank[weapon_attrs.rank]
             if weap.kind in job.usable_weapons
         ]
+
+        if force_weapon:
+            choices = [choice for choice in choices if choice.kind != WeaponKind.STAFF]
 
         return self.random.choice(choices).id
 
@@ -230,22 +290,26 @@ class FE8Randomizer:
         if char in self.fixed_char_data:
             new_job = self.fixed_char_data[char]
         else:
-            new_job_pool = (
-                self.promoted_jobs if job.is_promoted else self.unpromoted_jobs
-            )
-            new_job = self.random.choice(new_job_pool)
+            if char == VALTER_BOSS:
+                new_job = self.fixed_char_data[VALTER_PROLOGUE]
+            elif char == ORSON_BOSS:
+                new_job = self.fixed_char_data[ORSON_5X]
+            elif char == PABLO_13:
+                new_job = self.fixed_char_data[PABLO_10]
+            elif char == LYON_ENDGAME:
+                new_job = self.fixed_char_data[LYON_17]
+            else:
+                new_job_pool = (
+                    self.promoted_jobs if job.is_promoted else self.unpromoted_jobs
+                )
+                new_job = self.random.choice(new_job_pool)
 
-            if is_player or char in [PABLO_10, LYON_17]:
+            if is_player or char in NOTABLE_NPCS:
                 self.fixed_char_data[char] = new_job
 
-        if char == ORSON_BOSS:
-            new_job = self.fixed_char_data[ORSON_5X]
-        if char == PABLO_13:
-            new_job = self.fixed_char_data[PABLO_10]
-        if char == LYON_ENDGAME:
-            new_job = self.fixed_char_data[LYON_17]
-
-        new_inventory = [self.select_new_item(new_job, item) for item in inventory]
+        new_inventory = self.select_new_inventory(
+            new_job, inventory, self.unit_must_fight(data_offset, char)
+        )
 
         self.rom[data_offset + 1] = new_job.id
         for i, item_id in enumerate(new_inventory):
@@ -266,23 +330,20 @@ class FE8Randomizer:
 
     # TODO: logic
     #   - Valter must be holding a weapon
-    #   - at least one of Eirika or Seth must be able to fight
-    #   - at least one of Ephraim/Forde/Kyle/Orson must be able to fight
     #   - at least one of L'Arachel or Dozla must be able to fight
     #   - Nudge Cormag to 5,15 (pre) and 6,13 (post) in Eirika 13
     #   - Nudge Cormag to 11,12 in Ephraim 10
     #   - Nudge Tana to 0,5
     #   - Nudge the chapter 2 brigands
-    #
-    # TODO: polish
-    #   - NPCs that appear in cutscenes (Caellach, Glen, Riev, etc) should have
-    #     the same class every time.
     def apply_changes(self) -> None:
+        # CR cam: This would be less messy if we encoded meaningful chapter
+        # information into `unit_blocks.json` instead of just having a giant
+        # bucket of offsets
         for block in self.unit_blocks:
             for i in range(block.count):
                 self.randomize_chapter_unit(block.base + i * CHAPTER_UNIT_SIZE)
 
         eirika_job = self.fixed_char_data[EIRIKA]
         # We give a random C-ranked weapon to Eirika to simulate the Rapier.
-        new_rapier = self.select_new_item(eirika_job, STEEL_BLADE)
+        new_rapier = self.select_new_item(eirika_job, STEEL_BLADE, False)
         self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
