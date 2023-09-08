@@ -1,7 +1,7 @@
 import pkgutil
-# This is renamed to catch any uses of the non-multiworld random functions.
-import random as rng
-from rng import Random
+# We deliberately do not import [random] directly to ensure that all random
+# functions go through the multiworld rng seed.
+from random import Random
 import json
 from collections import defaultdict
 from dataclasses import dataclass
@@ -18,15 +18,13 @@ INVENTORY_INDEX = 0xC
 INVENTORY_SIZE = 0x4
 CHARACTER_TABLE_OFFSET = 0x803D30
 
-# TODO: there are other recurring bosses, like Lyon and Valter
 ORSON_5X = 0x42
 ORSON_BOSS = 0x6D
-VALTER_PROLOGUE = 0x43
-VALTER_BOSS = 0x45
 PABLO_10 = 0x4F
 PABLO_13 = 0x54
 LYON_17 = 0x40
 LYON_ENDGAME = 0x6C
+
 EIRIKA = 0x1
 EIRIKA_RAPIER_OFFSET = 0x9EF088
 
@@ -237,13 +235,11 @@ class FE8Randomizer:
             )
             new_job = self.random.choice(new_job_pool)
 
-            if is_player:
+            if is_player or char in [PABLO_10, LYON_17]:
                 self.fixed_char_data[char] = new_job
 
         if char == ORSON_BOSS:
             new_job = self.fixed_char_data[ORSON_5X]
-        if char == VALTER_BOSS:
-            new_job = self.fixed_char_data[VALTER_PROLOGUE]
         if char == PABLO_13:
             new_job = self.fixed_char_data[PABLO_10]
         if char == LYON_ENDGAME:
@@ -279,8 +275,8 @@ class FE8Randomizer:
     #   - Nudge the chapter 2 brigands
     #
     # TODO: polish
-    #   - NPCs that appear frequently in cutscenes (Caellach, Glen, Riev, etc)
-    #     should have the same class every time.
+    #   - NPCs that appear in cutscenes (Caellach, Glen, Riev, etc) should have
+    #     the same class every time.
     def apply_changes(self) -> None:
         for block in self.unit_blocks:
             for i in range(block.count):

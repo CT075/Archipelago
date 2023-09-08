@@ -13,6 +13,10 @@ from .fe8_rando import FE8Randomizer
 BASE_PATCH = "data/base_patch.bsdiff4"
 PATCH_FILE_EXT = ".apfe8"
 
+# TODO: populate this into connector_config on basepatch build
+SLOT_NAME_OFFS = 0xEFCE78  # archipelagoInfo->slotName
+SUPER_DEMON_KING_OFFS = 0xEFCEB8  # archipelagoOptions->superDemonKing
+
 
 class FE8DeltaPatch(APDeltaPatch):
     game = FE8_NAME
@@ -39,14 +43,18 @@ def generate_output(
     base_patch = pkgutil.get_data(__name__, BASE_PATCH)
     patched_rom = bytearray(bsdiff4.patch(base_rom, base_patch))
 
-    # TODO: set self-locations
-
     randomizer = FE8Randomizer(rom=patched_rom, random=random)
     randomizer.apply_changes()
 
-    # TODO: slot settings
+    for location in multiworld.get_locations(player):
+        if location.item.player == player:
+            # TODO
+            pass
 
-    # TODO: set slot name
+    patched_rom[SUPER_DEMON_KING_OFFS] = int(bool(multiworld.super_demon_king[player]))
+
+    for i, byte in enumerate(multiworld.player_name[player].encode("utf-8")):
+        patched_rom[SLOT_NAME_OFFS + i] = byte
 
     outfile_player_name = f"_P{player}"
     outfile_player_name += (
