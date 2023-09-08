@@ -11,6 +11,18 @@ WEAPON_DATA_JSON = "data/weapondata.json"
 JOB_DATA_JSON = "data/jobdata.json"
 CHAPTER_UNIT_BLOCKS_JSON = "data/chapter_unit_blocks.json"
 
+CHAPTER_UNIT_SIZE = 20
+INVENTORY_INDEX = 0xC
+INVENTORY_SIZE = 0x4
+
+ORSON_5X = 0x42
+ORSON_BOSS = 0x6D
+EIRIKA = 0x1
+EIRIKA_RAPIER_OFFSET = 0x9EF088
+
+STEEL_BLADE = 0x6
+FLUX = 0x45
+
 
 @dataclass
 class UnitBlock:
@@ -171,24 +183,27 @@ class FE8Randomizer:
         for weap in self.weapons_by_id.values():
             self.weapons_by_rank[weap.rank].append(weap)
 
+        # Dark has no E-ranked weapons, so we add Flux
+        self.weapons_by_rank[WeaponRank.E].append(self.weapons_by_id[FLUX])
+
     def select_new_item(self, job: JobData, item_id: int) -> int:
         if item_id not in self.weapons_by_id:
             return item_id
 
         weapon_attrs: WeaponData = self.weapons_by_id[item_id]
 
-        return random.choice(
-            [
-                weap
-                for weap in self.weapons_by_rank[weapon_attrs.rank]
-                if weap.kind in job.usable_weapons
-            ]
-        ).id
+        choices = [
+            weap
+            for weap in self.weapons_by_rank[weapon_attrs.rank]
+            if weap.kind in job.usable_weapons
+        ]
+
+        return random.choice(choices).id
 
     def randomize_chapter_unit(self, data_offset: int) -> None:
         # We *could* read the full struct, but we only need a few individual
         # bytes, so we may as well extract them ad-hoc.
-        unit = self.rom[data_offset : data_offset + 20]
+        unit = self.rom[data_offset : data_offset + CHAPTER_UNIT_SIZE]
         job_id = unit[1]
 
         # If the unit's class is is not a "standard" class that can be given to
@@ -198,11 +213,11 @@ class FE8Randomizer:
 
         job = self.jobs_by_id[job_id]
         char = unit[0]
-        is_player = bool(unit[2] & 2)
-        inventory = unit[0x10:0x14]
+        # Affiliation = bits 1,2; unit is player if they're unset
+        is_player = not bool(unit[2] & 6)
+        inventory = unit[INVENTORY_INDEX : INVENTORY_INDEX + INVENTORY_SIZE]
 
         if char in self.assigned_player_classes:
-            # TODO: Orson
             new_job = self.assigned_player_classes[char]
         else:
             new_job_pool = (
@@ -213,13 +228,21 @@ class FE8Randomizer:
             if is_player:
                 self.assigned_player_classes[char] = new_job
 
-        new_inventory = [self.select_new_item(job, item) for item in inventory]
+        if char == ORSON_BOSS:
+            new_job = self.assigned_player_classes[ORSON_5X]
+
+        new_inventory = [self.select_new_item(new_job, item) for item in inventory]
 
         self.rom[data_offset + 1] = new_job.id
         for i, item_id in enumerate(new_inventory):
-            self.rom[data_offset + 0x10 + i] = item_id
+            self.rom[data_offset + INVENTORY_INDEX + i] = item_id
 
     def apply_changes(self) -> None:
         for block in self.unit_blocks:
             for i in range(block.count):
-                self.randomize_chapter_unit(block.base + i * 20)
+                self.randomize_chapter_unit(block.base + i * CHAPTER_UNIT_SIZE)
+
+        eirika_job = self.assigned_player_classes[EIRIKA]
+        # We give a random C-ranked weapon to Eirika to simulate the Rapier.
+        new_rapier = self.select_new_item(eirika_job, STEEL_BLADE)
+        self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
