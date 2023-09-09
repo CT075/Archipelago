@@ -20,9 +20,10 @@ INVENTORY_INDEX = 0xC
 INVENTORY_SIZE = 0x4
 CHARACTER_TABLE_OFFSET = 0x803D30
 
+PHANTOM_SHIP_BLOCK = 0x8C3E50
+
 # The named character offsets are used outside of `NOTABLE_NPCS`
 EIRIKA = 0x1
-# CR cam: TODO
 DOZLA_APPEARANCES = []
 ORSON_5X = 0x42
 ORSON_BOSS = 0x6D
@@ -233,8 +234,11 @@ class FE8Randomizer:
         # may not have enough weapon uses to get through 5x..
         if char == ORSON_5X:
             return True
+        # Glen must be able to fight Valter
         if char == GLEN:
             return True
+        # Dozla and L'arachel appear as NPCs a few times; he should be able to
+        # fight in both of them.
         if offset in DOZLA_APPEARANCES:
             return True
         return False
@@ -335,6 +339,8 @@ class FE8Randomizer:
     #   - Nudge Cormag to 11,12 in Ephraim 10
     #   - Nudge Tana to 0,5
     #   - Nudge the chapter 2 brigands
+    #   - Saleh/Innes and Duessel/Knoll need to be able to fight in Ch15
+    #   - Flying Duessel vs enemy archers in that Ephraim map may be unbeatable
     def apply_changes(self) -> None:
         # CR cam: This would be less messy if we encoded meaningful chapter
         # information into `unit_blocks.json` instead of just having a giant
