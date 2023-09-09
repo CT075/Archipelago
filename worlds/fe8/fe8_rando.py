@@ -6,13 +6,14 @@ from random import Random
 import json
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Self, Optional
+from typing import Any, Self, Optional, NamedTuple, Union
 from enum import IntEnum
 
 # CR cam: Maybe these should go into [constants]?
 
 WEAPON_DATA_JSON = "data/weapondata.json"
 JOB_DATA_JSON = "data/jobdata.json"
+CHARACTERS_JSON = "data/characters.json"
 CHAPTER_UNIT_BLOCKS_JSON = "data/chapter_unit_blocks.json"
 
 CHAPTER_UNIT_SIZE = 20
@@ -20,46 +21,16 @@ INVENTORY_INDEX = 0xC
 INVENTORY_SIZE = 0x4
 CHARACTER_TABLE_OFFSET = 0x803D30
 
-PHANTOM_SHIP_BLOCK = 0x8C3E50
-
-# The named character offsets are used outside of `NOTABLE_NPCS`
-EIRIKA = 0x1
-DOZLA_APPEARANCES = []
-ORSON_5X = 0x42
-ORSON_BOSS = 0x6D
-GLEN = 0x25
-VALTER_PROLOGUE = 0x45
-VALTER_BOSS = 0x43
-PABLO_10 = 0x4F
-PABLO_13 = 0x54
-LYON_17 = 0x40
-LYON_ENDGAME = 0x6C
-
-NOTABLE_NPCS = {
-    GLEN,
-    0x57,  # Riev
-    0x44,  # Selena
-    0x53,  # Caellach
-    VALTER_PROLOGUE,
-    PABLO_10,
-    LYON_17,
-}
-
-SETH_PROLOGUE_UNIT = 0x8B3C14
 EIRIKA_RAPIER_OFFSET = 0x9EF088
 
 STEEL_BLADE = 0x6
 FLUX = 0x45
 
 
-@dataclass
-class UnitBlock:
+class UnitBlock(NamedTuple):
+    name: str
     base: int
     count: int
-
-    @classmethod
-    def of_object(cls, obj: dict[str, Any]) -> Optional[Self]:
-        return UnitBlock(base=int(obj["base"], 16), count=obj["count"])
 
 
 class WeaponKind(IntEnum):
@@ -166,25 +137,71 @@ class JobData:
         )
 
 
+class CharacterStore:
+    names_by_id: dict[int, str]
+    jobs_by_name: dict[str, JobData]
+
+    def __init__(self, char_ids: dict[str, list[int]]):
+        self.names_by_id = {}
+
+        for name, ids in char_ids.items():
+            for i in ids:
+                self.names_by_id[i] = name
+
+        self.jobs_by_name = {}
+
+    def lookup_name(self, char_id: int):
+        if char_id not in self.names_by_id:
+            return None
+        return self.names_by_id[char_id]
+
+    def __setitem__(self, char: Union[int, str], job: JobData):
+        if isinstance(char, int):
+            if char not in self.names_by_id:
+                return
+            name = self.names_by_id[char]
+        else:
+            name = char
+        self.jobs_by_name[name] = job
+
+    def __getitem__(self, char: Union[int, str]):
+        name = char if isinstance(char, str) else self.names_by_id[char]
+        return self.jobs_by_name[name]
+
+    def __contains__(self, char: Union[int, str]):
+        if isinstance(char, int):
+            if char not in self.names_by_id:
+                return False
+            name = self.names_by_id[char]
+        else:
+            name = char
+
+        return name in self.jobs_by_name
+
+
 # TODO: ensure that all the progression weapons are usable
 class FE8Randomizer:
-    unit_blocks: list[UnitBlock]
+    unit_blocks: dict[str, UnitBlock]
     weapons_by_id: dict[int, WeaponData]
     weapons_by_rank: dict[WeaponRank, list[WeaponData]]
+    recurring_characters: CharacterStore
     jobs_by_id: dict[int, JobData]
     promoted_jobs: list[JobData]
     unpromoted_jobs: list[JobData]
-    fixed_char_data: dict[int, int]
     random: Random
     rom: bytearray
 
     def __init__(self, rom: bytearray, random: Random):
         self.random = random
         self.rom = rom
-        self.unit_blocks = json.loads(
+        unit_blocks = json.loads(
             pkgutil.get_data(__name__, CHAPTER_UNIT_BLOCKS_JSON).decode("utf-8"),
-            object_hook=UnitBlock.of_object,
         )
+        self.unit_blocks = {
+            name: [UnitBlock(**block) for block in blocks]
+            for name, blocks in unit_blocks.items()
+        }
+
         item_data = json.loads(
             pkgutil.get_data(__name__, WEAPON_DATA_JSON).decode("utf-8"),
             object_hook=WeaponData.of_object,
@@ -198,7 +215,11 @@ class FE8Randomizer:
         # TODO: handle these properly
         job_data = [job for job in job_data if job.usable_weapons]
 
-        self.fixed_char_data = dict()
+        self.recurring_characters = CharacterStore(
+            json.loads(
+                pkgutil.get_data(__name__, CHARACTERS_JSON).decode("utf-8"),
+            )
+        )
 
         self.weapons_by_id = {item.id: item for item in item_data}
         self.jobs_by_id = {job.id: job for job in job_data}
@@ -214,33 +235,37 @@ class FE8Randomizer:
         # Dark has no E-ranked weapons, so we add Flux
         self.weapons_by_rank[WeaponRank.E].append(self.weapons_by_id[FLUX])
 
-    def unit_must_fight(self, offset: int, char: int) -> bool:
-        # It is clearer to check character id when possible, but sometimes we
-        # need to disambiguate between different instances of the same
-        # character (most frequently player characters that appear in unit maps
-        # later in the game).
+    def unit_must_fight(self, offset: int, char_id: int, chapter_name: str) -> bool:
+        char = self.recurring_characters.lookup_name(char_id)
+
+        if char is None:
+            return False
 
         # Prologue Valter must be able to fight Seth, and Seth must be able to
         # fight back
-        if char == VALTER_PROLOGUE:
-            return True
-        if offset == SETH_PROLOGUE_UNIT:
-            return True
+        if chapter_name == "Prologue":
+            if char in ["Seth", "Valter"]:
+                return True
+
         # At least one of Ephraim, Forde, Kyle and Orson should be able to
         # fight. Orson is the natural choice, as he cannot be randomized into
         # a staff-only class anyway.
         #
         # CR cam: In theory, if Ephraim/Forde/Kyle are all combatants, Orson
         # may not have enough weapon uses to get through 5x..
-        if char == ORSON_5X:
-            return True
+        if chapter_name == "Ch5x":
+            if char == "Orson":
+                return True
+
         # Glen must be able to fight Valter
-        if char == GLEN:
+        if char == "Glen":
             return True
+
         # Dozla and L'arachel appear as NPCs a few times; he should be able to
         # fight in both of them.
-        if offset in DOZLA_APPEARANCES:
+        if char == "Dozla":
             return True
+
         return False
 
     def select_new_inventory(
@@ -272,7 +297,7 @@ class FE8Randomizer:
 
         return self.random.choice(choices).id
 
-    def randomize_chapter_unit(self, data_offset: int) -> None:
+    def randomize_chapter_unit(self, data_offset: int, chapter_name: str) -> None:
         # We *could* read the full struct, but we only need a few individual
         # bytes, so we may as well extract them ad-hoc.
         unit = self.rom[data_offset : data_offset + CHAPTER_UNIT_SIZE]
@@ -291,28 +316,18 @@ class FE8Randomizer:
         autolevel = unit[2] & 1
         inventory = unit[INVENTORY_INDEX : INVENTORY_INDEX + INVENTORY_SIZE]
 
-        if char in self.fixed_char_data:
-            new_job = self.fixed_char_data[char]
+        if char in self.recurring_characters:
+            new_job = self.recurring_characters[char]
         else:
-            if char == VALTER_BOSS:
-                new_job = self.fixed_char_data[VALTER_PROLOGUE]
-            elif char == ORSON_BOSS:
-                new_job = self.fixed_char_data[ORSON_5X]
-            elif char == PABLO_13:
-                new_job = self.fixed_char_data[PABLO_10]
-            elif char == LYON_ENDGAME:
-                new_job = self.fixed_char_data[LYON_17]
-            else:
-                new_job_pool = (
-                    self.promoted_jobs if job.is_promoted else self.unpromoted_jobs
-                )
-                new_job = self.random.choice(new_job_pool)
+            new_job_pool = (
+                self.promoted_jobs if job.is_promoted else self.unpromoted_jobs
+            )
+            new_job = self.random.choice(new_job_pool)
 
-            if is_player or char in NOTABLE_NPCS:
-                self.fixed_char_data[char] = new_job
+            self.recurring_characters[char] = new_job
 
         new_inventory = self.select_new_inventory(
-            new_job, inventory, self.unit_must_fight(data_offset, char)
+            new_job, inventory, self.unit_must_fight(data_offset, char, chapter_name)
         )
 
         self.rom[data_offset + 1] = new_job.id
@@ -342,14 +357,15 @@ class FE8Randomizer:
     #   - Saleh/Innes and Duessel/Knoll need to be able to fight in Ch15
     #   - Flying Duessel vs enemy archers in that Ephraim map may be unbeatable
     def apply_changes(self) -> None:
-        # CR cam: This would be less messy if we encoded meaningful chapter
-        # information into `unit_blocks.json` instead of just having a giant
-        # bucket of offsets
-        for block in self.unit_blocks:
-            for i in range(block.count):
-                self.randomize_chapter_unit(block.base + i * CHAPTER_UNIT_SIZE)
+        for chapter_name, chapter in self.unit_blocks.items():
+            for block in chapter:
+                for i in range(block.count):
+                    self.randomize_chapter_unit(
+                        block.base + i * CHAPTER_UNIT_SIZE, chapter_name=chapter_name
+                    )
 
-        eirika_job = self.fixed_char_data[EIRIKA]
+        eirika_job = self.recurring_characters["Eirika"]
+
         # We give a random C-ranked weapon to Eirika to simulate the Rapier.
         new_rapier = self.select_new_item(eirika_job, STEEL_BLADE, False)
         self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
