@@ -55,7 +55,7 @@ def write_short_le(data: bytearray, addr: int, val: int):
 
 
 def rom_location(loc: FE8Location):
-    return LOCATION_INFO_OFFS + loc.local_id * LOCATION_INFO_SIZE
+    return LOCATION_INFO_OFFS + loc.local_address * LOCATION_INFO_SIZE
 
 
 def generate_output(
@@ -104,4 +104,4 @@ def generate_output(
         patched_path=output_path,
     )
     patch.write()
-    # os.unlink(output_path)
+    os.unlink(output_path)

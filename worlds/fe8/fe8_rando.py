@@ -27,7 +27,8 @@ STEEL_BLADE = 0x6
 FLUX = 0x45
 
 
-class UnitBlock(NamedTuple):
+@dataclass
+class UnitBlock:
     name: str
     base: int
     count: int
