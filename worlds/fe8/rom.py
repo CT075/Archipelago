@@ -7,7 +7,8 @@ from BaseClasses import MultiWorld
 from worlds.Files import APDeltaPatch
 from settings import get_settings
 
-from .constants import FE8_NAME
+from .locations import FE8Location
+from .constants import FE8_NAME, FE8_ID_PREFIX
 from .fe8_rando import FE8Randomizer
 
 BASE_PATCH = "data/base_patch.bsdiff4"
@@ -16,6 +17,13 @@ PATCH_FILE_EXT = ".apfe8"
 # TODO: populate this into connector_config on basepatch build
 SLOT_NAME_OFFS = 0xEFCE78  # archipelagoInfo->slotName
 SUPER_DEMON_KING_OFFS = 0xEFCEB8  # archipelagoOptions->superDemonKing
+
+# TODO: move this into `locations.py`
+LOCATION_INFO_OFFS = 0xEFCEBC
+LOCATION_INFO_SIZE = 4
+
+AP_ITEM_KIND = 1
+SELF_ITEM_KIND = 2
 
 
 class FE8DeltaPatch(APDeltaPatch):
@@ -36,6 +44,20 @@ def get_base_rom_as_bytes() -> bytes:
     return base_rom_bytes
 
 
+def write_bytes_le(data: bytearray, addr: int, val: int, size: int):
+    for offset in range(size):
+        data[addr + offset] = val & 0xFF
+        val = val >> 8
+
+
+def write_short_le(data: bytearray, addr: int, val: int):
+    write_bytes_le(data, addr, val, 2)
+
+
+def rom_location(loc: FE8Location):
+    return LOCATION_INFO_OFFS + loc.local_id * LOCATION_INFO_SIZE
+
+
 def generate_output(
     multiworld: MultiWorld, player: int, output_dir: str, random: Random
 ) -> None:
@@ -47,9 +69,16 @@ def generate_output(
     randomizer.apply_changes()
 
     for location in multiworld.get_locations(player):
-        if location.item.player == player:
-            # TODO
-            pass
+        rom_loc = rom_location(location)
+        if location.item and location.item.player == player:
+            write_short_le(patched_rom, rom_loc, SELF_ITEM_KIND)
+            write_short_le(
+                patched_rom,
+                rom_loc + 2,
+                location.item.code - FE8_ID_PREFIX,
+            )
+        else:
+            write_short_le(patched_rom, rom_loc, AP_ITEM_KIND)
 
     patched_rom[SUPER_DEMON_KING_OFFS] = int(bool(multiworld.super_demon_king[player]))
 

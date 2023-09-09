@@ -31,6 +31,7 @@ class UnitBlock(NamedTuple):
     name: str
     base: int
     count: int
+    tags: list[str]
 
 
 class WeaponKind(IntEnum):
@@ -347,6 +348,12 @@ class FE8Randomizer:
                 rank = self.rom[boss_wrank_addr]
                 self.rom[boss_wrank_addr] = max(rank, weapon.rank)
 
+    def randomize_block(self, block: UnitBlock, chapter_name: str):
+        for i in range(block.count):
+            self.randomize_chapter_unit(
+                block.base + i * CHAPTER_UNIT_SIZE, chapter_name=chapter_name
+            )
+
     # TODO: logic
     #   - Valter must be holding a weapon
     #   - at least one of L'Arachel or Dozla must be able to fight
@@ -359,10 +366,7 @@ class FE8Randomizer:
     def apply_changes(self) -> None:
         for chapter_name, chapter in self.unit_blocks.items():
             for block in chapter:
-                for i in range(block.count):
-                    self.randomize_chapter_unit(
-                        block.base + i * CHAPTER_UNIT_SIZE, chapter_name=chapter_name
-                    )
+                self.randomize_block(block, chapter_name=chapter_name)
 
         eirika_job = self.recurring_characters["Eirika"]
 
