@@ -58,13 +58,15 @@ try:
 
     if not os.path.exists(connector_script_path):
         with open(connector_script_path, "wb") as connector_script_file:
-            connector_script_file.write(
-                pkgutil.get_data(__name__, "data/fe8_connector.lua")
-            )
+            connector = pkgutil.get_data(__name__, "data/fe8_connector.lua")
+            if connector is None:
+                raise IOError
+            connector_script_file.write(connector)
     else:
         with open(connector_script_path, "rb+") as connector_script_file:
             expected_script = pkgutil.get_data(__name__, "data/fe8_connector.lua")
-
+            if expected_script is None:
+                raise IOError
             expected_hash = hashlib.md5(expected_script).digest()
             existing_hash = hashlib.md5(connector_script_file.read()).digest()
 

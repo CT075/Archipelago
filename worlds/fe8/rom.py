@@ -7,6 +7,7 @@ from BaseClasses import MultiWorld
 from worlds.Files import APDeltaPatch
 from settings import get_settings
 
+from .items import FE8Item
 from .locations import FE8Location
 from .constants import FE8_NAME, FE8_ID_PREFIX
 from .fe8_rando import FE8Randomizer
@@ -69,13 +70,15 @@ def generate_output(
     randomizer.apply_changes()
 
     for location in multiworld.get_locations(player):
+        assert isinstance(location, FE8Location)
         rom_loc = rom_location(location)
         if location.item and location.item.player == player:
+            assert isinstance(location.item, FE8Item)
             write_short_le(patched_rom, rom_loc, SELF_ITEM_KIND)
             write_short_le(
                 patched_rom,
                 rom_loc + 2,
-                location.item.code - FE8_ID_PREFIX,
+                location.item.local_code
             )
         else:
             write_short_le(patched_rom, rom_loc, AP_ITEM_KIND)
@@ -104,4 +107,4 @@ def generate_output(
         patched_path=output_path,
     )
     patch.write()
-    os.unlink(output_path)
+    #os.unlink(output_path)

@@ -12,4 +12,4 @@ class FE8Location(Location):
     def __init__(self, player: int, name, address: int, parent):
         super(FE8Location, self).__init__(player, name, FE8_ID_PREFIX + address, parent)
         self.local_address = address
-        self.event = None
+        self.event = False
