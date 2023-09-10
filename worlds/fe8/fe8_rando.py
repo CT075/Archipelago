@@ -346,15 +346,17 @@ class FE8Randomizer:
             nudge = logic["nudge"]
             if "start" in nudge:
                 x, y = nudge["start"]
-                start_addr = data_offset + COORDS_INDEX
-                self.rewrite_coords(start_addr, x, y)
+                start_offs = data_offset + COORDS_INDEX
+                self.rewrite_coords(start_offs, x, y)
 
             if "end" in nudge:
-                # TODO: check if we ever need to deal with multiple REDAs?
-                end_addr = read_word_le(self.rom, data_offset + REDA_PTR_INDEX)
-                end_addr -= ROM_BASE_ADDRESS
+                reda_count = self.rom[data_offset + REDA_COUNT_INDEX]
+                redas_addr = read_word_le(self.rom, data_offset + REDA_PTR_INDEX)
+                end_addr = redas_addr + (reda_count - 1) * 8
+
+                end_offs = end_addr - ROM_BASE_ADDRESS
                 x, y = nudge["end"]
-                self.rewrite_coords(end_addr, x, y)
+                self.rewrite_coords(end_offs, x, y)
 
     def randomize_block(self, block: UnitBlock):
         for i in range(block.count):
