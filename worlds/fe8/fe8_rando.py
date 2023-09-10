@@ -1,13 +1,12 @@
-import pkgutil
-
 # We deliberately do not import [random] directly to ensure that all random
 # functions go through the multiworld rng seed.
 from random import Random
-import json
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, TypeVar, Callable, Union, Optional
+from typing import Any, Union
 from enum import IntEnum
+
+from .util import fetch_json, write_short_le, read_short_le, read_word_le
 
 # CR cam: Maybe these should go into [constants]?
 
@@ -16,33 +15,27 @@ JOB_DATA = "data/jobdata.json"
 CHARACTERS = "data/characters.json"
 CHAPTER_UNIT_BLOCKS = "data/chapter_unit_blocks.json"
 
-T = TypeVar("T")
-
-
-def fetch_json(
-    path: str, object_hook: Optional[Callable[[dict[str, Any]], T]] = None
-) -> Any:
-    data = pkgutil.get_data(__name__, path)
-    if data is None:
-        raise FileNotFoundError
-    return json.loads(data.decode("utf-8"), object_hook=object_hook)
-
+ROM_BASE_ADDRESS = 0x08000000
 
 CHAPTER_UNIT_SIZE = 20
 INVENTORY_INDEX = 0xC
 INVENTORY_SIZE = 0x4
+COORDS_INDEX = 4
+REDA_COUNT_INDEX = 7
+REDA_PTR_INDEX = 8
+
 CHARACTER_TABLE_OFFSET = 0x803D30
 CHARACTER_SIZE = 52
 CHARACTER_WRANK_BASE = 20
 
 EIRIKA_RAPIER_OFFSET = 0x9EF088
-BONE_COORDS_OFFSET = 0x9F0310
+BONE_COORDS_OFFSET = 0x9F0372
 
 STEEL_BLADE = 0x6
 FLUX = 0x45
 
 
-def encode_reda_coords(x: int, y: int) -> int:
+def encode_unit_coords(x: int, y: int) -> int:
     return y << 6 | x
 
 
@@ -295,6 +288,12 @@ class FE8Randomizer:
             self.select_new_item(job, item_id, logic) for i, item_id in enumerate(items)
         ]
 
+    def rewrite_coords(self, offset: int, x: int, y: int):
+        old_coords = read_short_le(self.rom, offset)
+        flags = old_coords & 0b1111000000000000
+        new_coords = encode_unit_coords(x, y)
+        write_short_le(self.rom, offset, new_coords | flags)
+
     def randomize_chapter_unit(self, data_offset: int, logic: dict[str, Any]) -> None:
         # We *could* read the full struct, but we only need a few individual
         # bytes, so we may as well extract them ad-hoc.
@@ -314,9 +313,7 @@ class FE8Randomizer:
         autolevel = unit[3] & 1
         inventory = unit[INVENTORY_INDEX : INVENTORY_INDEX + INVENTORY_SIZE]
 
-        if char == 0x45:
-            new_job = self.jobs_by_id[27]
-        elif char in self.character_store:
+        if char in self.character_store:
             new_job = self.character_store[char]
         else:
             new_job_pool = (
@@ -345,6 +342,20 @@ class FE8Randomizer:
                 rank = self.rom[boss_wrank_addr]
                 self.rom[boss_wrank_addr] = max(rank, weapon.rank)
 
+        if "nudge" in logic:
+            nudge = logic["nudge"]
+            if "start" in nudge:
+                x, y = nudge["start"]
+                start_addr = data_offset + COORDS_INDEX
+                self.rewrite_coords(start_addr, x, y)
+
+            if "end" in nudge:
+                # TODO: check if we ever need to deal with multiple REDAs?
+                end_addr = read_word_le(self.rom, data_offset + REDA_PTR_INDEX)
+                end_addr -= ROM_BASE_ADDRESS
+                x, y = nudge["end"]
+                self.rewrite_coords(end_addr, x, y)
+
     def randomize_block(self, block: UnitBlock):
         for i in range(block.count):
             self.randomize_chapter_unit(
@@ -360,10 +371,11 @@ class FE8Randomizer:
 
         # The chapter 2 boss moves to an inaccessible mountain tile after his
         # pre-map dialogue.
-        self.rom[BONE_COORDS_OFFSET] = 10
-        self.rom[BONE_COORDS_OFFSET] = 8
+        self.rom[BONE_COORDS_OFFSET] = 6
+        self.rom[BONE_COORDS_OFFSET + 1] = 8
 
     # TODO: logic
+    #   - Ross and Garcia should be able to fight
     #   - at least one of L'Arachel or Dozla must be able to fight
     #   - Nudge Cormag to 5,15 (pre) and 6,13 (post) in Eirika 13
     #   - Nudge Cormag to 11,12 in Ephraim 10

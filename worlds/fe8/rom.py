@@ -9,7 +9,8 @@ from settings import get_settings
 
 from .items import FE8Item
 from .locations import FE8Location
-from .constants import FE8_NAME, FE8_ID_PREFIX
+from .constants import FE8_NAME
+from .util import write_short_le
 from .fe8_rando import FE8Randomizer
 
 BASE_PATCH = "data/base_patch.bsdiff4"
@@ -43,16 +44,6 @@ def get_base_rom_as_bytes() -> bytes:
         base_rom_bytes = bytes(infile.read())
 
     return base_rom_bytes
-
-
-def write_bytes_le(data: bytearray, addr: int, val: int, size: int):
-    for offset in range(size):
-        data[addr + offset] = val & 0xFF
-        val = val >> 8
-
-
-def write_short_le(data: bytearray, addr: int, val: int):
-    write_bytes_le(data, addr, val, 2)
 
 
 def rom_location(loc: FE8Location):

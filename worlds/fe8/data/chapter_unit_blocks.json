@@ -335,8 +335,8 @@
             "base": 9126724,
             "count": 6,
             "logic": {
-                "0": {"nudge": {"REDA": true, "dst": [5, 5]}},
-                "4": {"nudge": {"REDA": true, "dst": [3, 7]}}
+                "0": {"nudge": {"start": [10,10], "end": [5, 5]}},
+                "4": {"nudge": {"start": [10,11], "end": [3, 7]}}
             }
         },
         {"name": "label28", "base": 9126924, "count": 1, "logic": {}},
