@@ -297,7 +297,7 @@
       "Lance"
     ],
     "is_promoted": false,
-    "tags": []
+    "tags": [ "flying" ]
   },
   {
     "id": 32,
@@ -306,7 +306,7 @@
       "Lance"
     ],
     "is_promoted": false,
-    "tags": []
+    "tags": [ "flying" ]
   },
   {
     "id": 33,
@@ -316,7 +316,7 @@
       "Lance"
     ],
     "is_promoted": true,
-    "tags": []
+    "tags": [ "flying" ]
   },
   {
     "id": 34,
@@ -326,7 +326,7 @@
       "Lance"
     ],
     "is_promoted": true,
-    "tags": []
+    "tags": [ "flying" ]
   },
   {
     "id": 35,
@@ -335,7 +335,7 @@
       "Lance"
     ],
     "is_promoted": true,
-    "tags": []
+    "tags": [ "flying" ]
   },
   {
     "id": 36,
@@ -344,7 +344,7 @@
       "Lance"
     ],
     "is_promoted": true,
-    "tags": []
+    "tags": [ "flying" ]
   },
   {
     "id": 37,
@@ -524,7 +524,7 @@
     "is_promoted": true,
     "tags": [
       "special",
-      "cannot_fight"
+      "flying"
     ]
   },
   {
@@ -534,12 +534,12 @@
     "is_promoted": false,
     "tags": [
       "special",
-      "cannot_fight"
+      "flying"
     ]
   },
   {
-    "id": 61,
-    "name": "Journeyman (1)",
+    "id": 126,
+    "name": "Journeyman (2)",
     "usable_weapons": [
       "Axe"
     ],
@@ -549,8 +549,8 @@
     ]
   },
   {
-    "id": 62,
-    "name": "Pupil (1)",
+    "id": 127,
+    "name": "Pupil (2)",
     "usable_weapons": [
       "Anima"
     ],
@@ -635,8 +635,8 @@
     ]
   },
   {
-    "id": 71,
-    "name": "Recruit (1)",
+    "id": 55,
+    "name": "Recruit (2)",
     "usable_weapons": [
       "Lance"
     ],
@@ -652,7 +652,7 @@
       "Lance"
     ],
     "is_promoted": false,
-    "tags": []
+    "tags": [ "flying" ]
   },
   {
     "id": 73,
@@ -662,7 +662,7 @@
       "Lance"
     ],
     "is_promoted": true,
-    "tags": []
+    "tags": [ "flying" ]
   },
   {
     "id": 74,
@@ -882,7 +882,8 @@
     "is_promoted": false,
     "tags": [
       "monster",
-      "special"
+      "special",
+      "flying"
     ]
   },
   {
@@ -894,7 +895,8 @@
     "is_promoted": true,
     "tags": [
       "monster",
-      "special"
+      "special",
+      "flying"
     ]
   },
   {
@@ -918,7 +920,8 @@
     "is_promoted": false,
     "tags": [
       "monster",
-      "special"
+      "special",
+      "flying"
     ]
   },
   {
@@ -930,7 +933,8 @@
     "is_promoted": true,
     "tags": [
       "monster",
-      "special"
+      "special",
+      "flying"
     ]
   },
   {
@@ -939,7 +943,6 @@
     "usable_weapons": [],
     "is_promoted": true,
     "tags": [
-      "cannot_fight"
     ]
   },
   {

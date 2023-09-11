@@ -39,6 +39,13 @@ def encode_unit_coords(x: int, y: int) -> int:
     return y << 6 | x
 
 
+def int_if_possible(x: str) -> Union[int, str]:
+    try:
+        return int(x)
+    except ValueError:
+        return x
+
+
 class UnitBlock:
     name: str
     base: int
@@ -47,15 +54,17 @@ class UnitBlock:
     # Currently, the names of blocks in `chapter_unit_blocks.json` are all
     # automatically generated from chapter event disassembly and are tagged
     # with any relevant information about the block. However,
-    logic: defaultdict[int, dict[str, Any]]
+    logic: defaultdict[Union[int, str], dict[str, Any]]
 
     def __init__(
-        self, name: str, base: int, count: int, logic: dict[int, dict[str, Any]]
+        self, name: str, base: int, count: int, logic: dict[str, dict[str, Any]]
     ):
         self.name = name
         self.base = base
         self.count = count
-        self.logic = defaultdict(dict, {int(k): v for k, v in logic.items()})
+        self.logic = defaultdict(
+            dict, {int_if_possible(k): v for k, v in logic.items()}
+        )
 
 
 class WeaponKind(IntEnum):
@@ -99,6 +108,34 @@ class WeaponKind(IntEnum):
                 return WeaponKind.RING
             case "Dragonstone":
                 return WeaponKind.DRAGONSTONE
+        raise ValueError
+
+    def damaging(self) -> bool:
+        match self:
+            case WeaponKind.SWORD:
+                return True
+            case WeaponKind.LANCE:
+                return True
+            case WeaponKind.AXE:
+                return True
+            case WeaponKind.BOW:
+                return True
+            case WeaponKind.STAFF:
+                return False
+            case WeaponKind.ANIMA:
+                return True
+            case WeaponKind.LIGHT:
+                return True
+            case WeaponKind.DARK:
+                return True
+            case WeaponKind.ITEM:
+                return False
+            case WeaponKind.MONSTER_WEAPON:
+                return True
+            case WeaponKind.RING:
+                return False
+            case WeaponKind.DRAGONSTONE:
+                return True
         raise ValueError
 
 
@@ -206,6 +243,21 @@ class CharacterStore:
             name = char
 
         return name in self.jobs_by_name
+
+
+def job_valid(job: JobData, logic: dict[str, Any]) -> bool:
+    if "must_fly" in logic and "flying" not in job.tags:
+        return False
+
+    if "no_fly" in logic and "flying" in job.tags:
+        return False
+
+    if "must_fight" in logic and all(
+        not wtype.damaging() for wtype in job.usable_weapons
+    ):
+        return False
+
+    return True
 
 
 def weapon_valid(weapon: WeaponData, logic: dict[str, Any]) -> bool:
@@ -319,7 +371,9 @@ class FE8Randomizer:
             new_job_pool = (
                 self.promoted_jobs if job.is_promoted else self.unpromoted_jobs
             )
-            new_job = self.random.choice(new_job_pool)
+            new_job = self.random.choice(
+                [job for job in new_job_pool if job_valid(job, logic)]
+            )
 
             self.character_store[char] = new_job
 
@@ -359,6 +413,12 @@ class FE8Randomizer:
                 self.rewrite_coords(end_offs, x, y)
 
     def randomize_block(self, block: UnitBlock):
+        if "must_fight" in block.logic:
+            for i in self.random.sample(
+                range(block.count), block.logic["must_fight"]["at_least"]
+            ):
+                block.logic[i]["must_fight"] = True
+
         for i in range(block.count):
             self.randomize_chapter_unit(
                 block.base + i * CHAPTER_UNIT_SIZE, block.logic[i]
@@ -377,12 +437,10 @@ class FE8Randomizer:
         self.rom[BONE_COORDS_OFFSET + 1] = 8
 
     # TODO: logic
-    #   - Ross and Garcia should be able to fight
     #   - at least one of L'Arachel or Dozla must be able to fight
     #   - Nudge Cormag to 5,15 (pre) and 6,13 (post) in Eirika 13
     #   - Nudge Cormag to 11,12 in Ephraim 10
     #   - Nudge Tana to 0,5
-    #   - Saleh/Innes and Duessel/Knoll need to be able to fight in Ch15
     #   - Flying Duessel vs enemy archers in that Ephraim map may be unbeatable
     def apply_changes(self) -> None:
         for _chapter_name, chapter in self.unit_blocks.items():

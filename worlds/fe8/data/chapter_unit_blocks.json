@@ -23,7 +23,14 @@
         {"name": "label50", "base": 9186668, "count": 6, "logic": {}},
         {"name": "label60", "base": 9186808, "count": 1, "logic": {}},
         {"name": "label45", "base": 9186848, "count": 14, "logic": {}},
-        {"name": "label49", "base": 9187248, "count": 4, "logic": {}},
+        {
+            "name": "label49",
+            "base": 9187248,
+            "count": 4,
+            "logic": {
+                "0": {"must_fight": true, "no_fly": true}
+            }
+        },
         {"name": "label52", "base": 9187408, "count": 3, "logic": {}},
         {"name": "label46", "base": 9187688, "count": 4, "logic": {}},
         {"name": "label47", "base": 9187788, "count": 1, "logic": {}},
@@ -159,13 +166,29 @@
         {"name": "Units1", "base": 9160208, "count": 12, "logic": {}},
         {"name": "label48", "base": 9160468, "count": 40, "logic": {}},
         {"name": "label50", "base": 9161288, "count": 6, "logic": {}},
-        {"name": "label52", "base": 9161428, "count": 3, "logic": {}}
+        {
+            "name": "label52",
+            "base": 9161428,
+            "count": 3,
+            "logic": {
+                "0": {"must_fight": true},
+                "2": {"must_fight": true}
+            }
+        }
     ],
     "Ch15Eph": [
         {"name": "Units1", "base": 9203220, "count": 12, "logic": {}},
         {"name": "label45", "base": 9203480, "count": 42, "logic": {}},
         {"name": "label52", "base": 9204340, "count": 3, "logic": {}},
-        {"name": "label54", "base": 9204420, "count": 3, "logic": {}},
+        {
+            "name": "label54",
+            "base": 9204420,
+            "count": 3,
+            "logic": {
+                "1": {"must_fight": true},
+                "2": {"must_fight": true}
+            }
+        },
         {"name": "label47", "base": 9204960, "count": 2, "logic": {}},
         {"name": "label48", "base": 9205020, "count": 8, "logic": {}},
         {"name": "label46", "base": 9205200, "count": 1, "logic": {}}
@@ -341,7 +364,12 @@
         },
         {"name": "label28", "base": 9126924, "count": 1, "logic": {}},
         {"name": "label32", "base": 9126964, "count": 2, "logic": {}},
-        {"name": "label30", "base": 9127084, "count": 1, "logic": {}}
+        {
+            "name": "label30",
+            "base": 9127084,
+            "count": 1,
+            "logic": {"1": {"must_fight": true}}
+        }
     ],
     "Ch3": [
         {"name": "Units1", "base": 9127284, "count": 9, "logic": {}},
@@ -380,7 +408,14 @@
         {"name": "label45", "base": 9140364, "count": 1, "logic": {}}
     ],
     "Ch5x": [
-        {"name": "Units1", "base": 9132644, "count": 4, "logic": {}},
+        {
+          "name": "Units1",
+          "base": 9132644,
+          "count": 4,
+          "logic": {
+              "must_fight": { "at_least": 2 }
+          }
+        },
         {"name": "label22", "base": 9132744, "count": 31, "logic": {}},
         {"name": "label23", "base": 9133384, "count": 3, "logic": {}},
         {"name": "label18", "base": 9133484, "count": 3, "logic": {}},
