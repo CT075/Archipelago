@@ -23,15 +23,17 @@
         {"name": "label50", "base": 9186668, "count": 6, "logic": {}},
         {"name": "label60", "base": 9186808, "count": 1, "logic": {}},
         {"name": "label45", "base": 9186848, "count": 14, "logic": {}},
+        {"name": "label49", "base": 9187248, "count": 4, "logic": {}},
         {
-            "name": "label49",
-            "base": 9187248,
-            "count": 4,
+            "name": "label52",
+            "base": 9187408,
+            "count": 3,
             "logic": {
-                "0": {"must_fight": true, "no_fly": true}
+                "0": {"nudges": {}},
+                "1": {"must_fly": true},
+                "2": {"must_fly": true}
             }
         },
-        {"name": "label52", "base": 9187408, "count": 3, "logic": {}},
         {"name": "label46", "base": 9187688, "count": 4, "logic": {}},
         {"name": "label47", "base": 9187788, "count": 1, "logic": {}},
         {"name": "label48", "base": 9187828, "count": 3, "logic": {}},
@@ -54,16 +56,36 @@
     "Ch11Eir": [
         {"name": "Units1", "base": 9148564, "count": 11, "logic": {}},
         {"name": "label34", "base": 9148804, "count": 41, "logic": {}},
-        {"name": "label33", "base": 9149644, "count": 2, "logic": {}},
+        {
+            "name": "label33",
+            "base": 9149644,
+            "count": 2,
+            "logic": {"must_fight": {"at_least": 1}}
+        },
         {"name": "label31", "base": 9149984, "count": 6, "logic": {}},
-        {"name": "label38", "base": 9150228, "count": 8, "logic": {}},
+        {
+            "name": "label38",
+            "base": 9150228,
+            "count": 8,
+            "logic": {"5": {"must_fight": true}}
+        },
         {"name": "label39", "base": 9150408, "count": 3, "logic": {}},
         {"name": "label37", "base": 9150488, "count": 1, "logic": {}}
     ],
     "Ch11Eph": [
         {"name": "Units1", "base": 9190992, "count": 11, "logic": {}},
-        {"name": "label37", "base": 9191232, "count": 10, "logic": {}},
-        {"name": "label42", "base": 9191452, "count": 2, "logic": {}},
+        {
+            "name": "label37",
+            "base": 9191232,
+            "count": 10,
+            "logic": {"must_fly": true}
+        },
+        {
+            "name": "label42",
+            "base": 9191452,
+            "count": 2,
+            "logic": {"must_fight": {"at_least": 1}}
+        },
         {"name": "label40", "base": 9191512, "count": 12, "logic": {}},
         {"name": "label41", "base": 9191772, "count": 9, "logic": {}},
         {"name": "label34", "base": 9192112, "count": 2, "logic": {}},
@@ -102,7 +124,14 @@
         {"name": "SkirmishUnitsEnemy2", "base": 9155740, "count": 24, "logic": {}},
         {"name": "SkirmishUnitsAlly3", "base": 9156240, "count": 9, "logic": {}},
         {"name": "SkirmishUnitsEnemy3", "base": 9156440, "count": 24, "logic": {}},
-        {"name": "label37", "base": 9156976, "count": 1, "logic": {}},
+        {
+            "name": "label37",
+            "base": 9156976,
+            "count": 1,
+            "logic": {
+                "0": {"nudges": {}}
+            }
+        },
         {"name": "label38", "base": 9157060, "count": 5, "logic": {}},
         {"name": "label49", "base": 9157208, "count": 1, "logic": {}},
         {"name": "label50", "base": 9157248, "count": 1, "logic": {}}
@@ -358,8 +387,8 @@
             "base": 9126724,
             "count": 6,
             "logic": {
-                "0": {"nudge": {"start": [10,10], "end": [5, 5]}},
-                "4": {"nudge": {"start": [10,11], "end": [3, 7]}}
+                "0": {"nudges": {"start": [10,10], "0": [5, 5]}},
+                "4": {"nudges": {"start": [10,11], "0": [3, 7]}}
             }
         },
         {"name": "label28", "base": 9126924, "count": 1, "logic": {}},
@@ -384,7 +413,14 @@
         {"name": "label34", "base": 9128576, "count": 16, "logic": {}},
         {"name": "label36", "base": 9128916, "count": 1, "logic": {}},
         {"name": "label39", "base": 9128956, "count": 1, "logic": {}},
-        {"name": "label38", "base": 9129176, "count": 3, "logic": {}},
+        {
+            "name": "label38",
+            "base": 9129176,
+            "count": 3,
+            "logic": {
+                "must_fight": {"at_least": 2}
+            }
+        },
         {"name": "label40", "base": 9129256, "count": 2, "logic": {}},
         {"name": "label41", "base": 9129316, "count": 3, "logic": {}},
         {"name": "SkirmishUnitsAlly1", "base": 9129396, "count": 8, "logic": {}},
@@ -412,9 +448,7 @@
           "name": "Units1",
           "base": 9132644,
           "count": 4,
-          "logic": {
-              "must_fight": { "at_least": 2 }
-          }
+          "logic": {"must_fight": {"at_least": 2}}
         },
         {"name": "label22", "base": 9132744, "count": 31, "logic": {}},
         {"name": "label23", "base": 9133384, "count": 3, "logic": {}},
@@ -424,10 +458,20 @@
         {"name": "label25", "base": 9133948, "count": 3, "logic": {}},
         {"name": "label24", "base": 9134028, "count": 10, "logic": {}},
         {"name": "label26", "base": 9134248, "count": 5, "logic": {}},
-        {"name": "label27", "base": 9134368, "count": 1, "logic": {}}
+        {
+            "name": "label27",
+            "base": 9134368,
+            "count": 1,
+            "logic": {"must_fly": true}
+        }
     ],
     "Ch6": [
-        {"name": "label32", "base": 9134504, "count": 27, "logic": {}},
+        {
+            "name": "label32",
+            "base": 9134504,
+            "count": 27,
+            "logic": {"6": {"no_fly": true}}
+        },
         {"name": "Units1", "base": 9135064, "count": 10, "logic": {}},
         {"name": "label31", "base": 9135284, "count": 2, "logic": {}},
         {"name": "SkirmishUnitsAlly1", "base": 9135424, "count": 9, "logic": {}},
@@ -453,7 +497,12 @@
     "Ch9Eir": [
         {"name": "Units1", "base": 9141260, "count": 11, "logic": {}},
         {"name": "label44", "base": 9141500, "count": 23, "logic": {}},
-        {"name": "label40", "base": 9142620, "count": 3, "logic": {}},
+        {
+            "name": "label40",
+            "base": 9142620,
+            "count": 3,
+            "logic": {"2": {}}
+        },
         {"name": "label41", "base": 9142700, "count": 5, "logic": {}},
         {"name": "label42", "base": 9142820, "count": 1, "logic": {}},
         {"name": "label49", "base": 9142860, "count": 3, "logic": {}},

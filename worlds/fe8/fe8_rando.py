@@ -396,21 +396,23 @@ class FE8Randomizer:
                 rank = self.rom[boss_wrank_addr]
                 self.rom[boss_wrank_addr] = max(rank, weapon.rank)
 
-        if "nudge" in logic:
-            nudge = logic["nudge"]
-            if "start" in nudge:
-                x, y = nudge["start"]
+        if "nudges" in logic:
+            nudges = logic["nudges"]
+
+            if "start" in nudges:
+                x, y = nudges["start"]
                 start_offs = data_offset + COORDS_INDEX
                 self.rewrite_coords(start_offs, x, y)
 
-            if "end" in nudge:
-                reda_count = self.rom[data_offset + REDA_COUNT_INDEX]
-                redas_addr = read_word_le(self.rom, data_offset + REDA_PTR_INDEX)
-                end_addr = redas_addr + (reda_count - 1) * 8
+            reda_count = self.rom[data_offset + REDA_COUNT_INDEX]
+            redas_addr = read_word_le(self.rom, data_offset + REDA_PTR_INDEX)
+            redas_offs = redas_addr - ROM_BASE_ADDRESS
 
-                end_offs = end_addr - ROM_BASE_ADDRESS
-                x, y = nudge["end"]
-                self.rewrite_coords(end_offs, x, y)
+            for i in range(reda_count):
+                if str(i) in nudges:
+                    x, y = nudges[str(i)]
+                    reda_offs = redas_offs + 8 * i
+                    self.rewrite_coords(reda_offs, x, y)
 
     def randomize_block(self, block: UnitBlock):
         if "must_fight" in block.logic:
@@ -418,6 +420,14 @@ class FE8Randomizer:
                 range(block.count), block.logic["must_fight"]["at_least"]
             ):
                 block.logic[i]["must_fight"] = True
+
+        if "must_fly" in block.logic:
+            for i in range(block.count):
+                block.logic[i]["must_fly"] = True
+
+        if "no_fly" in block.logic:
+            for i in range(block.count):
+                block.logic[i]["no_fly"] = True
 
         for i in range(block.count):
             self.randomize_chapter_unit(
@@ -437,11 +447,7 @@ class FE8Randomizer:
         self.rom[BONE_COORDS_OFFSET + 1] = 8
 
     # TODO: logic
-    #   - at least one of L'Arachel or Dozla must be able to fight
-    #   - Nudge Cormag to 5,15 (pre) and 6,13 (post) in Eirika 13
-    #   - Nudge Cormag to 11,12 in Ephraim 10
-    #   - Nudge Tana to 0,5
-    #   - Flying Duessel vs enemy archers in that Ephraim map may be unbeatable
+    #   - Flying Duessel vs enemy archers in Ephraim 10 may be unbeatable
     def apply_changes(self) -> None:
         for _chapter_name, chapter in self.unit_blocks.items():
             for block in chapter:
