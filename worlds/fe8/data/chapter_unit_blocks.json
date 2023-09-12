@@ -392,13 +392,13 @@
             }
         },
         {"name": "label28", "base": 9126924, "count": 1, "logic": {}},
-        {"name": "label32", "base": 9126964, "count": 2, "logic": {}},
         {
-            "name": "label30",
-            "base": 9127084,
-            "count": 1,
+            "name": "label32",
+            "base": 9126964,
+            "count": 2,
             "logic": {"1": {"must_fight": true}}
-        }
+        },
+        {"name": "label30", "base": 9127084, "count": 1, "logic": {}}
     ],
     "Ch3": [
         {"name": "Units1", "base": 9127284, "count": 9, "logic": {}},

@@ -5,6 +5,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import Any, Union
 from enum import IntEnum
+import logging
 
 from .util import fetch_json, write_short_le, read_short_le, read_word_le
 
@@ -246,14 +247,16 @@ class CharacterStore:
 
 
 def job_valid(job: JobData, logic: dict[str, Any]) -> bool:
-    if "must_fly" in logic and "flying" not in job.tags:
+    if "must_fly" in logic and logic["must_fly"] and "flying" not in job.tags:
         return False
 
-    if "no_fly" in logic and "flying" in job.tags:
+    if "no_fly" in logic and logic["no_fly"] and "flying" in job.tags:
         return False
 
-    if "must_fight" in logic and all(
-        not wtype.damaging() for wtype in job.usable_weapons
+    if (
+        "must_fight" in logic
+        and logic["must_fight"]
+        and all(not wtype.damaging() for wtype in job.usable_weapons)
     ):
         return False
 
@@ -331,6 +334,12 @@ class FE8Randomizer:
             if weap.kind in job.usable_weapons and weapon_valid(weap, logic)
         ]
 
+        if not choices:
+            import json
+            logging.error("LOGIC ERROR: no viable weapons")
+            logging.error(f"  job: {job.id}")
+            logging.error(f"  logic: {json.dumps(logic, indent=2)}")
+
         return self.random.choice(choices).id
 
     def select_new_inventory(
@@ -396,6 +405,8 @@ class FE8Randomizer:
                 rank = self.rom[boss_wrank_addr]
                 self.rom[boss_wrank_addr] = max(rank, weapon.rank)
 
+        # TODO: This should probably be split into a different method so it
+        # doesn't get `ignore`d.
         if "nudges" in logic:
             nudges = logic["nudges"]
 
@@ -421,15 +432,21 @@ class FE8Randomizer:
             ):
                 block.logic[i]["must_fight"] = True
 
-        if "must_fly" in block.logic:
+        if "must_fly" in block.logic and block.logic["must_fly"]:
             for i in range(block.count):
-                block.logic[i]["must_fly"] = True
+                block.logic[i]["must_fly"] = block.logic["must_fly"]
 
-        if "no_fly" in block.logic:
+        if "no_fly" in block.logic and block.logic["no_fly"]:
             for i in range(block.count):
-                block.logic[i]["no_fly"] = True
+                block.logic[i]["no_fly"] = block.logic["no_fly"]
+
+        if "ignore" in block.logic and block.logic["ignore"]:
+            for i in range(block.count):
+                block.logic[i]["ignore"] = block.logic["ignore"]
 
         for i in range(block.count):
+            if "ignore" in block.logic[i] and block.logic[i]["ignore"]:
+                continue
             self.randomize_chapter_unit(
                 block.base + i * CHAPTER_UNIT_SIZE, block.logic[i]
             )
