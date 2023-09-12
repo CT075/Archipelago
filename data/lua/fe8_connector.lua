@@ -116,10 +116,9 @@ function create_message ()
     local slot_name = memory.read_bytes_as_array(slot_name_address, 64, "ROM")
     data["slot_name"] = slot_name
 
-    if (current_game_state == GAME_STATE_SAFE) then
-        local flag_bytes = memory.read_bytes_as_array(flags_offset, flags_size, "EWRAM")
-        data["flag_bytes"] = flag_bytes
-    end
+    -- TODO: do we need to check safety here somehow?
+    local flag_bytes = memory.read_bytes_as_array(flags_offset, flags_size, "EWRAM")
+    data["flag_bytes"] = flag_bytes
 
     return json.encode(data).."\n"
 end

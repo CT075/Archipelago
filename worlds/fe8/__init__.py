@@ -127,7 +127,9 @@ class FE8World(World):
         return FE8Item(
             item,
             cls,
-            self.item_name_to_id[item],
+            # CR cam: the `FE8Item` constructor also adds `FE8_ID_PREFIX`, so
+            # we need to subtract it here, which is awful.
+            self.item_name_to_id[item] - FE8_ID_PREFIX,
             self.player,
         )
 
