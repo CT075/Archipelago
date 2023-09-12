@@ -113,7 +113,7 @@ async def handle_read_data(gba_data: Dict[str, Any], ctx: GBAContext):
     if "flag_bytes" in gba_data:
         for byte_i, byte in enumerate(gba_data["flag_bytes"]):
             for i in range(8):
-                if byte & (i << 1) != 0:
+                if byte & (1 << i) != 0:
                     flag_id = byte_i * 8 + i
                     location_id = flag_id + FE8_ID_PREFIX
 
