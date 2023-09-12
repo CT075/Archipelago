@@ -43,6 +43,7 @@ local archipelago_received_item_address = 0x026E44
 local slot_name_address = 0xEFCE78
 
 local proc_pool_address = 0x024E68
+local proc_size = 0x6C
 local num_procs = 0x40
 
 -- These two include the ROM hardware offset because we compare against them as
@@ -58,7 +59,6 @@ bizhawk_minor = tonumber(bizhawk_minor)
 function check_game_state ()
     local current_proc = proc_pool_address
     local count = 0
-    local cb2_value = memory.read_u32_le(cb2_address, "IWRAM")
 
     while count < num_procs do
       local ptr = memory.read_u32_le(current_proc)
@@ -66,6 +66,8 @@ function check_game_state ()
         current_game_state = GAME_STATE_SAFE
         return
       end
+      count = count + 1
+      current_proc = proc_pool_address + proc_size
     end
     current_game_state = GAME_STATE_UNSAFE
 end
