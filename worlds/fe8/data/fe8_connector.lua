@@ -32,17 +32,16 @@ local ewram_start = 0x2000000
 -- results of the build (or pulling them from the relevant header files). We
 -- should probably look towards populating them automatically eventually.
 
-local last_received_item_index_offset = 0x026E4C
-local flags_offset = 0x026E3C
+local flags_offset = 0x02026E3C
 local flags_size = 8
-local archipelago_received_item_address = 0x026E44
+local archipelago_received_item_address = 0x02026E44
 
 -- ROM addresses
 -- CR cam: This *especially* should be populated automatically (probably from
 -- the nocash sym file?)
 local slot_name_address = 0xEFCE78
 
-local proc_pool_address = 0x024E68
+local proc_pool_address = 0x02024E68
 local proc_size = 0x6C
 local num_procs = 0x40
 
@@ -67,7 +66,7 @@ function check_game_state ()
         return
       end
       count = count + 1
-      current_proc = proc_pool_address + proc_size
+      current_proc = current_proc + proc_size
     end
     current_game_state = GAME_STATE_UNSAFE
 end
