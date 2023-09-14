@@ -60,7 +60,7 @@ function check_game_state ()
     local count = 0
 
     while count < num_procs do
-      local ptr = memory.read_u32_le(current_proc)
+      local ptr = memory.read_u32_le(current_proc, "EWRAM")
       if ptr == wm_proc_address or ptr == e_player_phase_proc_address then
         current_game_state = GAME_STATE_SAFE
         return

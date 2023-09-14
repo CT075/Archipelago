@@ -32,7 +32,6 @@ local ewram_start = 0x2000000
 -- results of the build (or pulling them from the relevant header files). We
 -- should probably look towards populating them automatically eventually.
 
-local last_received_item_index_offset = 0x026E4C
 local flags_offset = 0x026E3C
 local flags_size = 8
 local archipelago_received_item_address = 0x026E44
@@ -61,13 +60,13 @@ function check_game_state ()
     local count = 0
 
     while count < num_procs do
-      local ptr = memory.read_u32_le(current_proc)
+      local ptr = memory.read_u32_le(current_proc, "EWRAM")
       if ptr == wm_proc_address or ptr == e_player_phase_proc_address then
         current_game_state = GAME_STATE_SAFE
         return
       end
       count = count + 1
-      current_proc = proc_pool_address + proc_size
+      current_proc = current_proc + proc_size
     end
     current_game_state = GAME_STATE_UNSAFE
 end
@@ -79,8 +78,6 @@ function process_data (data)
     end
 
     if (data["items"] ~= nil) then
-        -- CR cam: There's a race here where, if we receive a new batch of
-        -- items before `received_items` is emptied, we could clobber them
         received_items = data["items"]
     end
 end
@@ -88,6 +85,8 @@ end
 -- Try to fill the received item struct with the next item
 function try_write_next_item ()
     if (current_game_state == GAME_STATE_SAFE) then
+	print("trying to write item to game...")
+
         -- CR cam: this +3 is hand-computed from the definition of `struct APReceivedItem`
         local is_filled = memory.read_u8(archipelago_received_item_address + 3, "EWRAM")
 
@@ -97,6 +96,10 @@ function try_write_next_item ()
         -- will be tiny and the latency here should be dwarfed by transport. If
         -- it comes down to it, we can reverse the list when we get it and pop
         -- off the end instead.
+        --
+        -- CR cam: This is actually wrong, because `received_items` gets reset
+        -- to be the list of _all_ received items, not just new items. This is
+        -- the purpose of `received_items_index`.
         local next_item = table.remove(received_items, 1)
         if (next_item ~= nil) then
             -- TODO: progression filtering?
