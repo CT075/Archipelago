@@ -32,16 +32,16 @@ local ewram_start = 0x2000000
 -- results of the build (or pulling them from the relevant header files). We
 -- should probably look towards populating them automatically eventually.
 
-local flags_offset = 0x02026E3C
+local flags_offset = 0x026E3C
 local flags_size = 8
-local archipelago_received_item_address = 0x02026E44
+local archipelago_received_item_address = 0x026E44
 
 -- ROM addresses
 -- CR cam: This *especially* should be populated automatically (probably from
 -- the nocash sym file?)
 local slot_name_address = 0xEFCE78
 
-local proc_pool_address = 0x02024E68
+local proc_pool_address = 0x024E68
 local proc_size = 0x6C
 local num_procs = 0x40
 
@@ -78,8 +78,6 @@ function process_data (data)
     end
 
     if (data["items"] ~= nil) then
-        -- CR cam: There's a race here where, if we receive a new batch of
-        -- items before `received_items` is emptied, we could clobber them
         received_items = data["items"]
     end
 end
@@ -96,6 +94,10 @@ function try_write_next_item ()
         -- will be tiny and the latency here should be dwarfed by transport. If
         -- it comes down to it, we can reverse the list when we get it and pop
         -- off the end instead.
+        --
+        -- CR cam: This is actually wrong, because `received_items` gets reset
+        -- to be the list of _all_ received items, not just new items. This is
+        -- the purpose of `received_items_index`.
         local next_item = table.remove(received_items, 1)
         if (next_item ~= nil) then
             -- TODO: progression filtering?
