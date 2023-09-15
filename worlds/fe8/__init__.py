@@ -54,17 +54,17 @@ components.append(
 )
 
 try:
-    connector_script_path = os.path.join(user_path("data", "lua"), "fe8_connector.lua")
+    connector_script_path = os.path.join(user_path("data", "lua"), "connector_fe8.lua")
 
     if not os.path.exists(connector_script_path):
         with open(connector_script_path, "wb") as connector_script_file:
-            connector = pkgutil.get_data(__name__, "data/fe8_connector.lua")
+            connector = pkgutil.get_data(__name__, "data/connector_fe8.lua")
             if connector is None:
                 raise IOError
             connector_script_file.write(connector)
     else:
         with open(connector_script_path, "rb+") as connector_script_file:
-            expected_script = pkgutil.get_data(__name__, "data/fe8_connector.lua")
+            expected_script = pkgutil.get_data(__name__, "data/connector_fe8.lua")
             if expected_script is None:
                 raise IOError
             expected_hash = hashlib.md5(expected_script).digest()
@@ -76,7 +76,7 @@ try:
                 connector_script_file.write(expected_script)
 except IOError:
     logging.warning(
-        "Unable to copy fe8_connector.lua to /data/lua in your Archipelago install."
+        "Unable to copy connector_fe8.lua to /data/lua in your Archipelago install."
     )
 
 
