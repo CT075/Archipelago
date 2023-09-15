@@ -31,8 +31,8 @@ SELF_ITEM_KIND = 2
 class FE8DeltaPatch(APDeltaPatch):
     game = FE8_NAME
     hash = "005531fef9efbb642095fb8f64645236"
-    patch_file = PATCH_FILE_EXT
-    patch_file_ending = ".gba"
+    patch_file_ending = PATCH_FILE_EXT
+    result_file_ending = ".gba"
 
     @classmethod
     def get_source_data(cls) -> bytes:
@@ -98,4 +98,4 @@ def generate_output(
         patched_path=output_path,
     )
     patch.write()
-    #os.unlink(output_path)
+    os.unlink(output_path)
