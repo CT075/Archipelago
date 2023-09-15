@@ -17,11 +17,11 @@ BASE_PATCH = "data/base_patch.bsdiff4"
 PATCH_FILE_EXT = ".apfe8"
 
 # TODO: populate this into connector_config on basepatch build
-SLOT_NAME_OFFS = 0xEFCE78  # archipelagoInfo->slotName
-SUPER_DEMON_KING_OFFS = 0xEFCEB8  # archipelagoOptions->superDemonKing
+SLOT_NAME_OFFS = 0xEFCED4  # archipelagoInfo->slotName
+SUPER_DEMON_KING_OFFS = 0xEFCF14  # archipelagoOptions->superDemonKing
 
 # TODO: move this into `locations.py`
-LOCATION_INFO_OFFS = 0xEFCEBC
+LOCATION_INFO_OFFS = 0xEFCF18
 LOCATION_INFO_SIZE = 4
 
 AP_ITEM_KIND = 1
