@@ -315,7 +315,12 @@
         {"name": "Units1", "base": 9199548, "count": 12, "logic": {}},
         {"name": "label36", "base": 9199808, "count": 2, "logic": {}},
         {"name": "label39", "base": 9199868, "count": 41, "logic": {}},
-        {"name": "label56", "base": 9200708, "count": 1, "logic": {}},
+        {
+            "name": "KnollLoad",
+            "base": 9200708,
+            "count": 1,
+            "logic": {"0": {"must_fight": true}}
+        },
         {"name": "label37", "base": 9201248, "count": 1, "logic": {}},
         {"name": "label42", "base": 9201288, "count": 3, "logic": {}},
         {"name": "label58", "base": 9201368, "count": 7, "logic": {}},
