@@ -29,7 +29,6 @@
             "base": 9187408,
             "count": 3,
             "logic": {
-                "0": {"nudges": {}},
                 "1": {"must_fly": true},
                 "2": {"must_fly": true}
             }
@@ -128,9 +127,7 @@
             "name": "label37",
             "base": 9156976,
             "count": 1,
-            "logic": {
-                "0": {"nudges": {}}
-            }
+            "logic": {}
         },
         {"name": "label38", "base": 9157060, "count": 5, "logic": {}},
         {"name": "label49", "base": 9157208, "count": 1, "logic": {}},
@@ -381,19 +378,22 @@
         {"name": "label44", "base": 9218916, "count": 1, "logic": {}}
     ],
     "Ch2": [
+        {
+            "name": "VanessaMoulder",
+            "base": 9126864,
+            "count": 2,
+            "logic": {"0": {"must_fly": true}}
+        },
         {"name": "Units1", "base": 9126604, "count": 5, "logic": {}},
         {
             "name": "label29",
             "base": 9126724,
             "count": 6,
-            "logic": {
-                "0": {"nudges": {"start": [10,10], "0": [5, 5]}},
-                "4": {"nudges": {"start": [10,11], "0": [3, 7]}}
-            }
+            "logic": {}
         },
         {"name": "label28", "base": 9126924, "count": 1, "logic": {}},
         {
-            "name": "label32",
+            "name": "RossGarcia",
             "base": 9126964,
             "count": 2,
             "logic": {"1": {"must_fight": true}}

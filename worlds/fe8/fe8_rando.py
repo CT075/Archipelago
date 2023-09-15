@@ -25,15 +25,52 @@ COORDS_INDEX = 4
 REDA_COUNT_INDEX = 7
 REDA_PTR_INDEX = 8
 
-CHARACTER_TABLE_OFFSET = 0x803D30
+CHARACTER_TABLE_BASE = 0x803D30
 CHARACTER_SIZE = 52
-CHARACTER_WRANK_BASE = 20
+CHARACTER_WRANK_OFFSET = 20
+CHARACTER_STATS_OFFSET = 12
+
+JOB_TABLE_BASE = 0x807110
+JOB_SIZE = 84
+JOB_STATS_OFFSET = 11
+
+STATS_COUNT = 6  # HP, Str, Skl, Spd, Def, Res (don't need Lck)
+
+EIRIKA = 1
+EIRIKA_LORD = 2
 
 EIRIKA_RAPIER_OFFSET = 0x9EF088
-BONE_COORDS_OFFSET = 0x9F0372
+ROSS_CH2_HP_OFFSET = 0x9F03B8
 
-STEEL_BLADE = 0x6
-FLUX = 0x45
+MOVEMENT_COST_TABLE_BASE = 0x80B808
+MOVEMENT_COST_ENTRY_SIZE = 65
+MOVEMENT_COST_ENTRY_COUNT = 49
+MOVEMENT_COST_SENTINEL = 31
+
+IMPORTANT_TERRAIN_TYPES = [
+    14,  # Thicket
+    15,  # Sand
+    16,  # Desert
+    17,  # River
+    18,  # Mountain
+    19,  # Peak
+    20,  # Bridge
+    21,  # Bridge 2
+    22,  # Sea
+    23,  # Lake
+    26,  # Fence 1
+    39,  # Cliff
+    47,  # Building 2
+    51,  # Fence 2
+    54,  # Sky
+    55,  # Deeps
+    57,  # Inn
+    58,  # Barrel
+    59,  # Bone
+    60,  # Dark
+    61,  # Water
+    62,  # Gunnels
+]
 
 
 def encode_unit_coords(x: int, y: int) -> int:
@@ -278,6 +315,7 @@ def weapon_valid(weapon: WeaponData, logic: dict[str, Any]) -> bool:
 class FE8Randomizer:
     unit_blocks: dict[str, list[UnitBlock]]
     weapons_by_id: dict[int, WeaponData]
+    weapons_by_name: dict[str, WeaponData]
     weapons_by_rank: dict[WeaponRank, list[WeaponData]]
     character_store: CharacterStore
     jobs_by_id: dict[int, JobData]
@@ -309,6 +347,7 @@ class FE8Randomizer:
         self.character_store = CharacterStore(fetch_json(CHARACTERS))
 
         self.weapons_by_id = {item.id: item for item in item_data}
+        self.weapons_by_name = {item.name: item for item in item_data}
         self.jobs_by_id = {job.id: job for job in job_data}
 
         self.promoted_jobs = [job for job in job_data if job.is_promoted]
@@ -320,7 +359,7 @@ class FE8Randomizer:
             self.weapons_by_rank[weap.rank].append(weap)
 
         # Dark has no E-ranked weapons, so we add Flux
-        self.weapons_by_rank[WeaponRank.E].append(self.weapons_by_id[FLUX])
+        self.weapons_by_rank[WeaponRank.E].append(self.weapons_by_name["Flux"])
 
     def select_new_item(self, job: JobData, item_id: int, logic: dict[str, Any]):
         if item_id not in self.weapons_by_id:
@@ -336,6 +375,7 @@ class FE8Randomizer:
 
         if not choices:
             import json
+
             logging.error("LOGIC ERROR: no viable weapons")
             logging.error(f"  job: {job.id}")
             logging.error(f"  logic: {json.dumps(logic, indent=2)}")
@@ -399,11 +439,11 @@ class FE8Randomizer:
             for item_id in new_inventory:
                 if item_id not in self.weapons_by_id:
                     continue
-                boss_data_addr = CHARACTER_TABLE_OFFSET + char * CHARACTER_SIZE
+                boss_data_offs = CHARACTER_TABLE_BASE + char * CHARACTER_SIZE
                 weapon = self.weapons_by_id[item_id]
-                boss_wrank_addr = boss_data_addr + CHARACTER_WRANK_BASE + weapon.kind
-                rank = self.rom[boss_wrank_addr]
-                self.rom[boss_wrank_addr] = max(rank, weapon.rank)
+                boss_wrank_offs = boss_data_offs + CHARACTER_WRANK_OFFSET + weapon.kind
+                rank = self.rom[boss_wrank_offs]
+                self.rom[boss_wrank_offs] = max(rank, weapon.rank)
 
         # TODO: This should probably be split into a different method so it
         # doesn't get `ignore`d.
@@ -451,17 +491,56 @@ class FE8Randomizer:
                 block.base + i * CHAPTER_UNIT_SIZE, block.logic[i]
             )
 
+    def fix_movement_costs(self):
+        """
+        Units that spawn over water or mountains can get stuck, causing crashes
+        or softlocking if their new class cannot walk on those tiles. To resolve
+        this, the basepatch includes a fix allowing units to walk on certain
+        terrain types (marked by the sentinel value) if they are otherwise stuck.
+        """
+        for i in range(MOVEMENT_COST_ENTRY_COUNT):
+            entry = MOVEMENT_COST_TABLE_BASE + i * MOVEMENT_COST_ENTRY_SIZE
+            for terrain_type in IMPORTANT_TERRAIN_TYPES:
+                if self.rom[entry + terrain_type] == 255:
+                    self.rom[entry + terrain_type] = MOVEMENT_COST_SENTINEL
+
+    def fix_eirika_lord_stats(self):
+        # Move some of Eirika's base stats from her lord class to herself
+        eirika_character_entry = CHARACTER_TABLE_BASE + EIRIKA * CHARACTER_SIZE
+        eirika_stats_base = eirika_character_entry + CHARACTER_STATS_OFFSET
+
+        eirika_lord_entry = JOB_TABLE_BASE + EIRIKA_LORD * JOB_SIZE
+        eirika_job_stats_base = eirika_lord_entry + JOB_STATS_OFFSET
+
+        for i in range(STATS_COUNT):
+            roll = self.random.randint(0, 4)
+            old_base = self.rom[eirika_job_stats_base]
+            new_personal_base = min(roll, old_base)
+            self.rom[eirika_stats_base + i] = new_personal_base
+            self.rom[eirika_job_stats_base + i] -= new_personal_base
+
     def apply_cutscene_fixes(self):
         # Eirika's Rapier is given in a cutscene at the start of the chapter,
         # rather than being in her inventory
         eirika_job = self.character_store["Eirika"]
-        new_rapier = self.select_new_item(eirika_job, STEEL_BLADE, {})
+        if any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
+            new_rapier = self.select_new_item(
+                eirika_job, self.weapons_by_name("Steel Blade"), {}
+            )
+        else:
+            new_rapier = self.random.choice(
+                [
+                    self.weapons_by_name["Heal"],
+                    self.weapons_by_name["Mend"],
+                    self.weapons_by_name["Recover"],
+                ]
+            )
         self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
 
-        # The chapter 2 boss moves to an inaccessible mountain tile after his
-        # pre-map dialogue.
-        self.rom[BONE_COORDS_OFFSET] = 6
-        self.rom[BONE_COORDS_OFFSET + 1] = 8
+        # While we force Vanessa to fly to give Ross a fighting chance, it's
+        # very possible that she won't be able to lift him. To make it more
+        # reasonable to save him, we _also_ set his starting HP.
+        self.rom[ROSS_CH2_HP_OFFSET] = 15
 
     # TODO: logic
     #   - Flying Duessel vs enemy archers in Ephraim 10 may be unbeatable
@@ -470,4 +549,7 @@ class FE8Randomizer:
             for block in chapter:
                 self.randomize_block(block)
 
+        self.fix_movement_costs()
         self.apply_cutscene_fixes()
+        self.fix_eirika_lord_stats()
+        # TODO: Super Formortiis buffs

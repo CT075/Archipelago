@@ -85,7 +85,7 @@ end
 -- Try to fill the received item struct with the next item
 function try_write_next_item ()
     if (current_game_state == GAME_STATE_SAFE) then
-        -- CR cam: this +3 is hand-computed from the definition of `struct APReceivedItem`
+        -- CR cam: this +2 is hand-computed from the definition of `struct APReceivedItem`
         local is_filled = memory.read_u8(archipelago_received_item_address + 2, "EWRAM")
 
         if (is_filled ~= 0) then return end
