@@ -86,7 +86,7 @@ end
 function try_write_next_item ()
     if (current_game_state == GAME_STATE_SAFE) then
         -- CR cam: this +3 is hand-computed from the definition of `struct APReceivedItem`
-        local is_filled = memory.read_u8(archipelago_received_item_address + 3, "EWRAM")
+        local is_filled = memory.read_u8(archipelago_received_item_address + 2, "EWRAM")
 
         if (is_filled ~= 0) then return end
 
@@ -102,7 +102,7 @@ function try_write_next_item ()
         if (next_item ~= nil) then
             -- TODO: progression filtering?
             memory.write_u16_le(archipelago_received_item_address + 0, next_item[1], "EWRAM")
-            memory.write_u8(archipelago_received_item_address + 3, 1, "EWRAM")
+            memory.write_u8(archipelago_received_item_address + 2, 1, "EWRAM")
         end
     end
 end
