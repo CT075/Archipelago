@@ -514,18 +514,18 @@ class FE8Randomizer:
 
         for i in range(STATS_COUNT):
             roll = self.random.randint(0, 4)
-            old_base = self.rom[eirika_job_stats_base]
+            old_base = self.rom[eirika_job_stats_base + i]
             new_personal_base = min(roll, old_base)
             self.rom[eirika_stats_base + i] = new_personal_base
             self.rom[eirika_job_stats_base + i] -= new_personal_base
 
-    def apply_cutscene_fixes(self):
+    def apply_cutscene_fixes(self) -> None:
         # Eirika's Rapier is given in a cutscene at the start of the chapter,
         # rather than being in her inventory
         eirika_job = self.character_store["Eirika"]
         if any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
             new_rapier = self.select_new_item(
-                eirika_job, self.weapons_by_name("Steel Blade"), {}
+                eirika_job, self.weapons_by_name["Steel Blade"].id, {}
             )
         else:
             new_rapier = self.random.choice(
@@ -534,7 +534,7 @@ class FE8Randomizer:
                     self.weapons_by_name["Mend"],
                     self.weapons_by_name["Recover"],
                 ]
-            )
+            ).id
         self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
 
         # While we force Vanessa to fly to give Ross a fighting chance, it's
