@@ -435,7 +435,7 @@ class FE8Randomizer:
         # If an NPC isn't autoleveled, it's probably a boss or important NPC of
         # some kind, so we should force its weapon levels in the character
         # table.
-        if not is_player and not autolevel:
+        if not is_player and not autolevel and char in self.character_store:
             for item_id in new_inventory:
                 if item_id not in self.weapons_by_id:
                     continue
