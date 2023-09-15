@@ -97,7 +97,7 @@ function try_write_next_item ()
             -- TODO: progression filtering?
             memory.write_u16_le(archipelago_received_item_address + 0, next_item[1], "EWRAM")
             memory.write_u8(archipelago_received_item_address + 2, 1, "EWRAM")
-            memory.write_u32_le(archipelago_received_item_index, next_item+1, "EWRAM")
+            memory.write_u32_le(archipelago_received_item_index, item_index+1, "EWRAM")
         end
     end
 end
