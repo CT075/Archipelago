@@ -18,6 +18,7 @@ from Utils import async_start
 from settings import get_settings
 import Patch
 
+from .data import locations
 from .constants import FE8_NAME, FE8_ID_PREFIX
 
 GBA_SOCKET_PORT = 43053
@@ -37,8 +38,7 @@ CONNECTION_STATUS_TENTATIVE = "Initial connection made"
 CONNECTION_STATUS_CONNECTED = "Connected"
 CONNECTION_STATUS_INITIAL = "Connection has not been initiated"
 
-# CR cam: .
-FORMORTIIS_FLAG = 0
+FOMORTIIS_FLAG = dict(locations)["Defeat Formortiis"]
 
 
 class GBACommandProcessor(ClientCommandProcessor):
@@ -57,7 +57,7 @@ class GBAContext(CommonContext):
     awaiting_rom = False
     gba_push_pull_task: Optional[asyncio.Task]
     local_checked_locations: Set[int]
-    goal_flag: int = FORMORTIIS_FLAG
+    goal_flag: int = FOMORTIIS_FLAG
 
     def __init__(self, server_address: Optional[str], password: Optional[str]):
         super().__init__(server_address, password)
