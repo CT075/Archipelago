@@ -966,5 +966,41 @@
       "monster",
       "special"
     ]
+  },
+  {
+    "id": 61,
+    "name": "Journeyman (1)",
+    "usable_weapons": [
+      "Axe"
+    ],
+    "is_promoted": false,
+    "tags": [
+      "trainee",
+      "no_rando"
+    ]
+  },
+  {
+    "id": 71,
+    "name": "Recruit (1)",
+    "usable_weapons": [
+      "Lance"
+    ],
+    "is_promoted": false,
+    "tags": [
+      "trainee",
+      "no_rando"
+    ]
+  },
+  {
+    "id": 62,
+    "name": "Pupil (1)",
+    "usable_weapons": [
+      "Anima"
+    ],
+    "is_promoted": false,
+    "tags": [
+      "trainee",
+      "no_rando"
+    ]
   }
 ]

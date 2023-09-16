@@ -255,7 +255,7 @@ class JobData:
 
 class CharacterStore:
     names_by_id: dict[int, str]
-    jobs_by_name: dict[str, JobData]
+    character_jobs: dict[str, JobData]
 
     def __init__(self, char_ids: dict[str, list[int]]):
         self.names_by_id = {}
@@ -264,7 +264,7 @@ class CharacterStore:
             for i in ids:
                 self.names_by_id[i] = name
 
-        self.jobs_by_name = {}
+        self.character_jobs = {}
 
     def lookup_name(self, char_id: int):
         if char_id not in self.names_by_id:
@@ -278,11 +278,11 @@ class CharacterStore:
             name = self.names_by_id[char]
         else:
             name = char
-        self.jobs_by_name[name] = job
+        self.character_jobs[name] = job
 
     def __getitem__(self, char: Union[int, str]):
         name = char if isinstance(char, str) else self.names_by_id[char]
-        return self.jobs_by_name[name]
+        return self.character_jobs[name]
 
     def __contains__(self, char: Union[int, str]):
         if isinstance(char, int):
@@ -292,7 +292,7 @@ class CharacterStore:
         else:
             name = char
 
-        return name in self.jobs_by_name
+        return name in self.character_jobs
 
 
 def job_valid(job: JobData, logic: dict[str, Any]) -> bool:
@@ -370,8 +370,14 @@ class FE8Randomizer:
         self.weapons_by_name = {item.name: item for item in item_data}
         self.jobs_by_id = {job.id: job for job in job_data}
 
-        self.promoted_jobs = [job for job in job_data if job.is_promoted]
-        self.unpromoted_jobs = [job for job in job_data if not job.is_promoted]
+        self.promoted_jobs = [
+            job for job in job_data if job.is_promoted and "no_rando" not in job.tags
+        ]
+        self.unpromoted_jobs = [
+            job
+            for job in job_data
+            if not job.is_promoted and "no_rando" not in job.tags
+        ]
 
         self.weapons_by_rank = defaultdict(list)
 
@@ -434,9 +440,9 @@ class FE8Randomizer:
         if DEBUG:
             cname = self.character_store.lookup_name(char)
             if cname is not None:
-                debug_print("    randomizing {cname}...")
+                debug_print(f"    randomizing {cname}...")
             else:
-                debug_print("    randomizing unit id 0x{hex(char)}...")
+                debug_print(f"    randomizing unit id {hex(char)}...")
 
         # Affiliation = bits 1,2; unit is player if they're unset
         is_player = not bool(unit[3] & 0b0110)
@@ -454,7 +460,7 @@ class FE8Randomizer:
                 [job for job in new_job_pool if job_valid(job, logic)]
             )
 
-            if "no_store" in logic and not logic["no_store"]:
+            if "no_store" not in logic or not logic["no_store"]:
                 self.character_store[char] = new_job
 
         new_inventory = self.select_new_inventory(new_job, inventory, logic)
@@ -497,15 +503,15 @@ class FE8Randomizer:
                     self.rewrite_coords(reda_offs, x, y)
 
     def randomize_block(self, block: UnitBlock):
-        debug_print("  randomizing block {block.name}:")
+        debug_print(f"  randomizing block {block.name}:")
 
-        for k, v in block.logic.items():
-            if type(k) == int:
+        for k, v in list(block.logic.items()):
+            if isinstance(k, int):
                 continue
 
-            assert type(k) == str
+            assert isinstance(k, str)
 
-            if "at_least" in v:
+            if isinstance(v, dict) and "at_least" in v:
                 affected = self.random.sample(range(block.count), v["at_least"])
             else:
                 affected = list(range(block.count))
@@ -577,7 +583,7 @@ class FE8Randomizer:
     #   - Duessel's map is just broken
     def apply_changes(self) -> None:
         for chapter_name, chapter in self.unit_blocks.items():
-            debug_print("randomizing {chapter_name}:")
+            debug_print(f"randomizing {chapter_name}:")
             for block in chapter:
                 self.randomize_block(block)
 
