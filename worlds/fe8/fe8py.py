@@ -270,23 +270,31 @@ class JobData:
 
 class CharacterStore:
     names_by_id: dict[int, str]
+    ids_by_name: dict[str, list[int]]
     character_jobs: dict[str, JobData]
     character_tags: dict[str, set[str]]
 
-    def __init__(self, char_ids: dict[str, dict[str, Union[list[int], list[str]]]]):
+    def __init__(self, char_data: dict[str, dict[str, Any]]):
         self.names_by_id = {}
         self.character_tags = dict()
+        self.ids_by_name = dict()
 
-        for name, data in char_ids.items():
+        for name, data in char_data.items():
             for i in data["ids"]:
                 assert isinstance(i, int)
                 self.names_by_id[i] = name
 
             # CR cam: figure out how to convince mypy that `data["tags"]` is
             # actually a list of strings
-            self.character_tags[name] = set(data["tags"])  # type: ignore
+            self.character_tags[name] = set(data["tags"])
+            self.ids_by_name = data["ids"]
 
         self.character_jobs = {}
+
+    def lookup_ids(self, char_name: str) -> Optional[list[int]]:
+        if char_name not in self.ids_by_name:
+            return None
+        return self.ids_by_name[char_name]
 
     def lookup_name(self, char_id: int) -> Optional[str]:
         if char_id not in self.names_by_id:
@@ -609,8 +617,7 @@ class FE8Randomizer:
 
     # TODO: logic
     #   - Flying Duessel vs enemy archers in Ephraim 10 may be unbeatable
-    #   - Duessel's map is just broken
-    def apply_changes(self) -> None:
+    def apply_base_changes(self) -> None:
         for chapter_name, chapter in self.unit_blocks.items():
             for block in chapter:
                 try:
@@ -625,3 +632,15 @@ class FE8Randomizer:
         self.apply_cutscene_fixes()
         self.fix_lord_stats()
         # TODO: Super Formortiis buffs
+
+    def apply_5x_buffs(self) -> None:
+        for char in ["Ephraim", "Forde", "Kyle"]:
+            ids = self.character_store.lookup_ids(char)
+            if ids is None:
+                logging.error(f"Error: apply_5x_buffs: Unable to lookup ids for {char}")
+                continue
+            for char_id in ids:
+                char_base = CHARACTER_TABLE_BASE + CHARACTER_SIZE * char_id
+                stats_base = char_base + CHARACTER_STATS_OFFSET
+                for i in range(STATS_COUNT):
+                    self.rom[stats_base + i] += 3

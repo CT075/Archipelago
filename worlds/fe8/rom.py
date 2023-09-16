@@ -17,7 +17,7 @@ from .connector_config import (
     LOCATION_INFO_OFFS,
     LOCATION_INFO_SIZE,
 )
-from .fe8_rando import FE8Randomizer
+from .fe8py import FE8Randomizer
 
 BASE_PATCH = "data/base_patch.bsdiff4"
 PATCH_FILE_EXT = ".apfe8"
@@ -56,7 +56,10 @@ def generate_output(
     patched_rom = bytearray(bsdiff4.patch(base_rom, base_patch))
 
     randomizer = FE8Randomizer(rom=patched_rom, random=random)
-    randomizer.apply_changes()
+    randomizer.apply_base_changes()
+
+    if multiworld.easier_5x[player]:
+        randomizer.apply_5x_buffs()
 
     for location in multiworld.get_locations(player):
         assert isinstance(location, FE8Location)

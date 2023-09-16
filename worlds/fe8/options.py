@@ -1,6 +1,6 @@
 from typing import Dict
 
-from Options import Option, Range, Toggle
+from Options import AssembleOptions, Range, Toggle
 
 
 def round_up_to(x, mod):
@@ -78,10 +78,21 @@ class ExcludeLatona(Toggle):
     default = 1
 
 
-fe8_options: Dict[str, type[Option]] = {
+class Easier5x(Toggle):
+    """
+    Give Ephraim, Forde and Kyle extra base stats. This can make chapter 5x
+    less of a slog.
+    """
+
+    display_name = "Buff Ephraim's party for chapter 5x"
+    default = 0
+
+
+fe8_options: Dict[str, AssembleOptions] = {
     "super_demon_king": SuperDemonKing,
     "smooth_level_caps": SmoothLevelCapProgression,
     "min_endgame_level_cap": MinimumEndgameLevelCapRange,
     "required_holy_weapons": MinimumUsableHolyWeapons,
     "exclude_latona": ExcludeLatona,
+    "easier_5x": Easier5x,
 }
