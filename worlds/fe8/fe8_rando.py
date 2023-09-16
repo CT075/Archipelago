@@ -3,7 +3,7 @@
 from random import Random
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Union
+from typing import Any, Union, Optional
 from enum import IntEnum
 import logging
 
@@ -232,6 +232,26 @@ class WeaponData:
         )
 
 
+# This is a hack until we get monster weapons set up in `weapondata.json`
+# properly.
+EYES = {
+    0xB3: {
+        "id": 0xB3,
+        "name": "Evil Eye",
+        "rank": WeaponRank.D,
+        "kind": WeaponKind.DARK,
+        "locks": set(),
+    },
+    0xB4: {
+        "id": 0xB4,
+        "name": "Crimson Eye",
+        "rank": WeaponRank.B,
+        "kind": WeaponKind.DARK,
+        "locks": set(),
+    },
+}
+
+
 @dataclass
 class JobData:
     id: int
@@ -256,22 +276,38 @@ class JobData:
 class CharacterStore:
     names_by_id: dict[int, str]
     character_jobs: dict[str, JobData]
+    character_tags: dict[str, set[str]]
 
-    def __init__(self, char_ids: dict[str, list[int]]):
+    def __init__(self, char_ids: dict[str, dict[str, Union[list[int], list[str]]]]):
         self.names_by_id = {}
+        self.character_tags = dict()
 
-        for name, ids in char_ids.items():
-            for i in ids:
+        for name, data in char_ids.items():
+            for i in data["ids"]:
+                assert isinstance(i, int)
                 self.names_by_id[i] = name
+
+            # CR cam: figure out how to convince mypy that `data["tags"]` is
+            # actually a list of strings
+            self.character_tags[name] = set(data["tags"])  # type: ignore
 
         self.character_jobs = {}
 
-    def lookup_name(self, char_id: int):
+    def lookup_name(self, char_id: int) -> Optional[str]:
         if char_id not in self.names_by_id:
             return None
         return self.names_by_id[char_id]
 
-    def __setitem__(self, char: Union[int, str], job: JobData):
+    def tags(self, char: Union[int, str]) -> Optional[set[str]]:
+        if isinstance(char, int):
+            if char not in self.names_by_id:
+                return None
+            name = self.names_by_id[char]
+        else:
+            name = char
+        return self.character_tags[name]
+
+    def __setitem__(self, char: Union[int, str], job: JobData) -> None:
         if isinstance(char, int):
             if char not in self.names_by_id:
                 return
@@ -284,7 +320,7 @@ class CharacterStore:
         name = char if isinstance(char, str) else self.names_by_id[char]
         return self.character_jobs[name]
 
-    def __contains__(self, char: Union[int, str]):
+    def __contains__(self, char: Union[int, str]) -> bool:
         if isinstance(char, int):
             if char not in self.names_by_id:
                 return False
@@ -293,23 +329,6 @@ class CharacterStore:
             name = char
 
         return name in self.character_jobs
-
-
-def job_valid(job: JobData, logic: dict[str, Any]) -> bool:
-    if "must_fly" in logic and logic["must_fly"] and "flying" not in job.tags:
-        return False
-
-    if "no_fly" in logic and logic["no_fly"] and "flying" in job.tags:
-        return False
-
-    if (
-        "must_fight" in logic
-        and logic["must_fight"]
-        and all(not wtype.damaging() for wtype in job.usable_weapons)
-    ):
-        return False
-
-    return True
 
 
 # TODO: Eirika and Ephraim should be able to use their respective weapons if
@@ -387,17 +406,44 @@ class FE8Randomizer:
         # Dark has no E-ranked weapons, so we add Flux
         self.weapons_by_rank[WeaponRank.E].append(self.weapons_by_name["Flux"])
 
-    def select_new_item(self, job: JobData, item_id: int, logic: dict[str, Any]):
-        if item_id not in self.weapons_by_id:
+    def job_valid(self, job: JobData, char: int, logic: dict[str, Any]) -> bool:
+        tags = self.character_store.tags(char)
+        if tags is not None and "generic" in tags:
+            if "generic_only" in job.tags:
+                return False
+
+        if "must_fly" in logic and logic["must_fly"] and "flying" not in job.tags:
+            return False
+
+        if "no_fly" in logic and logic["no_fly"] and "flying" in job.tags:
+            return False
+
+        if (
+            "must_fight" in logic
+            and logic["must_fight"]
+            and all(not wtype.damaging() for wtype in job.usable_weapons)
+        ):
+            return False
+
+        return True
+
+    def select_new_item(self, job: JobData, item_id: int, logic: dict[str, Any]) -> int:
+        if item_id not in self.weapons_by_id and item_id not in EYES:
             return item_id
 
-        weapon_attrs: WeaponData = self.weapons_by_id[item_id]
+        if item_id in EYES:
+            weapon_attrs: WeaponData = WeaponData(**EYES[item_id])  # type: ignore
+        else:
+            weapon_attrs = self.weapons_by_id[item_id]
 
         choices = [
             weap
             for weap in self.weapons_by_rank[weapon_attrs.rank]
             if weapon_usable(weap, job, logic)
         ]
+
+        if item_id in EYES and WeaponKind.DARK in job.usable_weapons:
+            choices.append(weapon_attrs)
 
         if not choices:
             import json
@@ -457,7 +503,7 @@ class FE8Randomizer:
                 self.promoted_jobs if job.is_promoted else self.unpromoted_jobs
             )
             new_job = self.random.choice(
-                [job for job in new_job_pool if job_valid(job, logic)]
+                [job for job in new_job_pool if self.job_valid(job, char, logic)]
             )
 
             if "no_store" not in logic or not logic["no_store"]:

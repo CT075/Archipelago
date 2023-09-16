@@ -712,7 +712,7 @@
       "Lance"
     ],
     "is_promoted": false,
-    "tags": []
+    "tags": ["generic_only"]
   },
   {
     "id": 79,
@@ -731,7 +731,8 @@
     "is_promoted": false,
     "tags": [
       "monster",
-      "special"
+      "special",
+      "generic_only"
     ]
   },
   {
@@ -741,7 +742,8 @@
     "is_promoted": true,
     "tags": [
       "monster",
-      "special"
+      "special",
+      "generic_only"
     ]
   },
   {

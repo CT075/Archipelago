@@ -1,5 +1,5 @@
 import pkgutil
-import bsdiff4
+import bsdiff4  # type: ignore
 import os
 from random import Random
 
@@ -66,11 +66,7 @@ def generate_output(
         if location.item and location.item.player == player:
             assert isinstance(location.item, FE8Item)
             write_short_le(patched_rom, rom_loc, SELF_ITEM_KIND)
-            write_short_le(
-                patched_rom,
-                rom_loc + 2,
-                location.item.local_code
-            )
+            write_short_le(patched_rom, rom_loc + 2, location.item.local_code)
         else:
             write_short_le(patched_rom, rom_loc, AP_ITEM_KIND)
 
