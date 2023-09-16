@@ -32,7 +32,7 @@ from .constants import (
 )
 from .locations import FE8Location
 from .items import FE8Item
-from .data import locations, items
+from .connector_config import locations, items
 
 from .rom import FE8DeltaPatch, generate_output
 

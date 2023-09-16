@@ -38,8 +38,6 @@ local archipelago_received_item_address = 0x026E44
 local archipelago_received_item_index = 0x026E48
 
 -- ROM addresses
--- CR cam: This *especially* should be populated automatically (probably from
--- the nocash sym file?)
 local slot_name_address = 0xEFCED4
 
 local proc_pool_address = 0x024E68
@@ -206,3 +204,4 @@ function main ()
 end
 
 main()
+

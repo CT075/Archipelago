@@ -11,18 +11,16 @@ from .items import FE8Item
 from .locations import FE8Location
 from .constants import FE8_NAME
 from .util import write_short_le
+from .connector_config import (
+    SLOT_NAME_OFFS,
+    SUPER_DEMON_KING_OFFS,
+    LOCATION_INFO_OFFS,
+    LOCATION_INFO_SIZE,
+)
 from .fe8_rando import FE8Randomizer
 
 BASE_PATCH = "data/base_patch.bsdiff4"
 PATCH_FILE_EXT = ".apfe8"
-
-# TODO: populate this into connector_config on basepatch build
-SLOT_NAME_OFFS = 0xEFCED4  # archipelagoInfo->slotName
-SUPER_DEMON_KING_OFFS = 0xEFCF14  # archipelagoOptions->superDemonKing
-
-# TODO: move this into `locations.py`
-LOCATION_INFO_OFFS = 0xEFCF18
-LOCATION_INFO_SIZE = 4
 
 AP_ITEM_KIND = 1
 SELF_ITEM_KIND = 2

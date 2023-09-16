@@ -46,10 +46,10 @@ items = [
   ("Progressive Weapon Level (Lance)", 2),
   ("Progressive Weapon Level (Axe)", 3),
   ("Progressive Weapon Level (Bow)", 4),
-  ("Progressive Weapon Level (Anima)", 5),
-  ("Progressive Weapon Level (Light)", 6),
-  ("Progressive Weapon Level (Dark)", 7),
-  ("Progressive Weapon Level (Staff)", 8),
+  ("Progressive Weapon Level (Staff)", 5),
+  ("Progressive Weapon Level (Anima)", 6),
+  ("Progressive Weapon Level (Light)", 7),
+  ("Progressive Weapon Level (Dark)", 8),
   ("Sieglinde", 9),
   ("Siegmund", 10),
   ("Gleipnir", 11),
@@ -61,3 +61,8 @@ items = [
   ("Ivaldi", 17),
   ("Latona", 18),
 ]
+SLOT_NAME_OFFS = 0xEFCED4
+SUPER_DEMON_KING_OFFS = 0xEFCF14
+LOCATION_INFO_OFFS = 0xEFCF18
+LOCATION_INFO_SIZE = 4
+
