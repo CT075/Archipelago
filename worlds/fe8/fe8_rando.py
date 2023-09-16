@@ -12,11 +12,6 @@ from .util import fetch_json, write_short_le, read_short_le, read_word_le
 DEBUG = False
 
 
-def debug_print(s: str) -> None:
-    if DEBUG:
-        print(s)
-
-
 # CR cam: Maybe these should go into [constants]?
 
 WEAPON_DATA = "data/weapondata.json"
@@ -475,20 +470,11 @@ class FE8Randomizer:
 
         # If the unit's class is is not a "standard" class that can be given to
         # players, it's probably some NPC or enemy that shouldn't be touched.
-        #
-        # CR cam: trainees are broken, do this better
         if job_id not in self.jobs_by_id:
             return
 
         job = self.jobs_by_id[job_id]
         char = unit[0]
-
-        if DEBUG:
-            cname = self.character_store.lookup_name(char)
-            if cname is not None:
-                debug_print(f"    randomizing {cname}...")
-            else:
-                debug_print(f"    randomizing unit id {hex(char)}...")
 
         # Affiliation = bits 1,2; unit is player if they're unset
         is_player = not bool(unit[3] & 0b0110)
@@ -549,8 +535,6 @@ class FE8Randomizer:
                     self.rewrite_coords(reda_offs, x, y)
 
     def randomize_block(self, block: UnitBlock):
-        debug_print(f"  randomizing block {block.name}:")
-
         for k, v in list(block.logic.items()):
             if isinstance(k, int):
                 continue
@@ -629,9 +613,14 @@ class FE8Randomizer:
     #   - Duessel's map is just broken
     def apply_changes(self) -> None:
         for chapter_name, chapter in self.unit_blocks.items():
-            debug_print(f"randomizing {chapter_name}:")
             for block in chapter:
-                self.randomize_block(block)
+                try:
+                    self.randomize_block(block)
+                except ValueError as e:
+                    logging.error("crash dump:")
+                    logging.error(f"  block_data: {chapter_name}, {block.name}")
+                    logging.error(f"  {e}")
+                    raise
 
         self.fix_movement_costs()
         self.apply_cutscene_fixes()

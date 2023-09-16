@@ -200,7 +200,11 @@
             "name": "label52",
             "base": 9187408,
             "count": 3,
-            "logic": {"1": {"must_fly": true}, "2": {"must_fly": true}}
+            "logic": {
+              "0": {"nudges": {"start": [17,14]}},
+              "1": {"must_fly": true},
+              "2": {"must_fly": true}
+            }
         },
         {"name": "label46", "base": 9187688, "count": 4, "logic": {}},
         {"name": "label47", "base": 9187788, "count": 1, "logic": {}},
@@ -219,7 +223,12 @@
         {"name": "SkirmishUnitsAlly3", "base": 9189788, "count": 9, "logic": {}},
         {"name": "SkirmishUnitsEnemy3", "base": 9189988, "count": 23, "logic": {}},
         {"name": "label43", "base": 9190580, "count": 7, "logic": {}},
-        {"name": "label42", "base": 9190760, "count": 3, "logic": {}}
+        {
+            "name": "label42",
+            "base": 9190760,
+            "count": 3,
+            "logic": {"0": {"must_fly": true}}
+        }
     ],
     "Ch11Eir": [
         {"name": "Units1", "base": 9148564, "count": 11, "logic": {}},
