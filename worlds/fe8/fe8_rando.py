@@ -462,6 +462,22 @@ class FE8Randomizer:
         new_coords = encode_unit_coords(x, y)
         write_short_le(self.rom, offset, new_coords | flags)
 
+    def apply_nudges(self, data_offset: int, nudges: dict[str, list[int]]) -> None:
+        if "start" in nudges:
+            x, y = nudges["start"]
+            start_offs = data_offset + COORDS_INDEX
+            self.rewrite_coords(start_offs, x, y)
+
+        reda_count = self.rom[data_offset + REDA_COUNT_INDEX]
+        redas_addr = read_word_le(self.rom, data_offset + REDA_PTR_INDEX)
+        redas_offs = redas_addr - ROM_BASE_ADDRESS
+
+        for i in range(reda_count):
+            if str(i) in nudges:
+                x, y = nudges[str(i)]
+                reda_offs = redas_offs + 8 * i
+                self.rewrite_coords(reda_offs, x, y)
+
     def randomize_chapter_unit(self, data_offset: int, logic: dict[str, Any]) -> None:
         # We *could* read the full struct, but we only need a few individual
         # bytes, so we may as well extract them ad-hoc.
@@ -514,26 +530,6 @@ class FE8Randomizer:
                 rank = self.rom[boss_wrank_offs]
                 self.rom[boss_wrank_offs] = max(rank, weapon.rank)
 
-        # TODO: This should probably be split into a different method so it
-        # doesn't get `ignore`d.
-        if "nudges" in logic:
-            nudges = logic["nudges"]
-
-            if "start" in nudges:
-                x, y = nudges["start"]
-                start_offs = data_offset + COORDS_INDEX
-                self.rewrite_coords(start_offs, x, y)
-
-            reda_count = self.rom[data_offset + REDA_COUNT_INDEX]
-            redas_addr = read_word_le(self.rom, data_offset + REDA_PTR_INDEX)
-            redas_offs = redas_addr - ROM_BASE_ADDRESS
-
-            for i in range(reda_count):
-                if str(i) in nudges:
-                    x, y = nudges[str(i)]
-                    reda_offs = redas_offs + 8 * i
-                    self.rewrite_coords(reda_offs, x, y)
-
     def randomize_block(self, block: UnitBlock):
         for k, v in list(block.logic.items()):
             if isinstance(k, int):
@@ -550,11 +546,14 @@ class FE8Randomizer:
                 block.logic[i][k] = True
 
         for i in range(block.count):
-            if "ignore" in block.logic[i] and block.logic[i]["ignore"]:
+            offset = block.base + i * CHAPTER_UNIT_SIZE
+            logic = block.logic[i]
+
+            if "nudges" in logic:
+                self.apply_nudges(offset, logic["nudges"])
+            if "ignore" in logic and logic["ignore"]:
                 continue
-            self.randomize_chapter_unit(
-                block.base + i * CHAPTER_UNIT_SIZE, block.logic[i]
-            )
+            self.randomize_chapter_unit(offset, logic)
 
     def fix_movement_costs(self) -> None:
         """
