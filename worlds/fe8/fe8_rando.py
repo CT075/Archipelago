@@ -38,6 +38,8 @@ STATS_COUNT = 6  # HP, Str, Skl, Spd, Def, Res (don't need Lck)
 
 EIRIKA = 1
 EIRIKA_LORD = 2
+EPHRAIM = 15
+EPHRAIM_LORD = 1
 
 EIRIKA_RAPIER_OFFSET = 0x9EF088
 ROSS_CH2_HP_OFFSET = 0x9F03B8
@@ -395,7 +397,7 @@ class FE8Randomizer:
         new_coords = encode_unit_coords(x, y)
         write_short_le(self.rom, offset, new_coords | flags)
 
-    def randomize_chapter_unit(self, data_offset: int, logic: dict[str, Any]) -> None:
+    def randomize_chapter_unit(self, data_offset: int, logic: dict[str, Any], chapter_name: str) -> None:
         # We *could* read the full struct, but we only need a few individual
         # bytes, so we may as well extract them ad-hoc.
         unit = self.rom[data_offset : data_offset + CHAPTER_UNIT_SIZE]
@@ -403,8 +405,11 @@ class FE8Randomizer:
 
         # If the unit's class is is not a "standard" class that can be given to
         # players, it's probably some NPC or enemy that shouldn't be touched.
+        #
+        # CR cam: trainees are broken, do this better
         if job_id not in self.jobs_by_id:
             return
+
 
         job = self.jobs_by_id[job_id]
         char = unit[0]
@@ -424,7 +429,8 @@ class FE8Randomizer:
                 [job for job in new_job_pool if job_valid(job, logic)]
             )
 
-            self.character_store[char] = new_job
+            if "no_store" in logic and not logic["no_store"]:
+                self.character_store[char] = new_job
 
         new_inventory = self.select_new_inventory(new_job, inventory, logic)
 
@@ -465,7 +471,7 @@ class FE8Randomizer:
                     reda_offs = redas_offs + 8 * i
                     self.rewrite_coords(reda_offs, x, y)
 
-    def randomize_block(self, block: UnitBlock):
+    def randomize_block(self, block: UnitBlock, chapter_name: str):
         if "must_fight" in block.logic:
             for i in self.random.sample(
                 range(block.count), block.logic["must_fight"]["at_least"]
@@ -488,10 +494,11 @@ class FE8Randomizer:
             if "ignore" in block.logic[i] and block.logic[i]["ignore"]:
                 continue
             self.randomize_chapter_unit(
-                block.base + i * CHAPTER_UNIT_SIZE, block.logic[i]
+                block.base + i * CHAPTER_UNIT_SIZE, block.logic[i],
+                chapter_name
             )
 
-    def fix_movement_costs(self):
+    def fix_movement_costs(self) -> None:
         """
         Units that spawn over water or mountains can get stuck, causing crashes
         or softlocking if their new class cannot walk on those tiles. To resolve
@@ -504,20 +511,21 @@ class FE8Randomizer:
                 if self.rom[entry + terrain_type] == 255:
                     self.rom[entry + terrain_type] = MOVEMENT_COST_SENTINEL
 
-    def fix_eirika_lord_stats(self):
-        # Move some of Eirika's base stats from her lord class to herself
-        eirika_character_entry = CHARACTER_TABLE_BASE + EIRIKA * CHARACTER_SIZE
-        eirika_stats_base = eirika_character_entry + CHARACTER_STATS_OFFSET
+    def fix_lord_stats(self) -> None:
+        for char, job in [(EIRIKA, EIRIKA_LORD), (EPHRAIM, EPHRAIM_LORD)]:
+            # Move some of the lord base stats from the lord classes to the lords
+            character_entry = CHARACTER_TABLE_BASE + char * CHARACTER_SIZE
+            stats_base = character_entry + CHARACTER_STATS_OFFSET
 
-        eirika_lord_entry = JOB_TABLE_BASE + EIRIKA_LORD * JOB_SIZE
-        eirika_job_stats_base = eirika_lord_entry + JOB_STATS_OFFSET
+            lord_entry = JOB_TABLE_BASE + job * JOB_SIZE
+            job_stats_base = lord_entry + JOB_STATS_OFFSET
 
-        for i in range(STATS_COUNT):
-            roll = self.random.randint(0, 4)
-            old_base = self.rom[eirika_job_stats_base + i]
-            new_personal_base = min(roll, old_base)
-            self.rom[eirika_stats_base + i] = new_personal_base
-            self.rom[eirika_job_stats_base + i] -= new_personal_base
+            for i in range(STATS_COUNT):
+                roll = self.random.randint(0, 4)
+                old_base = self.rom[job_stats_base + i]
+                new_personal_base = min(roll, old_base)
+                self.rom[stats_base + i] += new_personal_base
+                self.rom[stats_base + i] -= new_personal_base
 
     def apply_cutscene_fixes(self) -> None:
         # Eirika's Rapier is given in a cutscene at the start of the chapter,
@@ -544,10 +552,11 @@ class FE8Randomizer:
 
     # TODO: logic
     #   - Flying Duessel vs enemy archers in Ephraim 10 may be unbeatable
+    #   - Duessel is just broken
     def apply_changes(self) -> None:
-        for _chapter_name, chapter in self.unit_blocks.items():
+        for chapter_name, chapter in self.unit_blocks.items():
             for block in chapter:
-                self.randomize_block(block)
+                self.randomize_block(block, chapter_name)
 
         self.fix_movement_costs()
         self.apply_cutscene_fixes()

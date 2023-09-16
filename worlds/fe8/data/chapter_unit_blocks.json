@@ -7,14 +7,22 @@
             "logic": {"0": {"must_fight": true}}
         },
         {"name": "label36", "base": 9124944, "count": 3, "logic": {}},
-        {"name": "label28", "base": 9125144, "count": 8, "logic": {}},
+        {
+            "name": "RenaisCastleGuards",
+            "base": 9125144,
+            "count": 8,
+            "logic": {
+                "3": {"no_store": true},
+                "4": {"no_store": true}
+            }
+        },
         {"name": "label29", "base": 9125324, "count": 1, "logic": {}},
         {"name": "label32", "base": 9125364, "count": 2, "logic": {}},
         {"name": "label30", "base": 9125424, "count": 4, "logic": {}},
         {"name": "label31", "base": 9125524, "count": 6, "logic": {}},
         {"name": "label33", "base": 9125736, "count": 3, "logic": {}},
         {
-            "name": "label34",
+            "name": "ValterGroup",
             "base": 9125816,
             "count": 3,
             "logic": {"0": {"must_fight": true}}
@@ -22,7 +30,12 @@
     ],
     "Ch1": [
         {"name": "Units1", "base": 9126048, "count": 2, "logic": {}},
-        {"name": "label30", "base": 9126108, "count": 7, "logic": {}},
+        {
+            "name": "label30",
+            "base": 9126108,
+            "count": 7,
+            "logic": {"0": {"must_fight": true}}
+        },
         {"name": "label35", "base": 9126268, "count": 2, "logic": {}},
         {"name": "label32", "base": 9126408, "count": 2, "logic": {}}
     ],

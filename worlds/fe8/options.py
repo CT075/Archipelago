@@ -78,7 +78,7 @@ class ExcludeLatona(Toggle):
     default = 1
 
 
-fe8_options: Dict[str, type(Option)] = {
+fe8_options: Dict[str, type[Option]] = {
     "super_demon_king": SuperDemonKing,
     "smooth_level_caps": SmoothLevelCapProgression,
     "min_endgame_level_cap": MinimumEndgameLevelCapRange,
