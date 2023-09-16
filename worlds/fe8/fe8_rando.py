@@ -9,6 +9,12 @@ import logging
 
 from .util import fetch_json, write_short_le, read_short_le, read_word_le
 
+DEBUG = False
+
+def debug_print(s: str) -> None:
+    if DEBUG:
+        print(s)
+
 # CR cam: Maybe these should go into [constants]?
 
 WEAPON_DATA = "data/weapondata.json"
@@ -211,6 +217,7 @@ class WeaponData:
     name: str
     rank: WeaponRank
     kind: WeaponKind
+    locks: set[str]
 
     @classmethod
     def of_object(cls, obj: dict[str, Any]):
@@ -219,6 +226,7 @@ class WeaponData:
             name=obj["name"],
             rank=WeaponRank.of_str(obj["rank"]),
             kind=WeaponKind.of_str(obj["kind"]),
+            locks=obj.get("locks", []),
         )
 
 
@@ -239,7 +247,7 @@ class JobData:
             usable_weapons=set(
                 WeaponKind.of_str(kind) for kind in obj["usable_weapons"]
             ),
-            tags=obj["tags"],
+            tags=set(obj["tags"]),
         )
 
 
@@ -397,7 +405,9 @@ class FE8Randomizer:
         new_coords = encode_unit_coords(x, y)
         write_short_le(self.rom, offset, new_coords | flags)
 
-    def randomize_chapter_unit(self, data_offset: int, logic: dict[str, Any], chapter_name: str) -> None:
+    def randomize_chapter_unit(
+        self, data_offset: int, logic: dict[str, Any]
+    ) -> None:
         # We *could* read the full struct, but we only need a few individual
         # bytes, so we may as well extract them ad-hoc.
         unit = self.rom[data_offset : data_offset + CHAPTER_UNIT_SIZE]
@@ -410,9 +420,16 @@ class FE8Randomizer:
         if job_id not in self.jobs_by_id:
             return
 
-
         job = self.jobs_by_id[job_id]
         char = unit[0]
+
+        if DEBUG:
+            cname = self.character_store.lookup_name(char)
+            if cname is not None:
+                debug_print("    randomizing {cname}...")
+            else:
+                debug_print("    randomizing unit id 0x{hex(char)}...")
+
         # Affiliation = bits 1,2; unit is player if they're unset
         is_player = not bool(unit[3] & 0b0110)
         # Autolevel is LSB
@@ -471,7 +488,9 @@ class FE8Randomizer:
                     reda_offs = redas_offs + 8 * i
                     self.rewrite_coords(reda_offs, x, y)
 
-    def randomize_block(self, block: UnitBlock, chapter_name: str):
+    def randomize_block(self, block: UnitBlock):
+        debug_print("  randomizing block {block.name}:")
+
         if "must_fight" in block.logic:
             for i in self.random.sample(
                 range(block.count), block.logic["must_fight"]["at_least"]
@@ -494,8 +513,7 @@ class FE8Randomizer:
             if "ignore" in block.logic[i] and block.logic[i]["ignore"]:
                 continue
             self.randomize_chapter_unit(
-                block.base + i * CHAPTER_UNIT_SIZE, block.logic[i],
-                chapter_name
+                block.base + i * CHAPTER_UNIT_SIZE, block.logic[i]
             )
 
     def fix_movement_costs(self) -> None:
@@ -552,13 +570,14 @@ class FE8Randomizer:
 
     # TODO: logic
     #   - Flying Duessel vs enemy archers in Ephraim 10 may be unbeatable
-    #   - Duessel is just broken
+    #   - Duessel's map is just broken
     def apply_changes(self) -> None:
         for chapter_name, chapter in self.unit_blocks.items():
+            debug_print("randomizing {chapter_name}:")
             for block in chapter:
-                self.randomize_block(block, chapter_name)
+                self.randomize_block(block)
 
         self.fix_movement_costs()
         self.apply_cutscene_fixes()
-        self.fix_eirika_lord_stats()
+        self.fix_lord_stats()
         # TODO: Super Formortiis buffs
