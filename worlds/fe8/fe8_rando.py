@@ -11,9 +11,11 @@ from .util import fetch_json, write_short_le, read_short_le, read_word_le
 
 DEBUG = False
 
+
 def debug_print(s: str) -> None:
     if DEBUG:
         print(s)
+
 
 # CR cam: Maybe these should go into [constants]?
 
@@ -310,7 +312,15 @@ def job_valid(job: JobData, logic: dict[str, Any]) -> bool:
     return True
 
 
-def weapon_valid(weapon: WeaponData, logic: dict[str, Any]) -> bool:
+# TODO: Eirika and Ephraim should be able to use their respective weapons if
+# they get randomized into the right class.
+def weapon_usable(weapon: WeaponData, job: JobData, logic: dict[str, Any]) -> bool:
+    if weapon.kind not in job.usable_weapons:
+        return False
+
+    if any(lock not in job.tags for lock in weapon.locks):
+        return False
+
     if "must_fight" in logic and weapon.kind in [
         WeaponKind.ITEM,
         WeaponKind.STAFF,
@@ -380,14 +390,14 @@ class FE8Randomizer:
         choices = [
             weap
             for weap in self.weapons_by_rank[weapon_attrs.rank]
-            if weap.kind in job.usable_weapons and weapon_valid(weap, logic)
+            if weapon_usable(weap, job, logic)
         ]
 
         if not choices:
             import json
 
             logging.error("LOGIC ERROR: no viable weapons")
-            logging.error(f"  job: {job.id}")
+            logging.error(f"  job: {job.name}")
             logging.error(f"  logic: {json.dumps(logic, indent=2)}")
 
         return self.random.choice(choices).id
@@ -405,9 +415,7 @@ class FE8Randomizer:
         new_coords = encode_unit_coords(x, y)
         write_short_le(self.rom, offset, new_coords | flags)
 
-    def randomize_chapter_unit(
-        self, data_offset: int, logic: dict[str, Any]
-    ) -> None:
+    def randomize_chapter_unit(self, data_offset: int, logic: dict[str, Any]) -> None:
         # We *could* read the full struct, but we only need a few individual
         # bytes, so we may as well extract them ad-hoc.
         unit = self.rom[data_offset : data_offset + CHAPTER_UNIT_SIZE]
@@ -491,23 +499,19 @@ class FE8Randomizer:
     def randomize_block(self, block: UnitBlock):
         debug_print("  randomizing block {block.name}:")
 
-        if "must_fight" in block.logic:
-            for i in self.random.sample(
-                range(block.count), block.logic["must_fight"]["at_least"]
-            ):
-                block.logic[i]["must_fight"] = True
+        for k, v in block.logic.items():
+            if type(k) == int:
+                continue
 
-        if "must_fly" in block.logic and block.logic["must_fly"]:
-            for i in range(block.count):
-                block.logic[i]["must_fly"] = block.logic["must_fly"]
+            assert type(k) == str
 
-        if "no_fly" in block.logic and block.logic["no_fly"]:
-            for i in range(block.count):
-                block.logic[i]["no_fly"] = block.logic["no_fly"]
+            if "at_least" in v:
+                affected = self.random.sample(range(block.count), v["at_least"])
+            else:
+                affected = list(range(block.count))
 
-        if "ignore" in block.logic and block.logic["ignore"]:
-            for i in range(block.count):
-                block.logic[i]["ignore"] = block.logic["ignore"]
+            for i in affected:
+                block.logic[i][k] = True
 
         for i in range(block.count):
             if "ignore" in block.logic[i] and block.logic[i]["ignore"]:

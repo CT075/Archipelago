@@ -6,7 +6,7 @@
       "Lance"
     ],
     "is_promoted": false,
-    "tags": []
+    "tags": ["Ephraim"]
   },
   {
     "id": 2,
@@ -15,7 +15,7 @@
       "Sword"
     ],
     "is_promoted": false,
-    "tags": []
+    "tags": ["Eirika"]
   },
   {
     "id": 3,
@@ -24,7 +24,7 @@
       "Lance"
     ],
     "is_promoted": true,
-    "tags": []
+    "tags": ["Ephraim"]
   },
   {
     "id": 4,
@@ -33,7 +33,7 @@
       "Sword"
     ],
     "is_promoted": true,
-    "tags": []
+    "tags": ["Eirika"]
   },
   {
     "id": 5,
@@ -179,7 +179,7 @@
       "Sword"
     ],
     "is_promoted": false,
-    "tags": []
+    "tags": ["FastSword"]
   },
   {
     "id": 20,
@@ -188,7 +188,7 @@
       "Sword"
     ],
     "is_promoted": false,
-    "tags": []
+    "tags": ["FastSword"]
   },
   {
     "id": 21,
@@ -197,7 +197,7 @@
       "Sword"
     ],
     "is_promoted": true,
-    "tags": []
+    "tags": ["FastSword"]
   },
   {
     "id": 22,
@@ -206,7 +206,7 @@
       "Sword"
     ],
     "is_promoted": true,
-    "tags": []
+    "tags": ["FastSword"]
   },
   {
     "id": 23,
@@ -215,7 +215,7 @@
       "Sword"
     ],
     "is_promoted": true,
-    "tags": []
+    "tags": ["FastSword"]
   },
   {
     "id": 24,
@@ -224,7 +224,7 @@
       "Sword"
     ],
     "is_promoted": true,
-    "tags": []
+    "tags": ["FastSword"]
   },
   {
     "id": 25,

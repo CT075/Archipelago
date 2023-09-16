@@ -48,6 +48,13 @@
     "kind": "Sword"
   },
   {
+    "id": 9,
+    "name": "Rapier",
+    "rank": "C",
+    "kind": "Sword",
+    "locks": ["Eirika"]
+  },
+  {
     "id": 11,
     "name": "Brave Sword",
     "rank": "B",
@@ -57,7 +64,8 @@
     "id": 12,
     "name": "Shamshir",
     "rank": "D",
-    "kind": "Sword"
+    "kind": "Sword",
+    "locks": ["FastSword"]
   },
   {
     "id": 13,
@@ -496,6 +504,13 @@
     "name": "Dragon Axe",
     "rank": "C",
     "kind": "Axe"
+  },
+  {
+    "id": 120,
+    "name": "Reginleif",
+    "rank": "C",
+    "kind": "Lance",
+    "locks": ["Ephraim"]
   },
   {
     "id": 129,
