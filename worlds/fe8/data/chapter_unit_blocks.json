@@ -330,7 +330,12 @@
         {"name": "label47", "base": 9159284, "count": 2, "logic": {}},
         {"name": "label48", "base": 9159344, "count": 5, "logic": {}},
         {"name": "label33", "base": 9159504, "count": 4, "logic": {}},
-        {"name": "label41", "base": 9159772, "count": 3, "logic": {}},
+        {
+            "name": "CaellachVsIsmaire",
+            "base": 9159772,
+            "count": 3,
+            "logic": {"must_fight": true}
+        },
         {"name": "label49", "base": 9159892, "count": 5, "logic": {}}
     ],
     "Ch14Eph": [
