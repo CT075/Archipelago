@@ -77,13 +77,7 @@
             "logic": {"must_fight": {"at_least": 2}}
         },
         {"name": "label40", "base": 9129256, "count": 2, "logic": {}},
-        {"name": "label41", "base": 9129316, "count": 3, "logic": {}},
-        {"name": "SkirmishUnitsAlly1", "base": 9129396, "count": 8, "logic": {}},
-        {"name": "SkirmishUnitsEnemy1", "base": 9129576, "count": 21, "logic": {}},
-        {"name": "SkirmishUnitsAlly2", "base": 9130016, "count": 8, "logic": {}},
-        {"name": "SkirmishUnitsEnemy2", "base": 9130196, "count": 21, "logic": {}},
-        {"name": "SkirmishUnitsAlly3", "base": 9130636, "count": 8, "logic": {}},
-        {"name": "SkirmishUnitsEnemy3", "base": 9130816, "count": 21, "logic": {}}
+        {"name": "label41", "base": 9129316, "count": 3, "logic": {}}
     ],
     "Ch5": [
         {"name": "label38", "base": 9128196, "count": 9, "logic": {}},
@@ -123,13 +117,7 @@
             "logic": {"6": {"no_fly": true}}
         },
         {"name": "Units1", "base": 9135064, "count": 10, "logic": {}},
-        {"name": "label31", "base": 9135284, "count": 2, "logic": {}},
-        {"name": "SkirmishUnitsAlly1", "base": 9135424, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy1", "base": 9135624, "count": 27, "logic": {}},
-        {"name": "SkirmishUnitsAlly2", "base": 9136184, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy2", "base": 9136384, "count": 27, "logic": {}},
-        {"name": "SkirmishUnitsAlly3", "base": 9136944, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy3", "base": 9137144, "count": 27, "logic": {}}
+        {"name": "label31", "base": 9135284, "count": 2, "logic": {}}
     ],
     "Ch7": [
         {"name": "Units1", "base": 9137784, "count": 10, "logic": {}},
@@ -178,12 +166,6 @@
         {"name": "label53", "base": 9145156, "count": 2, "logic": {}},
         {"name": "label54", "base": 9145216, "count": 10, "logic": {}},
         {"name": "label58", "base": 9145436, "count": 3, "logic": {}},
-        {"name": "SkirmishUnitsAlly1", "base": 9145516, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy1", "base": 9145716, "count": 29, "logic": {}},
-        {"name": "SkirmishUnitsAlly2", "base": 9146316, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy2", "base": 9146516, "count": 29, "logic": {}},
-        {"name": "SkirmishUnitsAlly3", "base": 9147116, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy3", "base": 9147316, "count": 29, "logic": {}},
         {"name": "label45", "base": 9147968, "count": 7, "logic": {}},
         {"name": "label46", "base": 9148128, "count": 2, "logic": {}},
         {"name": "label47", "base": 9148188, "count": 1, "logic": {}},
@@ -216,12 +198,6 @@
         {"name": "label59", "base": 9188228, "count": 1, "logic": {}},
         {"name": "label63", "base": 9188268, "count": 5, "logic": {}},
         {"name": "label64", "base": 9188388, "count": 1, "logic": {}},
-        {"name": "SkirmishUnitsAlly1", "base": 9188428, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy1", "base": 9188628, "count": 23, "logic": {}},
-        {"name": "SkirmishUnitsAlly2", "base": 9189108, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy2", "base": 9189308, "count": 23, "logic": {}},
-        {"name": "SkirmishUnitsAlly3", "base": 9189788, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy3", "base": 9189988, "count": 23, "logic": {}},
         {"name": "label43", "base": 9190580, "count": 7, "logic": {}},
         {
             "name": "label42",
@@ -290,12 +266,6 @@
         {"name": "label45", "base": 9154400, "count": 4, "logic": {}},
         {"name": "label46", "base": 9154500, "count": 8, "logic": {}},
         {"name": "label48", "base": 9154680, "count": 7, "logic": {}},
-        {"name": "SkirmishUnitsAlly1", "base": 9154840, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy1", "base": 9155040, "count": 24, "logic": {}},
-        {"name": "SkirmishUnitsAlly2", "base": 9155540, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy2", "base": 9155740, "count": 24, "logic": {}},
-        {"name": "SkirmishUnitsAlly3", "base": 9156240, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy3", "base": 9156440, "count": 24, "logic": {}},
         {"name": "label37", "base": 9156976, "count": 1, "logic": {}},
         {"name": "label38", "base": 9157060, "count": 5, "logic": {}},
         {"name": "label49", "base": 9157208, "count": 1, "logic": {}},
@@ -311,13 +281,7 @@
         {"name": "label43", "base": 9196528, "count": 8, "logic": {}},
         {"name": "label47", "base": 9196708, "count": 1, "logic": {}},
         {"name": "label48", "base": 9196748, "count": 2, "logic": {}},
-        {"name": "label44", "base": 9196808, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsAlly1", "base": 9197008, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy1", "base": 9197208, "count": 28, "logic": {}},
-        {"name": "SkirmishUnitsAlly2", "base": 9197788, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy2", "base": 9197988, "count": 28, "logic": {}},
-        {"name": "SkirmishUnitsAlly3", "base": 9198568, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy3", "base": 9198768, "count": 28, "logic": {}}
+        {"name": "label44", "base": 9196808, "count": 9, "logic": {}}
     ],
     "Ch14Eir": [
         {"name": "Units1", "base": 9157544, "count": 12, "logic": {}},
@@ -449,13 +413,7 @@
         {"name": "label48", "base": 9167824, "count": 4, "logic": {}},
         {"name": "label49", "base": 9167924, "count": 6, "logic": {}},
         {"name": "label43", "base": 9168064, "count": 5, "logic": {}},
-        {"name": "label52", "base": 9168184, "count": 5, "logic": {}},
-        {"name": "SkirmishUnitsAlly1", "base": 9168304, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy1", "base": 9168504, "count": 29, "logic": {}},
-        {"name": "SkirmishUnitsAlly2", "base": 9169104, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy2", "base": 9169304, "count": 29, "logic": {}},
-        {"name": "SkirmishUnitsAlly3", "base": 9169904, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy3", "base": 9170104, "count": 29, "logic": {}}
+        {"name": "label52", "base": 9168184, "count": 5, "logic": {}}
     ],
     "Ch17Eph": [
         {"name": "label40", "base": 9167204, "count": 5, "logic": {}},
@@ -464,39 +422,21 @@
         {"name": "label48", "base": 9167924, "count": 6, "logic": {}},
         {"name": "label42", "base": 9168064, "count": 5, "logic": {}},
         {"name": "label50", "base": 9168184, "count": 5, "logic": {}},
-        {"name": "Units1", "base": 9206940, "count": 12, "logic": {}},
-        {"name": "SkirmishUnitsAlly1", "base": 9208040, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy1", "base": 9208240, "count": 29, "logic": {}},
-        {"name": "SkirmishUnitsAlly2", "base": 9208840, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy2", "base": 9209040, "count": 29, "logic": {}},
-        {"name": "SkirmishUnitsAlly3", "base": 9209640, "count": 9, "logic": {}},
-        {"name": "SkirmishUnitsEnemy3", "base": 9209840, "count": 29, "logic": {}}
+        {"name": "Units1", "base": 9206940, "count": 12, "logic": {}}
     ],
     "Ch18Eir": [
         {"name": "Units1", "base": 9170920, "count": 12, "logic": {}},
         {"name": "label38", "base": 9171180, "count": 28, "logic": {}},
         {"name": "label41", "base": 9171760, "count": 7, "logic": {}},
         {"name": "label44", "base": 9171920, "count": 6, "logic": {}},
-        {"name": "label48", "base": 9172060, "count": 5, "logic": {}},
-        {"name": "SkirmishUnitsAlly1", "base": 9172660, "count": 8, "logic": {}},
-        {"name": "SkirmishUnitsEnemy1", "base": 9172840, "count": 37, "logic": {}},
-        {"name": "SkirmishUnitsAlly2", "base": 9173600, "count": 8, "logic": {}},
-        {"name": "SkirmishUnitsEnemy2", "base": 9173780, "count": 37, "logic": {}},
-        {"name": "SkirmishUnitsAlly3", "base": 9174540, "count": 8, "logic": {}},
-        {"name": "SkirmishUnitsEnemy3", "base": 9174720, "count": 37, "logic": {}}
+        {"name": "label48", "base": 9172060, "count": 5, "logic": {}}
     ],
     "Ch18Eph": [
         {"name": "label38", "base": 9171760, "count": 7, "logic": {}},
         {"name": "Units1", "base": 9210584, "count": 12, "logic": {}},
         {"name": "label41", "base": 9210844, "count": 28, "logic": {}},
         {"name": "label44", "base": 9211424, "count": 6, "logic": {}},
-        {"name": "label48", "base": 9211564, "count": 5, "logic": {}},
-        {"name": "SkirmishUnitsAlly1", "base": 9212164, "count": 8, "logic": {}},
-        {"name": "SkirmishUnitsEnemy1", "base": 9212344, "count": 37, "logic": {}},
-        {"name": "SkirmishUnitsAlly2", "base": 9213104, "count": 8, "logic": {}},
-        {"name": "SkirmishUnitsEnemy2", "base": 9213284, "count": 37, "logic": {}},
-        {"name": "SkirmishUnitsAlly3", "base": 9214044, "count": 8, "logic": {}},
-        {"name": "SkirmishUnitsEnemy3", "base": 9214224, "count": 37, "logic": {}}
+        {"name": "label48", "base": 9211564, "count": 5, "logic": {}}
     ],
     "Ch19Eir": [
         {"name": "Units1", "base": 9175696, "count": 17, "logic": {}},
