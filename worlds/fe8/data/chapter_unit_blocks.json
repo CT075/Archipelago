@@ -1,12 +1,12 @@
 {
     "Prologue": [
         {
-            "name": "Units1",
+            "name": "PlayerDeployment",
             "base": 9124884,
             "count": 2,
             "logic": {"0": {"must_fight": true}}
         },
-        {"name": "label36", "base": 9124944, "count": 3, "logic": {}},
+        {"name": "ONeillGroup", "base": 9124944, "count": 3, "logic": {}},
         {
             "name": "RenaisCastleGuards",
             "base": 9125144,
@@ -29,15 +29,16 @@
         }
     ],
     "Ch1": [
-        {"name": "Units1", "base": 9126048, "count": 2, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9126048, "count": 2, "logic": {}},
         {
-            "name": "label30",
+            "name": "BreguetGroup",
             "base": 9126108,
             "count": 7,
             "logic": {"0": {"must_fight": true}}
         },
         {"name": "label35", "base": 9126268, "count": 2, "logic": {}},
-        {"name": "label32", "base": 9126408, "count": 2, "logic": {}}
+        {"name": "label32", "base": 9126408, "count": 2, "logic": {}},
+			{"name": "EasternReinforcements", "base": 9126328, "count": 3, "logic": {}}
     ],
     "Ch2": [
         {
@@ -46,8 +47,8 @@
             "count": 2,
             "logic": {"0": {"must_fly": true}}
         },
-        {"name": "Units1", "base": 9126604, "count": 5, "logic": {}},
-        {"name": "label29", "base": 9126724, "count": 6, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9126604, "count": 5, "logic": {}},
+        {"name": "StartingEnemies", "base": 9126724, "count": 6, "logic": {}},
         {"name": "label28", "base": 9126924, "count": 1, "logic": {}},
         {
             "name": "RossGarcia",
@@ -55,46 +56,52 @@
             "count": 2,
             "logic": {"1": {"must_fight": true}}
         },
-        {"name": "label30", "base": 9127084, "count": 1, "logic": {}}
+        {"name": "label30", "base": 9127084, "count": 1, "logic": {}},
+		{"name": "Turn3Reinforcements", "base": 9127024, "count": 2, "logic": {}}
     ],
     "Ch3": [
-        {"name": "Units1", "base": 9127284, "count": 9, "logic": {}},
-        {"name": "label20", "base": 9127484, "count": 10, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9127284, "count": 9, "logic": {}},
+        {"name": "StartingEnemies", "base": 9127484, "count": 10, "logic": {}},
         {"name": "label23", "base": 9127704, "count": 1, "logic": {}},
         {"name": "label27", "base": 9127788, "count": 5, "logic": {}},
         {"name": "label28", "base": 9127908, "count": 3, "logic": {}}
     ],
     "Ch4": [
-        {"name": "Units1", "base": 9128196, "count": 9, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9128196, "count": 9, "logic": {}},
         {"name": "label33", "base": 9128396, "count": 8, "logic": {}},
-        {"name": "label34", "base": 9128576, "count": 16, "logic": {}},
+        {"name": "StartingEnemies", "base": 9128576, "count": 16, "logic": {}},
         {"name": "label36", "base": 9128916, "count": 1, "logic": {}},
         {"name": "label39", "base": 9128956, "count": 1, "logic": {}},
         {
-            "name": "label38",
+            "name": "LArachelGroup",
             "base": 9129176,
             "count": 3,
             "logic": {"must_fight": {"at_least": 2}}
         },
         {"name": "label40", "base": 9129256, "count": 2, "logic": {}},
-        {"name": "label41", "base": 9129316, "count": 3, "logic": {}}
+        {"name": "label41", "base": 9129316, "count": 3, "logic": {}},
+		{"name": "EasternSkeletons", "base": 9129096, "count": 3, "logic": {}},
+		{"name": "NorthernZombies", "base": 9128996, "count": 4, "logic": {}}
     ],
     "Ch5": [
         {"name": "label38", "base": 9128196, "count": 9, "logic": {}},
-        {"name": "Units1", "base": 9131568, "count": 9, "logic": {}},
-        {"name": "label35", "base": 9131768, "count": 7, "logic": {}},
-        {"name": "label36", "base": 9131928, "count": 9, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9131568, "count": 9, "logic": {}},
+        {"name": "WesternStartingEnemies", "base": 9131768, "count": 7, "logic": {}},
+        {"name": "EasternStartingEnemies", "base": 9131928, "count": 9, "logic": {}},
         {"name": "label40", "base": 9132308, "count": 1, "logic": {}},
         {"name": "label31", "base": 9132348, "count": 2, "logic": {}},
         {"name": "label33", "base": 9132408, "count": 3, "logic": {}},
         {"name": "label34", "base": 9132488, "count": 1, "logic": {}},
         {"name": "label37", "base": 9132528, "count": 2, "logic": {}},
         {"name": "label44", "base": 9140284, "count": 2, "logic": {}},
-        {"name": "label45", "base": 9140364, "count": 1, "logic": {}}
+        {"name": "label45", "base": 9140364, "count": 1, "logic": {}},
+		{"name": "Turn2Brigands", "base": 9132128, "count": 2, "logic": {}},
+		{"name": "Turn6Brigands", "base": 9132188, "count": 2, "logic": {}},
+		{"name": "Turn8Brigands", "base": 9132248, "count": 2, "logic": {}}
     ],
     "Ch5x": [
         {
-            "name": "Units1",
+            "name": "PlayerDeployment",
             "base": 9132644,
             "count": 4,
             "logic": {"must_fight": {"at_least": 2}}
@@ -111,29 +118,37 @@
     ],
     "Ch6": [
         {
-            "name": "label32",
+            "name": "StartingEnemies",
             "base": 9134504,
             "count": 27,
-            "logic": {"6": {"no_fly": true}}
+            "logic": {
+			"6": {"no_fly": true}},
+            "7": {"no_fly": true}},
+            "9": {"no_fly": true}},
+            "27": {"no_fly": true}}, {"nudges": {"start": [20,13]}}, {"comment": "armour knight"}
+            "28": {"no_fly": true}}
         },
-        {"name": "Units1", "base": 9135064, "count": 10, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9135064, "count": 10, "logic": {}},
         {"name": "label31", "base": 9135284, "count": 2, "logic": {}}
+		{"name": "CavalierReinforcements", "base": 9135344, "count": 3, "logic": {}}
     ],
     "Ch7": [
-        {"name": "Units1", "base": 9137784, "count": 10, "logic": {}},
-        {"name": "label22", "base": 9138004, "count": 19, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9137784, "count": 10, "logic": {}},
+        {"name": "StartingEnemies", "base": 9138004, "count": 19, "logic": {}},
         {"name": "label25", "base": 9138444, "count": 2, "logic": {}},
         {"name": "label26", "base": 9138504, "count": 1, "logic": {}}
     ],
     "Ch8": [
-        {"name": "Units1", "base": 9138944, "count": 9, "logic": {}},
-        {"name": "label33", "base": 9139144, "count": 27, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9138944, "count": 9, "logic": {}},
+        {"name": "StartingEnemies", "base": 9139144, "count": 27, "logic": {}},
         {"name": "label36", "base": 9139704, "count": 3, "logic": {}},
         {"name": "label30", "base": 9139964, "count": 3, "logic": {}},
-        {"name": "label31", "base": 9140044, "count": 3, "logic": {}}
+        {"name": "label31", "base": 9140044, "count": 3, "logic": {}},
+		{"name": "CavaliersBehindEphraim", "base": 9139864, "count": 3, "logic": {}},
+		{"name": "MageThiefReinforcements", "base": 9139784, "count": 3, "logic": {{}
     ],
     "Ch9Eir": [
-        {"name": "Units1", "base": 9141260, "count": 11, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9141260, "count": 11, "logic": {}},
         {"name": "label44", "base": 9141500, "count": 23, "logic": {}},
         {"name": "label40", "base": 9142620, "count": 3, "logic": {}},
         {"name": "label41", "base": 9142700, "count": 5, "logic": {}},
@@ -146,7 +161,7 @@
     ],
     "Ch9Eph": [
         {"name": "label34", "base": 9143000, "count": 8, "logic": {}},
-        {"name": "Units1", "base": 9183944, "count": 11, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9183944, "count": 11, "logic": {}},
         {"name": "label37", "base": 9184184, "count": 29, "logic": {}},
         {"name": "label42", "base": 9184784, "count": 6, "logic": {}},
         {"name": "label43", "base": 9184924, "count": 2, "logic": {}},
@@ -160,7 +175,7 @@
         {"name": "label49", "base": 9185852, "count": 1, "logic": {}}
     ],
     "Ch10Eir": [
-        {"name": "Units1", "base": 9143616, "count": 12, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9143616, "count": 12, "logic": {}},
         {"name": "label51", "base": 9143876, "count": 34, "logic": {}},
         {"name": "label50", "base": 9144716, "count": 3, "logic": {}},
         {"name": "label53", "base": 9145156, "count": 2, "logic": {}},
@@ -172,7 +187,7 @@
         {"name": "label49", "base": 9148228, "count": 1, "logic": {}}
     ],
     "Ch10Eph": [
-        {"name": "Units1", "base": 9186388, "count": 11, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9186388, "count": 11, "logic": {}},
         {"name": "label51", "base": 9186628, "count": 1, "logic": {}},
         {"name": "label50", "base": 9186668, "count": 6, "logic": {}},
         {"name": "label60", "base": 9186808, "count": 1, "logic": {}},
@@ -207,7 +222,7 @@
         }
     ],
     "Ch11Eir": [
-        {"name": "Units1", "base": 9148564, "count": 11, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9148564, "count": 11, "logic": {}},
         {"name": "label34", "base": 9148804, "count": 41, "logic": {}},
         {
             "name": "label33",
@@ -226,7 +241,7 @@
         {"name": "label37", "base": 9150488, "count": 1, "logic": {}}
     ],
     "Ch11Eph": [
-        {"name": "Units1", "base": 9190992, "count": 11, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9190992, "count": 11, "logic": {}},
         {"name": "label37", "base": 9191232, "count": 10, "logic": {"must_fly": true}},
         {
             "name": "label42",
@@ -241,7 +256,7 @@
         {"name": "label33", "base": 9192732, "count": 6, "logic": {}}
     ],
     "Ch12Eir": [
-        {"name": "Units1", "base": 9150832, "count": 12, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9150832, "count": 12, "logic": {}},
         {"name": "label31", "base": 9151092, "count": 31, "logic": {}},
         {"name": "label35", "base": 9151732, "count": 1, "logic": {}},
         {"name": "label36", "base": 9151952, "count": 1, "logic": {}},
@@ -249,7 +264,7 @@
         {"name": "label34", "base": 9152112, "count": 2, "logic": {}}
     ],
     "Ch12Eph": [
-        {"name": "Units1", "base": 9193144, "count": 12, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9193144, "count": 12, "logic": {}},
         {"name": "label35", "base": 9193404, "count": 37, "logic": {}},
         {"name": "label31", "base": 9194764, "count": 3, "logic": {}},
         {"name": "label32", "base": 9194844, "count": 1, "logic": {}},
@@ -258,7 +273,7 @@
         {"name": "label42", "base": 9195004, "count": 1, "logic": {}}
     ],
     "Ch13Eir": [
-        {"name": "Units1", "base": 9152840, "count": 12, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9152840, "count": 12, "logic": {}},
         {"name": "label44", "base": 9153100, "count": 1, "logic": {}},
         {"name": "label39", "base": 9153140, "count": 20, "logic": {}},
         {"name": "label41", "base": 9154320, "count": 1, "logic": {}},
@@ -272,7 +287,7 @@
         {"name": "label50", "base": 9157248, "count": 1, "logic": {}}
     ],
     "Ch13Eph": [
-        {"name": "Units1", "base": 9195188, "count": 11, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9195188, "count": 11, "logic": {}},
         {"name": "label41", "base": 9195428, "count": 1, "logic": {}},
         {"name": "label40", "base": 9195468, "count": 34, "logic": {}},
         {"name": "label46", "base": 9196168, "count": 2, "logic": {}},
@@ -284,7 +299,7 @@
         {"name": "label44", "base": 9196808, "count": 9, "logic": {}}
     ],
     "Ch14Eir": [
-        {"name": "Units1", "base": 9157544, "count": 12, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9157544, "count": 12, "logic": {}},
         {"name": "label34", "base": 9157804, "count": 42, "logic": {}},
         {"name": "label35", "base": 9158924, "count": 1, "logic": {}},
         {"name": "label38", "base": 9158964, "count": 2, "logic": {}},
@@ -303,7 +318,7 @@
         {"name": "label49", "base": 9159892, "count": 5, "logic": {}}
     ],
     "Ch14Eph": [
-        {"name": "Units1", "base": 9199548, "count": 12, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9199548, "count": 12, "logic": {}},
         {"name": "label36", "base": 9199808, "count": 2, "logic": {}},
         {"name": "label39", "base": 9199868, "count": 41, "logic": {}},
         {
@@ -331,7 +346,7 @@
     ],
     "Ch15Eir": [
         {"name": "label47", "base": 9159892, "count": 5, "logic": {}},
-        {"name": "Units1", "base": 9160208, "count": 12, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9160208, "count": 12, "logic": {}},
         {"name": "label48", "base": 9160468, "count": 40, "logic": {}},
         {"name": "label50", "base": 9161288, "count": 6, "logic": {}},
         {
@@ -342,7 +357,7 @@
         }
     ],
     "Ch15Eph": [
-        {"name": "Units1", "base": 9203220, "count": 12, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9203220, "count": 12, "logic": {}},
         {"name": "label45", "base": 9203480, "count": 42, "logic": {}},
         {"name": "label52", "base": 9204340, "count": 3, "logic": {}},
         {
@@ -356,7 +371,7 @@
         {"name": "label46", "base": 9205200, "count": 1, "logic": {}}
     ],
     "Ch16Eir": [
-        {"name": "Units1", "base": 9162328, "count": 12, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9162328, "count": 12, "logic": {}},
         {"name": "label28", "base": 9162588, "count": 29, "logic": {}},
         {"name": "label45", "base": 9163728, "count": 3, "logic": {}},
         {"name": "label48", "base": 9163808, "count": 6, "logic": {}},
@@ -403,17 +418,18 @@
         {"name": "label47", "base": 9165960, "count": 1, "logic": {}},
         {"name": "label48", "base": 9166000, "count": 1, "logic": {}},
         {"name": "label49", "base": 9166040, "count": 1, "logic": {}},
-        {"name": "Units1", "base": 9205320, "count": 12, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9205320, "count": 12, "logic": {}},
         {"name": "label60", "base": 9205580, "count": 37, "logic": {}}
     ],
     "Ch17Eir": [
-        {"name": "Units1", "base": 9166424, "count": 12, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9166424, "count": 12, "logic": {}},
         {"name": "label41", "base": 9167204, "count": 5, "logic": {}},
         {"name": "label47", "base": 9167644, "count": 8, "logic": {}},
         {"name": "label48", "base": 9167824, "count": 4, "logic": {}},
         {"name": "label49", "base": 9167924, "count": 6, "logic": {}},
         {"name": "label43", "base": 9168064, "count": 5, "logic": {}},
-        {"name": "label52", "base": 9168184, "count": 5, "logic": {}}
+        {"name": "label52", "base": 9168184, "count": 5, "logic": {}},
+		{"name": "StartingEnemies", "base": 9207200, "count": 25, "logic":{}}
     ],
     "Ch17Eph": [
         {"name": "label40", "base": 9167204, "count": 5, "logic": {}},
@@ -422,10 +438,11 @@
         {"name": "label48", "base": 9167924, "count": 6, "logic": {}},
         {"name": "label42", "base": 9168064, "count": 5, "logic": {}},
         {"name": "label50", "base": 9168184, "count": 5, "logic": {}},
-        {"name": "Units1", "base": 9206940, "count": 12, "logic": {}}
+        {"name": "PlayerDeployment", "base": 9206940, "count": 12, "logic": {}},
+		{"name": "StartingEnemies", "base": 9207200, "count": 25, "logic":{}}
     ],
     "Ch18Eir": [
-        {"name": "Units1", "base": 9170920, "count": 12, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9170920, "count": 12, "logic": {}},
         {"name": "label38", "base": 9171180, "count": 28, "logic": {}},
         {"name": "label41", "base": 9171760, "count": 7, "logic": {}},
         {"name": "label44", "base": 9171920, "count": 6, "logic": {}},
@@ -433,13 +450,13 @@
     ],
     "Ch18Eph": [
         {"name": "label38", "base": 9171760, "count": 7, "logic": {}},
-        {"name": "Units1", "base": 9210584, "count": 12, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9210584, "count": 12, "logic": {}},
         {"name": "label41", "base": 9210844, "count": 28, "logic": {}},
         {"name": "label44", "base": 9211424, "count": 6, "logic": {}},
         {"name": "label48", "base": 9211564, "count": 5, "logic": {}}
     ],
     "Ch19Eir": [
-        {"name": "Units1", "base": 9175696, "count": 17, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9175696, "count": 17, "logic": {}},
         {"name": "label31", "base": 9177316, "count": 5, "logic": {}},
         {"name": "label32", "base": 9177436, "count": 1, "logic": {}},
         {"name": "label33", "base": 9177476, "count": 2, "logic": {}},
@@ -449,7 +466,9 @@
         {"name": "label44", "base": 9177836, "count": 4, "logic": {}},
         {"name": "label40", "base": 9178000, "count": 1, "logic": {}},
         {"name": "label41", "base": 9178060, "count": 5, "logic": {}},
-        {"name": "label42", "base": 9178180, "count": 1, "logic": {}}
+        {"name": "label42", "base": 9178180, "count": 1, "logic": {}},
+		{"name": "StartingEnemies", "base": 9176056, "count": 25, "logic": {}},
+		{"name": "RaustenArmours", "base": 9176636, "count": 8, "logic": {}}
     ],
     "Ch19Eph": [
         {"name": "label30", "base": 9177316, "count": 5, "logic": {}},
@@ -462,10 +481,12 @@
         {"name": "label37", "base": 9178000, "count": 1, "logic": {}},
         {"name": "label38", "base": 9178060, "count": 5, "logic": {}},
         {"name": "label39", "base": 9178180, "count": 1, "logic": {}},
-        {"name": "Units1", "base": 9215152, "count": 17, "logic": {}}
+        {"name": "PlayerDeployment", "base": 9215152, "count": 17, "logic": {}},
+		{"name": "StartingEnemies", "base": 9215512, "count": 25, "logic": {}},
+		{"name": "RaustenArmours", "base": 9217152, "count": 8, "logic": {}}
     ],
     "Ch20Eir": [
-        {"name": "Units1", "base": 9178484, "count": 18, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9178484, "count": 18, "logic": {}},
         {"name": "label37", "base": 9178864, "count": 46, "logic": {}},
         {"name": "label38", "base": 9179804, "count": 1, "logic": {}},
         {"name": "label41", "base": 9180724, "count": 1, "logic": {}},
@@ -479,13 +500,13 @@
         {"name": "label37", "base": 9180764, "count": 6, "logic": {}},
         {"name": "label40", "base": 9180904, "count": 1, "logic": {}},
         {"name": "label41", "base": 9180972, "count": 1, "logic": {}},
-        {"name": "Units1", "base": 9217596, "count": 18, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9217596, "count": 18, "logic": {}},
         {"name": "label43", "base": 9217976, "count": 46, "logic": {}},
         {"name": "label44", "base": 9218916, "count": 1, "logic": {}}
     ],
     "Final1Eir": [
         {"name": "label30", "base": 9180972, "count": 1, "logic": {}},
-        {"name": "Units1", "base": 9181212, "count": 12, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9181212, "count": 12, "logic": {}},
         {"name": "label28", "base": 9181472, "count": 36, "logic": {}},
         {"name": "label31", "base": 9182672, "count": 5, "logic": {}},
         {"name": "label34", "base": 9182792, "count": 6, "logic": {}}
@@ -493,12 +514,12 @@
     "Final1Eph": [
         {"name": "label26", "base": 9180972, "count": 1, "logic": {}},
         {"name": "label27", "base": 9182672, "count": 5, "logic": {}},
-        {"name": "Units1", "base": 9220192, "count": 12, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9220192, "count": 12, "logic": {}},
         {"name": "label32", "base": 9220452, "count": 36, "logic": {}},
         {"name": "label34", "base": 9221652, "count": 6, "logic": {}}
     ],
     "Final2Eir": [
-        {"name": "Units1", "base": 9183044, "count": 2, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9183044, "count": 2, "logic": {}},
         {"name": "label18", "base": 9183104, "count": 2, "logic": {}},
         {"name": "label19", "base": 9183164, "count": 10, "logic": {}},
         {"name": "label17", "base": 9183384, "count": 1, "logic": {}}
@@ -508,6 +529,6 @@
         {"name": "label18", "base": 9183104, "count": 2, "logic": {}},
         {"name": "label19", "base": 9183164, "count": 10, "logic": {}},
         {"name": "label16", "base": 9183384, "count": 1, "logic": {}},
-        {"name": "Units1", "base": 9221792, "count": 0, "logic": {}}
+        {"name": "PlayerDeployment", "base": 9221792, "count": 0, "logic": {}}
     ]
 }
