@@ -255,7 +255,24 @@
         {"name": "label32", "base": 9194844, "count": 1, "logic": {}},
         {"name": "label33", "base": 9194884, "count": 2, "logic": {}},
         {"name": "label41", "base": 9194944, "count": 2, "logic": {}},
-        {"name": "label42", "base": 9195004, "count": 1, "logic": {}}
+        {"name": "label42", "base": 9195004, "count": 1, "logic": {}},
+        {"name": "EwanJoins", "base": 9194164, "count": 1, "logic": {}},
+        {"name": "MonstersTopRight", "base": 9194204, "count": 6, "logic": {}},
+        {"name": "MonstersTopLeft", "base": 9194344, "count": 3, "logic": {}},
+        {"name": "MonstersRight", "base": 9194424, "count": 2, "logic": {}},
+        {
+            "name": "MonstersBottom", 
+            "base": 9194484, 
+            "count": 3, 
+            "logic": {
+                "1": {"nudges": {"start": [1,27]}},
+                "2": {"nudges": {"start": [1,29]}}
+            }
+        },
+        {"name": "RightBoat", "base": 9194564, "count": 2, "logic": {}},
+        {"name": "SingleLeft", "base": 9194624, "count": 1, "logic": {}},
+        {"name": "SingleRight", "base": 9194664, "count": 1, "logic": {}},
+        {"name": "TopPair", "base": 9194704, "count": 2, "logic": {}}
     ],
     "Ch13Eir": [
         {"name": "Units1", "base": 9152840, "count": 12, "logic": {}},
