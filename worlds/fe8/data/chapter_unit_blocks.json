@@ -183,7 +183,7 @@
         {"name": "label45", "base": 9186848, "count": 14, "logic": {}},
         {"name": "label49", "base": 9187248, "count": 4, "logic": {}},
         {
-            "name": "label52",
+            "name": "CormagSquad2",
             "base": 9187408,
             "count": 3,
             "logic": {
@@ -192,23 +192,27 @@
               "2": {"must_fly": true}
             }
         },
-        {"name": "label46", "base": 9187688, "count": 4, "logic": {}},
+        {"name": "DuesselSquad", "base": 9187688, "count": 4, "logic": {}},
         {"name": "label47", "base": 9187788, "count": 1, "logic": {}},
-        {"name": "label48", "base": 9187828, "count": 3, "logic": {}},
+        {"name": "CormagSquad", "base": 9187828, "count": 3, "logic": {}},
         {"name": "label54", "base": 9187908, "count": 2, "logic": {}},
         {"name": "label55", "base": 9187968, "count": 8, "logic": {}},
-        {"name": "label57", "base": 9188148, "count": 1, "logic": {}},
-        {"name": "label58", "base": 9188188, "count": 1, "logic": {}},
+        {"name": "ValterVisits", "base": 9188148, "count": 1, "logic": {}},
+        {"name": "RedBoatLeavesFort", "base": 9188188, "count": 1, "logic": {}},
         {"name": "label59", "base": 9188228, "count": 1, "logic": {}},
         {"name": "label63", "base": 9188268, "count": 5, "logic": {}},
         {"name": "label64", "base": 9188388, "count": 1, "logic": {}},
-        {"name": "label43", "base": 9190580, "count": 7, "logic": {}},
+        {"name": "MessengerScene2", "base": 9190580, "count": 7, "logic": {}},
         {
-            "name": "label42",
+            "name": "MessengerScene",
             "base": 9190760,
             "count": 3,
             "logic": {"0": {"must_fly": true}}
-        }
+        },
+        {"name": "FromTheForts", "base": 9187348, "count":2, "logic":{}},
+        {"name": "TopRight6", "base": 9187488, "count":6, "logic":{}},
+        {"name": "TopRightHard", "base": 9187628, "count":2, "logic":{}},
+        {"name": "VillageRaiders", "base": 9187148, "count":4, "logic":{}}
     ],
     "Ch11Eir": [
         {"name": "Units1", "base": 9148564, "count": 11, "logic": {}},
