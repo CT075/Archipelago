@@ -237,16 +237,25 @@
         {"name": "Units1", "base": 9190992, "count": 11, "logic": {}},
         {"name": "label37", "base": 9191232, "count": 10, "logic": {"must_fly": true}},
         {
-            "name": "label42",
+            "name": "DozlaSquad",
             "base": 9191452,
             "count": 2,
             "logic": {"must_fight": {"at_least": 1}}
         },
-        {"name": "label40", "base": 9191512, "count": 12, "logic": {}},
-        {"name": "label41", "base": 9191772, "count": 9, "logic": {}},
-        {"name": "label34", "base": 9192112, "count": 2, "logic": {}},
-        {"name": "label36", "base": 9192172, "count": 2, "logic": {}},
-        {"name": "label33", "base": 9192732, "count": 6, "logic": {}}
+        {"name": "SecondShipCrew", "base": 9191512, "count": 12, "logic": {}},
+        {"name": "SecondShipCrew2", "base": 9191772, "count": 9, "logic": {}},
+        {"name": "MyrrhBoat", "base": 9192112, "count": 2, "logic": {}},
+        {"name": "MyrrhBoat2", "base": 9192172, "count": 2, "logic": {}},
+        {"name": "CastleCutscene", "base": 9192732, "count": 6, "logic": {}},
+        {"name": "SecondShipStairs", "base": 9191972, "count":2, "logic":{}},
+        {"name": "BossSquad", "base": 9192032, "count":3, "logic":{"must_fly": true}},
+        {"name": "LeftSidePair", "base": 9192232, "count":2, "logic":{"must_fly": true}},
+        {"name": "TopMiddlePair", "base": 9192292, "count":2, "logic":{"must_fly": true}},
+        {"name": "BottomMidPair", "base": 9192352, "count":2, "logic":{"must_fly": true}},
+        {"name": "TopRightDuo", "base": 9192432, "count":2, "logic":{"must_fly": true}},
+        {"name": "BottomRightDuo", "base": 9192492, "count":2, "logic":{"must_fly": true}},
+        {"name": "TopLeftDuo", "base": 9192592, "count":2, "logic":{"must_fly": true}},
+        {"name": "BottomRightDuo", "base": 9192652, "count":2, "logic":{"must_fly": true}}
     ],
     "Ch12Eir": [
         {"name": "Units1", "base": 9150832, "count": 12, "logic": {}},
