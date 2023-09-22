@@ -581,17 +581,36 @@
     ],
     "Ch15Eph": [
         {"name": "PlayerDeployment", "base": 9203220, "count": 12, "logic": {}},
-        {"name": "label45", "base": 9203480, "count": 42, "logic": {}},
+        {"name": "EnemyStart", "base": 9203480, "count": 42, "logic": {}},
         {"name": "label52", "base": 9204340, "count": 3, "logic": {}},
         {
-            "name": "label54",
+            "name": "EirikaSquad",
             "base": 9204420,
             "count": 3,
             "logic": {"1": {"must_fight": true}, "2": {"must_fight": true}}
         },
         {"name": "label47", "base": 9204960, "count": 2, "logic": {}},
-        {"name": "label48", "base": 9205020, "count": 8, "logic": {}},
-        {"name": "label46", "base": 9205200, "count": 1, "logic": {}}
+        {"name": "IntroBlueGroup", "base": 9205020, "count": 8, "logic": {}},
+        {"name": "label46", "base": 9205200, "count": 1, "logic": {}},
+        {
+            "name": "NortheastFliers",
+            "base": 9204500, "count":2,
+            "logic": {
+                "0": {"nudges": {"start":[23,3]}},
+                "1": {"nudges": {"start":[21,2]}}
+            }
+        },
+        {
+            "name": "NorthFliers",
+            "base": 9204560,
+            "count":2,
+            "logic":{
+                "1": {"must_fly":true}
+            }
+        },
+        {"name": "NorthLandTrio", "base": 9204620, "count":3, "logic":{}},
+        {"name": "BelowVillage", "base": 9204700, "count":9, "logic":{}},
+        {"name": "SouthernForts", "base": 9204900, "count":2, "logic":{}}
     ],
     "Ch16Eir": [
         {"name": "PlayerDeployment", "base": 9162328, "count": 12, "logic": {}},
