@@ -232,7 +232,21 @@ class WeaponData:
 
 # This is a hack until we get monster weapons set up in `weapondata.json`
 # properly.
-EYES = {
+MONSTER_DARKS = {
+    0xAB: {
+        "id": 0xAB,
+        "name": "Demon Surge",
+        "rank": WeaponRank.B,
+        "kind": WeaponKind.DARK,
+        "locks": set(),
+    },
+    0xAC: {
+        "id": 0xAC,
+        "name": "Shadowshot",
+        "rank": WeaponRank.A,
+        "kind": WeaponKind.DARK,
+        "locks": set(),
+    },
     0xB3: {
         "id": 0xB3,
         "name": "Evil Eye",
@@ -243,6 +257,13 @@ EYES = {
     0xB4: {
         "id": 0xB4,
         "name": "Crimson Eye",
+        "rank": WeaponRank.B,
+        "kind": WeaponKind.DARK,
+        "locks": set(),
+    },
+    0xB5: {
+        "id": 0xB5,
+        "name": "Stone",
         "rank": WeaponRank.B,
         "kind": WeaponKind.DARK,
         "locks": set(),
@@ -434,11 +455,11 @@ class FE8Randomizer:
         return True
 
     def select_new_item(self, job: JobData, item_id: int, logic: dict[str, Any]) -> int:
-        if item_id not in self.weapons_by_id and item_id not in EYES:
+        if item_id not in self.weapons_by_id and item_id not in MONSTER_DARKS:
             return item_id
 
-        if item_id in EYES:
-            weapon_attrs: WeaponData = WeaponData(**EYES[item_id])  # type: ignore
+        if item_id in MONSTER_DARKS:
+            weapon_attrs: WeaponData = WeaponData(**MONSTER_DARKS[item_id])  # type: ignore
         else:
             weapon_attrs = self.weapons_by_id[item_id]
 
@@ -448,7 +469,7 @@ class FE8Randomizer:
             if weapon_usable(weap, job, logic)
         ]
 
-        if item_id in EYES and WeaponKind.DARK in job.usable_weapons:
+        if item_id in MONSTER_DARKS and WeaponKind.DARK in job.usable_weapons:
             choices.append(weapon_attrs)
 
         if not choices:
