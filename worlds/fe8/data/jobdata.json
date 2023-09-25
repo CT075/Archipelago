@@ -15,7 +15,7 @@
       "Sword"
     ],
     "is_promoted": false,
-    "tags": ["Eirika"]
+    "tags": ["Eirika","FastSword"]
   },
   {
     "id": 3,
@@ -33,7 +33,7 @@
       "Sword"
     ],
     "is_promoted": true,
-    "tags": ["Eirika"]
+    "tags": ["Eirika","FastSword"]
   },
   {
     "id": 5,
