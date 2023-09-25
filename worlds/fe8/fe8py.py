@@ -32,6 +32,7 @@ CHARACTER_TABLE_BASE = 0x803D30
 CHARACTER_SIZE = 52
 CHARACTER_WRANK_OFFSET = 20
 CHARACTER_STATS_OFFSET = 12
+CHAR_ABILITY_4_OFFSET = 43
 
 JOB_TABLE_BASE = 0x807110
 JOB_SIZE = 84
@@ -41,8 +42,10 @@ STATS_COUNT = 6  # HP, Str, Skl, Spd, Def, Res (don't need Lck)
 
 EIRIKA = 1
 EIRIKA_LORD = 2
+EIRIKA_LOCK = 1 << 4
 EPHRAIM = 15
 EPHRAIM_LORD = 1
+EPHRAIM_LOCK = 1 << 5
 
 EIRIKA_RAPIER_OFFSET = 0x9EF088
 ROSS_CH2_HP_OFFSET = 0x9F03B8
@@ -229,7 +232,21 @@ class WeaponData:
 
 # This is a hack until we get monster weapons set up in `weapondata.json`
 # properly.
-EYES = {
+MONSTER_DARKS = {
+    0xAB: {
+        "id": 0xAB,
+        "name": "Demon Surge",
+        "rank": WeaponRank.B,
+        "kind": WeaponKind.DARK,
+        "locks": set(),
+    },
+    0xAC: {
+        "id": 0xAC,
+        "name": "Shadowshot",
+        "rank": WeaponRank.A,
+        "kind": WeaponKind.DARK,
+        "locks": set(),
+    },
     0xB3: {
         "id": 0xB3,
         "name": "Evil Eye",
@@ -240,6 +257,13 @@ EYES = {
     0xB4: {
         "id": 0xB4,
         "name": "Crimson Eye",
+        "rank": WeaponRank.B,
+        "kind": WeaponKind.DARK,
+        "locks": set(),
+    },
+    0xB5: {
+        "id": 0xB5,
+        "name": "Stone",
         "rank": WeaponRank.B,
         "kind": WeaponKind.DARK,
         "locks": set(),
@@ -431,11 +455,11 @@ class FE8Randomizer:
         return True
 
     def select_new_item(self, job: JobData, item_id: int, logic: dict[str, Any]) -> int:
-        if item_id not in self.weapons_by_id and item_id not in EYES:
+        if item_id not in self.weapons_by_id and item_id not in MONSTER_DARKS:
             return item_id
 
-        if item_id in EYES:
-            weapon_attrs: WeaponData = WeaponData(**EYES[item_id])  # type: ignore
+        if item_id in MONSTER_DARKS:
+            weapon_attrs: WeaponData = WeaponData(**MONSTER_DARKS[item_id])  # type: ignore
         else:
             weapon_attrs = self.weapons_by_id[item_id]
 
@@ -445,7 +469,7 @@ class FE8Randomizer:
             if weapon_usable(weap, job, logic)
         ]
 
-        if item_id in EYES and WeaponKind.DARK in job.usable_weapons:
+        if item_id in MONSTER_DARKS and WeaponKind.DARK in job.usable_weapons:
             choices.append(weapon_attrs)
 
         if not choices:
@@ -576,8 +600,11 @@ class FE8Randomizer:
                 if self.rom[entry + terrain_type] == 255:
                     self.rom[entry + terrain_type] = MOVEMENT_COST_SENTINEL
 
-    def fix_lord_stats(self) -> None:
-        for char, job in [(EIRIKA, EIRIKA_LORD), (EPHRAIM, EPHRAIM_LORD)]:
+    def tweak_lords(self) -> None:
+        for char, job, lock_mask in [
+            (EIRIKA, EIRIKA_LORD, EIRIKA_LOCK),
+            (EPHRAIM, EPHRAIM_LORD, EPHRAIM_LOCK),
+        ]:
             # Move some of the lord base stats from the lord classes to the lords
             character_entry = CHARACTER_TABLE_BASE + char * CHARACTER_SIZE
             stats_base = character_entry + CHARACTER_STATS_OFFSET
@@ -591,6 +618,9 @@ class FE8Randomizer:
                 new_personal_base = min(roll, old_base)
                 self.rom[stats_base + i] += new_personal_base
                 self.rom[stats_base + i] -= new_personal_base
+
+            ability_4_base = character_entry + CHAR_ABILITY_4_OFFSET
+            self.rom[ability_4_base] |= lock_mask
 
     def apply_cutscene_fixes(self) -> None:
         # Eirika's Rapier is given in a cutscene at the start of the chapter,
@@ -630,7 +660,7 @@ class FE8Randomizer:
 
         self.fix_movement_costs()
         self.apply_cutscene_fixes()
-        self.fix_lord_stats()
+        self.tweak_lords()
         # TODO: Super Formortiis buffs
 
     def apply_5x_buffs(self) -> None:

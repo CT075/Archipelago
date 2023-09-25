@@ -180,15 +180,19 @@
         {"name": "PlayerDeployment", "base": 9183944, "count": 11, "logic": {}},
         {"name": "label37", "base": 9184184, "count": 29, "logic": {}},
         {"name": "label42", "base": 9184784, "count": 6, "logic": {}},
-        {"name": "label43", "base": 9184924, "count": 2, "logic": {}},
-        {"name": "label45", "base": 9184984, "count": 2, "logic": {}},
-        {"name": "label39", "base": 9185324, "count": 2, "logic": {}},
+        {"name": "Amelia", "base": 9184924, "count": 2, "logic": {}},
+        {"name": "TanaGetsJailed", "base": 9184984, "count": 2, "logic": {}},
+        {"name": "TanaIntro", "base": 9185324, "count": 2, "logic": {}},
         {"name": "label40", "base": 9185384, "count": 1, "logic": {}},
-        {"name": "label38", "base": 9185424, "count": 2, "logic": {}},
+        {"name": "AmeliaIntro", "base": 9185424, "count": 2, "logic": {}},
         {"name": "label47", "base": 9185484, "count": 3, "logic": {}},
-        {"name": "label36", "base": 9185664, "count": 3, "logic": {}},
+        {"name": "HallwayLyon", "base": 9185664, "count": 3, "logic": {}},
         {"name": "label48", "base": 9185792, "count": 2, "logic": {}},
-        {"name": "label49", "base": 9185852, "count": 1, "logic": {}}
+        {"name": "label49", "base": 9185852, "count": 1, "logic": {}},
+        {"name": "OutsideStairs", "base": 9185124, "count": 1, "logic": {}},
+        {"name": "NearTana", "base": 9185164, "count": 2, "logic": {}},
+        {"name": "RightSide", "base": 9185224, "count": 4, "logic": {}},
+        {"name": "BottomTrio", "base": 9185044, "count": 3, "logic": {}}
     ],
     "Ch10Eir": [
         {"name": "PlayerDeployment", "base": 9143616, "count": 12, "logic": {}},
@@ -230,7 +234,7 @@
         {"name": "label45", "base": 9186848, "count": 14, "logic": {}},
         {"name": "label49", "base": 9187248, "count": 4, "logic": {}},
         {
-            "name": "label52",
+            "name": "CormagSquad2",
             "base": 9187408,
             "count": 3,
             "logic": {
@@ -239,23 +243,27 @@
                 "2": {"must_fly": true}
             }
         },
-        {"name": "label46", "base": 9187688, "count": 4, "logic": {}},
+        {"name": "DuesselSquad", "base": 9187688, "count": 4, "logic": {}},
         {"name": "label47", "base": 9187788, "count": 1, "logic": {}},
-        {"name": "label48", "base": 9187828, "count": 3, "logic": {}},
+        {"name": "CormagSquad", "base": 9187828, "count": 3, "logic": {}},
         {"name": "label54", "base": 9187908, "count": 2, "logic": {}},
         {"name": "label55", "base": 9187968, "count": 8, "logic": {}},
-        {"name": "label57", "base": 9188148, "count": 1, "logic": {}},
-        {"name": "label58", "base": 9188188, "count": 1, "logic": {}},
+        {"name": "ValterVisits", "base": 9188148, "count": 1, "logic": {}},
+        {"name": "RedBoatLeavesFort", "base": 9188188, "count": 1, "logic": {}},
         {"name": "label59", "base": 9188228, "count": 1, "logic": {}},
         {"name": "label63", "base": 9188268, "count": 5, "logic": {}},
         {"name": "label64", "base": 9188388, "count": 1, "logic": {}},
-        {"name": "label43", "base": 9190580, "count": 7, "logic": {}},
+        {"name": "MessengerScene2", "base": 9190580, "count": 7, "logic": {}},
         {
-            "name": "label42",
+            "name": "MessengerScene",
             "base": 9190760,
             "count": 3,
             "logic": {"0": {"must_fly": true}}
-        }
+        },
+        {"name": "FromTheForts", "base": 9187348, "count": 2, "logic": {}},
+        {"name": "TopRight6", "base": 9187488, "count": 6, "logic": {}},
+        {"name": "TopRightHard", "base": 9187628, "count": 2, "logic": {}},
+        {"name": "VillageRaiders", "base": 9187148, "count": 4, "logic": {}}
     ],
     "Ch11Eir": [
         {"name": "PlayerDeployment", "base": 9148564, "count": 11, "logic": {}},
@@ -284,16 +292,60 @@
         {"name": "PlayerDeployment", "base": 9190992, "count": 11, "logic": {}},
         {"name": "label37", "base": 9191232, "count": 10, "logic": {"must_fly": true}},
         {
-            "name": "label42",
+            "name": "DozlaSquad",
             "base": 9191452,
             "count": 2,
             "logic": {"must_fight": {"at_least": 1}}
         },
-        {"name": "label40", "base": 9191512, "count": 12, "logic": {}},
-        {"name": "label41", "base": 9191772, "count": 9, "logic": {}},
-        {"name": "label34", "base": 9192112, "count": 2, "logic": {}},
-        {"name": "label36", "base": 9192172, "count": 2, "logic": {}},
-        {"name": "label33", "base": 9192732, "count": 6, "logic": {}}
+        {"name": "SecondShipCrew", "base": 9191512, "count": 12, "logic": {}},
+        {"name": "SecondShipCrew2", "base": 9191772, "count": 9, "logic": {}},
+        {"name": "MyrrhBoat", "base": 9192112, "count": 2, "logic": {}},
+        {"name": "MyrrhBoat2", "base": 9192172, "count": 2, "logic": {}},
+        {"name": "CastleCutscene", "base": 9192732, "count": 6, "logic": {}},
+        {"name": "SecondShipStairs", "base": 9191972, "count": 2, "logic": {}},
+        {"name": "BossSquad", "base": 9192032, "count": 3, "logic": {"must_fly": true}},
+        {
+            "name": "LeftSidePair",
+            "base": 9192232,
+            "count": 2,
+            "logic": {"must_fly": true}
+        },
+        {
+            "name": "TopMiddlePair",
+            "base": 9192292,
+            "count": 2,
+            "logic": {"must_fly": true}
+        },
+        {
+            "name": "BottomMidPair",
+            "base": 9192352,
+            "count": 2,
+            "logic": {"must_fly": true}
+        },
+        {
+            "name": "TopRightDuo",
+            "base": 9192432,
+            "count": 2,
+            "logic": {"must_fly": true}
+        },
+        {
+            "name": "BottomRightDuo",
+            "base": 9192492,
+            "count": 2,
+            "logic": {"must_fly": true}
+        },
+        {
+            "name": "TopLeftDuo",
+            "base": 9192592,
+            "count": 2,
+            "logic": {"must_fly": true}
+        },
+        {
+            "name": "BottomRightDuo",
+            "base": 9192652,
+            "count": 2,
+            "logic": {"must_fly": true}
+        }
     ],
     "Ch12Eir": [
         {"name": "PlayerDeployment", "base": 9150832, "count": 12, "logic": {}},
@@ -371,7 +423,24 @@
         {"name": "label32", "base": 9194844, "count": 1, "logic": {}},
         {"name": "label33", "base": 9194884, "count": 2, "logic": {}},
         {"name": "label41", "base": 9194944, "count": 2, "logic": {}},
-        {"name": "label42", "base": 9195004, "count": 1, "logic": {}}
+        {"name": "label42", "base": 9195004, "count": 1, "logic": {}},
+        {"name": "EwanJoins", "base": 9194164, "count": 1, "logic": {}},
+        {"name": "MonstersTopRight", "base": 9194204, "count": 6, "logic": {}},
+        {"name": "MonstersTopLeft", "base": 9194344, "count": 3, "logic": {}},
+        {"name": "MonstersRight", "base": 9194424, "count": 2, "logic": {}},
+        {
+            "name": "MonstersBottom",
+            "base": 9194484,
+            "count": 3,
+            "logic": {
+                "1": {"nudges": {"start": [1, 27]}},
+                "2": {"nudges": {"start": [1, 29]}}
+            }
+        },
+        {"name": "RightBoat", "base": 9194564, "count": 2, "logic": {}},
+        {"name": "SingleLeft", "base": 9194624, "count": 1, "logic": {}},
+        {"name": "SingleRight", "base": 9194664, "count": 1, "logic": {}},
+        {"name": "TopPair", "base": 9194704, "count": 2, "logic": {}}
     ],
     "Ch13Eir": [
         {"name": "PlayerDeployment", "base": 9152840, "count": 12, "logic": {}},
@@ -436,15 +505,19 @@
     ],
     "Ch13Eph": [
         {"name": "PlayerDeployment", "base": 9195188, "count": 11, "logic": {}},
-        {"name": "label41", "base": 9195428, "count": 1, "logic": {}},
-        {"name": "label40", "base": 9195468, "count": 34, "logic": {}},
-        {"name": "label46", "base": 9196168, "count": 2, "logic": {}},
-        {"name": "label39", "base": 9196408, "count": 1, "logic": {}},
-        {"name": "label42", "base": 9196448, "count": 3, "logic": {}},
-        {"name": "label43", "base": 9196528, "count": 8, "logic": {}},
-        {"name": "label47", "base": 9196708, "count": 1, "logic": {}},
-        {"name": "label48", "base": 9196748, "count": 2, "logic": {}},
-        {"name": "label44", "base": 9196808, "count": 9, "logic": {}}
+        {"name": "SelenaBoss", "base": 9195428, "count": 1, "logic": {}},
+        {"name": "EnemyStart", "base": 9195468, "count": 34, "logic": {}},
+        {"name": "GerikGroup", "base": 9196168, "count": 2, "logic": {}},
+        {"name": "MyrrhMoving", "base": 9196408, "count": 1, "logic": {}},
+        {"name": "IntroLordSquad", "base": 9196448, "count": 3, "logic": {}},
+        {"name": "IntroBlueGroup", "base": 9196528, "count": 8, "logic": {}},
+        {"name": "MyrrhMoving2", "base": 9196708, "count": 1, "logic": {}},
+        {"name": "MyrrhAfterRout", "base": 9196748, "count": 2, "logic": {}},
+        {"name": "EnemyStart2", "base": 9196808, "count": 9, "logic": {}},
+        {"name": "WaterBandit", "base": 9196228, "count": 1, "logic": {}},
+        {"name": "LandBandit", "base": 9196268, "count": 1, "logic": {}},
+        {"name": "BottomBackup2", "base": 9196308, "count": 2, "logic": {}},
+        {"name": "BottomBackup1", "base": 9196368, "count": 1, "logic": {}}
     ],
     "Ch14Eir": [
         {"name": "PlayerDeployment", "base": 9157544, "count": 12, "logic": {}},
@@ -471,30 +544,42 @@
     ],
     "Ch14Eph": [
         {"name": "PlayerDeployment", "base": 9199548, "count": 12, "logic": {}},
-        {"name": "label36", "base": 9199808, "count": 2, "logic": {}},
-        {"name": "label39", "base": 9199868, "count": 41, "logic": {}},
+        {"name": "IntroLyon", "base": 9199808, "count": 2, "logic": {}},
+        {"name": "EnemyStart", "base": 9199868, "count": 41, "logic": {}},
         {
             "name": "KnollLoad",
             "base": 9200708,
             "count": 1,
             "logic": {"0": {"must_fight": true}}
         },
+        {"name": "RennacLoad", "base": 9200748, "count": 1, "logic": {}},
         {"name": "label37", "base": 9201248, "count": 1, "logic": {}},
-        {"name": "label42", "base": 9201288, "count": 3, "logic": {}},
-        {"name": "label58", "base": 9201368, "count": 7, "logic": {}},
+        {"name": "EndSceneThrone", "base": 9201288, "count": 3, "logic": {}},
+        {"name": "LordSquadThrone", "base": 9201368, "count": 7, "logic": {}},
         {"name": "label59", "base": 9201528, "count": 1, "logic": {}},
-        {"name": "label35", "base": 9201848, "count": 7, "logic": {}},
-        {"name": "label45", "base": 9202152, "count": 2, "logic": {}},
-        {"name": "label44", "base": 9202212, "count": 1, "logic": {}},
-        {"name": "label46", "base": 9202252, "count": 1, "logic": {}},
-        {"name": "label47", "base": 9202292, "count": 3, "logic": {}},
-        {"name": "label48", "base": 9202372, "count": 4, "logic": {}},
-        {"name": "label49", "base": 9202472, "count": 4, "logic": {}},
-        {"name": "label51", "base": 9202652, "count": 1, "logic": {}},
-        {"name": "label50", "base": 9202692, "count": 2, "logic": {}},
-        {"name": "label53", "base": 9202752, "count": 2, "logic": {}},
-        {"name": "label54", "base": 9202812, "count": 1, "logic": {}},
-        {"name": "label57", "base": 9202852, "count": 3, "logic": {}}
+        {"name": "LordOutsideCastle", "base": 9201848, "count": 7, "logic": {}},
+        {"name": "LordGoesToJail", "base": 9202152, "count": 2, "logic": {}},
+        {"name": "OutroLyon", "base": 9202212, "count": 1, "logic": {}},
+        {"name": "JailMessenger", "base": 9202252, "count": 1, "logic": {}},
+        {"name": "LordInJail", "base": 9202292, "count": 3, "logic": {}},
+        {"name": "LordInJail2", "base": 9202372, "count": 4, "logic": {}},
+        {"name": "KnollJailcell", "base": 9202472, "count": 4, "logic": {}},
+        {"name": "FlashbackKnoll", "base": 9202652, "count": 1, "logic": {}},
+        {"name": "FlashbackKing", "base": 9202692, "count": 2, "logic": {}},
+        {"name": "FlashbackLyon", "base": 9202752, "count": 2, "logic": {}},
+        {"name": "FlashbackLyonOnly", "base": 9202812, "count": 1, "logic": {}},
+        {"name": "LordSWRoom", "base": 9202852, "count": 3, "logic": {}},
+        {"name": "LeftHallTurn2", "base": 9200788, "count": 2, "logic": {}},
+        {"name": "RightHallTurn2", "base": 9201568, "count": 2, "logic": {}},
+        {"name": "LeftHallTurn3", "base": 9200848, "count": 2, "logic": {}},
+        {"name": "RightHallTurn3", "base": 9201628, "count": 2, "logic": {}},
+        {"name": "LeftHallTurn4", "base": 9200908, "count": 2, "logic": {}},
+        {"name": "RightHallTurn4", "base": 9201688, "count": 2, "logic": {}},
+        {"name": "TopLeftDuo", "base": 9200968, "count": 2, "logic": {}},
+        {"name": "TopRightDuo", "base": 9201748, "count": 2, "logic": {}},
+        {"name": "ChestRoomStairs", "base": 9201028, "count": 2, "logic": {}},
+        {"name": "ThroneStairsL", "base": 9201088, "count": 3, "logic": {}},
+        {"name": "ThroneStairsR", "base": 9201168, "count": 3, "logic": {}}
     ],
     "Ch15Eir": [
         {"name": "label47", "base": 9159892, "count": 5, "logic": {}},
@@ -531,17 +616,35 @@
     ],
     "Ch15Eph": [
         {"name": "PlayerDeployment", "base": 9203220, "count": 12, "logic": {}},
-        {"name": "label45", "base": 9203480, "count": 42, "logic": {}},
+        {"name": "EnemyStart", "base": 9203480, "count": 42, "logic": {}},
         {"name": "label52", "base": 9204340, "count": 3, "logic": {}},
         {
-            "name": "label54",
+            "name": "EirikaSquad",
             "base": 9204420,
             "count": 3,
             "logic": {"1": {"must_fight": true}, "2": {"must_fight": true}}
         },
         {"name": "label47", "base": 9204960, "count": 2, "logic": {}},
-        {"name": "label48", "base": 9205020, "count": 8, "logic": {}},
-        {"name": "label46", "base": 9205200, "count": 1, "logic": {}}
+        {"name": "IntroBlueGroup", "base": 9205020, "count": 8, "logic": {}},
+        {"name": "label46", "base": 9205200, "count": 1, "logic": {}},
+        {
+            "name": "NortheastFliers",
+            "base": 9204500,
+            "count": 2,
+            "logic": {
+                "0": {"nudges": {"start": [23, 3]}},
+                "1": {"nudges": {"start": [21, 2]}}
+            }
+        },
+        {
+            "name": "NorthFliers",
+            "base": 9204560,
+            "count": 2,
+            "logic": {"1": {"must_fly": true}}
+        },
+        {"name": "NorthLandTrio", "base": 9204620, "count": 3, "logic": {}},
+        {"name": "BelowVillage", "base": 9204700, "count": 9, "logic": {}},
+        {"name": "SouthernForts", "base": 9204900, "count": 2, "logic": {}}
     ],
     "Ch16Eir": [
         {"name": "PlayerDeployment", "base": 9162328, "count": 12, "logic": {}},
@@ -590,30 +693,37 @@
         {"name": "DruidReinforcements", "base": 9163688, "count": 1, "logic": {}}
     ],
     "Ch16Eph": [
-        {"name": "label59", "base": 9162328, "count": 12, "logic": {}},
+        {"name": "PlayerDeployment", "base": 9205320, "count": 12, "logic": {}},
+        {"name": "MyrrhJoins", "base": 9162328, "count": 12, "logic": {}},
+        {"name": "EnemyStart", "base": 9205580, "count": 37, "logic": {}},
+        {"name": "ExtraHardEnemies", "base": 9206780, "count": 5, "logic": {}},
         {"name": "label41", "base": 9163728, "count": 3, "logic": {}},
-        {"name": "label44", "base": 9163808, "count": 6, "logic": {}},
+        {"name": "LordSquadThrone", "base": 9163808, "count": 6, "logic": {}},
         {"name": "label50", "base": 9163948, "count": 3, "logic": {}},
         {"name": "label51", "base": 9164028, "count": 3, "logic": {}},
         {"name": "label52", "base": 9164108, "count": 6, "logic": {}},
-        {"name": "label28", "base": 9164360, "count": 9, "logic": {}},
+        {"name": "LordOutsideCastle", "base": 9164360, "count": 9, "logic": {}},
         {"name": "label29", "base": 9164816, "count": 2, "logic": {}},
-        {"name": "label30", "base": 9164876, "count": 1, "logic": {}},
-        {"name": "label31", "base": 9164916, "count": 2, "logic": {}},
+        {"name": "IntroOrson", "base": 9164876, "count": 1, "logic": {}},
+        {"name": "IntroDarling", "base": 9164916, "count": 2, "logic": {}},
         {"name": "label32", "base": 9164976, "count": 4, "logic": {}},
         {"name": "label35", "base": 9165076, "count": 2, "logic": {}},
         {"name": "label36", "base": 9165136, "count": 2, "logic": {}},
         {"name": "label37", "base": 9165196, "count": 2, "logic": {}},
         {"name": "label39", "base": 9165320, "count": 1, "logic": {}},
-        {"name": "label40", "base": 9165380, "count": 4, "logic": {}},
+        {"name": "OutroDarling", "base": 9165380, "count": 4, "logic": {}},
         {"name": "label43", "base": 9165560, "count": 3, "logic": {}},
         {"name": "label42", "base": 9165660, "count": 3, "logic": {}},
-        {"name": "label45", "base": 9165860, "count": 3, "logic": {}},
+        {"name": "LordsSacredRoom", "base": 9165860, "count": 3, "logic": {}},
         {"name": "label47", "base": 9165960, "count": 1, "logic": {}},
         {"name": "label48", "base": 9166000, "count": 1, "logic": {}},
         {"name": "label49", "base": 9166040, "count": 1, "logic": {}},
-        {"name": "PlayerDeployment", "base": 9205320, "count": 12, "logic": {}},
-        {"name": "label60", "base": 9205580, "count": 37, "logic": {}}
+        {"name": "EastSideDuo", "base": 9206540, "count": 2, "logic": {}},
+        {"name": "SEReinforcements", "base": 9206600, "count": 4, "logic": {}},
+        {"name": "SWReinforcements", "base": 9206420, "count": 5, "logic": {}},
+        {"name": "SWReinforcements2", "base": 9206340, "count": 2, "logic": {}},
+        {"name": "EastCastleThief", "base": 9206740, "count": 1, "logic": {}},
+        {"name": "SouthStairsThief", "base": 9206700, "count": 1, "logic": {}}
     ],
     "Ch17Eir": [
         {"name": "PlayerDeployment", "base": 9166424, "count": 12, "logic": {}},

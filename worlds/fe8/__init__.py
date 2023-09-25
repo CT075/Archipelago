@@ -169,7 +169,7 @@ class FE8World(World):
             holy_weapon_pool.remove("Latona")
 
         progression_holy_weapons = self.random.sample(
-            list(holy_weapon_pool), k=required_holy_weapons
+            list(holy_weapon_pool), k=int(required_holy_weapons)
         )
         progression_weapon_types = {HOLY_WEAPONS[w] for w in progression_holy_weapons}
 

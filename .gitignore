@@ -5,6 +5,7 @@
 *.bmbp
 *.apbp
 *.apl2ac
+*.apfe8
 *.apm3
 *.apmc
 *.apz5
@@ -26,6 +27,7 @@
 *multisave
 *.archipelago
 *.apsave
+*.apworld
 *.BIN
 
 setups
