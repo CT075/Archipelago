@@ -13,7 +13,11 @@
             "count": 8,
             "logic": {"3": {"no_store": true}, "4": {"no_store": true}}
         },
-        {"name": "label29", "base": 9125324, "count": 1, "logic": {}},
+        {
+            "name": "RenaisMessenger",
+            "base": 9125324, "count": 1,
+            "logic": {"0": {"no_store":true}}
+        },
         {"name": "label32", "base": 9125364, "count": 2, "logic": {}},
         {"name": "label30", "base": 9125424, "count": 4, "logic": {}},
         {"name": "label31", "base": 9125524, "count": 6, "logic": {}},
