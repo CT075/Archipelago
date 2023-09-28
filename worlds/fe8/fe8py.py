@@ -434,20 +434,34 @@ class FE8Randomizer:
         self.weapons_by_rank[WeaponRank.E].append(self.weapons_by_name["Flux"])
 
     def job_valid(self, job: JobData, char: int, logic: dict[str, Any]) -> bool:
+        #get character tags
         tags = self.character_store.tags(char)
-        if tags is not None and "generic" in tags:
-            if "generic_only" in job.tags:
-                return False
+        if not tags: tags = set()
 
-        if "must_fly" in logic and logic["must_fly"] and "flying" not in job.tags:
-            return False
-
-        if "no_fly" in logic and logic["no_fly"] and "flying" in job.tags:
+        #get list of tags that make the job invalid (notags)
+        #the "no_" prefix adds the tag to the invalid tag list
+        #"no_flying" makes any job with "flying" tag invalid
+        notags = set(z.removeprefix("no_") for z in tags if z.startswith("no_"))
+        for x in logic:
+            if x.startswith("no_") and logic[x]:
+                notags.add(x.removeprefix("no_"))
+        #job is invalid if it has any of the tags in notags
+        if notags and notags&job.tags:
             return False
 
         if (
-            "must_fight" in logic
+            ("must_fly" in logic 
+            and logic["must_fly"] 
+            or "must_fly" in tags)
+            and "flying" not in job.tags
+        ):
+            #demand that valid job has the "flying" tag
+            return False
+
+        if (
+            ("must_fight" in logic
             and logic["must_fight"]
+            or "must_fight" in tags)
             and all(not wtype.damaging() for wtype in job.usable_weapons)
         ):
             return False
