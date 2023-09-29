@@ -434,25 +434,20 @@ class FE8Randomizer:
         self.weapons_by_rank[WeaponRank.E].append(self.weapons_by_name["Flux"])
 
     def job_valid(self, job: JobData, char: int, logic: dict[str, Any]) -> bool:
-        # get character tags
-        tags = self.character_store.tags(char)
-        if not tags: tags = set()
-
         # get list of tags that make the job invalid (notags)
         # the "no_" prefix adds the tag to the invalid tag list
         # "no_flying" makes any job with "flying" tag invalid
-        notags = set(z.removeprefix("no_") for z in tags if z.startswith("no_"))
+        notags = set()
         for x in logic:
             if x.startswith("no_") and logic[x]:
                 notags.add(x.removeprefix("no_"))
         # job is invalid if it has any of the tags in notags
-        if notags and notags&job.tags:
+        if notags and notags & job.tags:
             return False
 
         if (
             ("must_fly" in logic 
-            and logic["must_fly"] 
-            or "must_fly" in tags)
+            and logic["must_fly"])
             and "flying" not in job.tags
         ):
             # demand that valid job has the "flying" tag
@@ -460,8 +455,7 @@ class FE8Randomizer:
 
         if (
             ("must_fight" in logic
-            and logic["must_fight"]
-            or "must_fight" in tags)
+            and logic["must_fight"])
             and all(not wtype.damaging() for wtype in job.usable_weapons)
         ):
             return False
@@ -537,6 +531,12 @@ class FE8Randomizer:
 
         job = self.jobs_by_id[job_id]
         char = unit[0]
+
+        # add character tags to logic
+        ctags = self.character_store.tags(char)
+        if not ctags: ctags = set()
+        for t in ctags:
+            if t not in logic: logic[t] = True
 
         # Affiliation = bits 1,2; unit is player if they're unset
         is_player = not bool(unit[3] & 0b0110)
