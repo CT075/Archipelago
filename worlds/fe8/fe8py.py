@@ -445,18 +445,12 @@ class FE8Randomizer:
         if notags and notags & job.tags:
             return False
 
-        if (
-            ("must_fly" in logic 
-            and logic["must_fly"])
-            and "flying" not in job.tags
-        ):
+        if ("must_fly" in logic and logic["must_fly"]) and "flying" not in job.tags:
             # demand that valid job has the "flying" tag
             return False
 
-        if (
-            ("must_fight" in logic
-            and logic["must_fight"])
-            and all(not wtype.damaging() for wtype in job.usable_weapons)
+        if ("must_fight" in logic and logic["must_fight"]) and all(
+            not wtype.damaging() for wtype in job.usable_weapons
         ):
             return False
 
@@ -534,9 +528,11 @@ class FE8Randomizer:
 
         # add character tags to logic
         ctags = self.character_store.tags(char)
-        if not ctags: ctags = set()
+        if not ctags:
+            ctags = set()
         for t in ctags:
-            if t not in logic: logic[t] = True
+            if t not in logic:
+                logic[t] = True
 
         # Affiliation = bits 1,2; unit is player if they're unset
         is_player = not bool(unit[3] & 0b0110)
