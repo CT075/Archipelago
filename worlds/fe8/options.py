@@ -87,6 +87,14 @@ class Easier5x(Toggle):
     display_name = "Buff Ephraim's party for chapter 5x"
     default = 1
 
+class UnbreakableRegalia(Toggle):
+    """
+    Make all holy weapons other than Latona unbreakable.
+    """
+
+    display_name = "Unbreakable Regalia"
+    default = 0
+
 
 fe8_options: Dict[str, AssembleOptions] = {
     "super_demon_king": SuperDemonKing,
@@ -95,4 +103,5 @@ fe8_options: Dict[str, AssembleOptions] = {
     "required_holy_weapons": MinimumUsableHolyWeapons,
     "exclude_latona": ExcludeLatona,
     "easier_5x": Easier5x,
+    "unbreakable_regalia": UnbreakableRegalia,
 }

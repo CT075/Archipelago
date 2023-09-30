@@ -17,9 +17,7 @@ HOLY_WEAPONS = {
     "Latona": "Staff",
 }
 
-WEAPON_TYPES = [
-        "Sword", "Lance", "Axe", "Bow", "Anima", "Light", "Dark", "Staff"
-]
+WEAPON_TYPES = ["Sword", "Lance", "Axe", "Bow", "Anima", "Light", "Dark", "Staff"]
 NUM_WEAPON_LEVELS = 3
 
 ROM_BASE_ADDRESS = 0x08000000
@@ -83,3 +81,19 @@ IMPORTANT_TERRAIN_TYPES = [
     62,  # Gunnels
 ]
 
+ITEM_TABLE_BASE = 0x809B10
+ITEM_SIZE = 36
+ITEM_ABILITY_1_INDEX = 8
+UNBREAKABLE_FLAG = 1 << 3
+
+HOLY_WEAPON_IDS = [
+    0x85,  # Sieglinde
+    0x92,  # Siegmund
+    0x4A,  # Gleipnir
+    0x93,  # Garm
+    0x94,  # Nidhogg
+    0x8E,  # Vidofnir
+    0x3E,  # Excalibur
+    0x91,  # Audhulma
+    0x87,  # Ivaldi
+]

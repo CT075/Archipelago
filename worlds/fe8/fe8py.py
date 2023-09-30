@@ -38,6 +38,11 @@ from .constants import (
     MOVEMENT_COST_ENTRY_COUNT,
     MOVEMENT_COST_SENTINEL,
     IMPORTANT_TERRAIN_TYPES,
+    ITEM_TABLE_BASE,
+    ITEM_SIZE,
+    ITEM_ABILITY_1_INDEX,
+    UNBREAKABLE_FLAG,
+    HOLY_WEAPON_IDS
 )
 
 
@@ -603,7 +608,7 @@ class FE8Randomizer:
             ability_4_base = character_entry + CHAR_ABILITY_4_OFFSET
             self.rom[ability_4_base] |= lock_mask
 
-    def apply_cutscene_fixes(self) -> None:
+    def fix_cutscenes(self) -> None:
         # Eirika's Rapier is given in a cutscene at the start of the chapter,
         # rather than being in her inventory
         eirika_job = self.character_store["Eirika"]
@@ -640,9 +645,8 @@ class FE8Randomizer:
                     raise
 
         self.fix_movement_costs()
-        self.apply_cutscene_fixes()
+        self.fix_cutscenes()
         self.tweak_lords()
-        # TODO: Super Formortiis buffs
 
     def apply_5x_buffs(self) -> None:
         for char in ["Ephraim", "Forde", "Kyle"]:
@@ -655,3 +659,10 @@ class FE8Randomizer:
                 stats_base = char_base + CHARACTER_STATS_OFFSET
                 for i in range(STATS_COUNT):
                     self.rom[stats_base + i] += 3
+
+    def apply_infinite_holy_weapons(self) -> None:
+        for weapon_id in HOLY_WEAPON_IDS:
+            weapon_base = ITEM_TABLE_BASE + weapon_id * ITEM_SIZE
+            ability_1_base = weapon_base + ITEM_ABILITY_1_INDEX
+            self.rom[ability_1_base] |= UNBREAKABLE_FLAG
+
