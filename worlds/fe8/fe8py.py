@@ -8,6 +8,38 @@ from enum import IntEnum
 import logging
 
 from .util import fetch_json, write_short_le, read_short_le, read_word_le
+from .constants import (
+    ROM_BASE_ADDRESS,
+    CHAPTER_UNIT_SIZE,
+    INVENTORY_INDEX,
+    INVENTORY_SIZE,
+    COORDS_INDEX,
+    REDA_COUNT_INDEX,
+    REDA_PTR_INDEX,
+    CHARACTER_TABLE_BASE,
+    CHARACTER_SIZE,
+    CHARACTER_WRANK_OFFSET,
+    CHARACTER_STATS_OFFSET,
+    CHAR_ABILITY_4_OFFSET,
+    JOB_TABLE_BASE,
+    JOB_SIZE,
+    JOB_STATS_OFFSET,
+    STATS_COUNT,
+    EIRIKA,
+    EIRIKA_LORD,
+    EIRIKA_LOCK,
+    EPHRAIM,
+    EPHRAIM_LORD,
+    EPHRAIM_LOCK,
+    EIRIKA_RAPIER_OFFSET,
+    ROSS_CH2_HP_OFFSET,
+    MOVEMENT_COST_TABLE_BASE,
+    MOVEMENT_COST_ENTRY_SIZE,
+    MOVEMENT_COST_ENTRY_COUNT,
+    MOVEMENT_COST_SENTINEL,
+    IMPORTANT_TERRAIN_TYPES,
+)
+
 
 DEBUG = False
 
@@ -18,67 +50,6 @@ WEAPON_DATA = "data/weapondata.json"
 JOB_DATA = "data/jobdata.json"
 CHARACTERS = "data/characters.json"
 CHAPTER_UNIT_BLOCKS = "data/chapter_unit_blocks.json"
-
-ROM_BASE_ADDRESS = 0x08000000
-
-CHAPTER_UNIT_SIZE = 20
-INVENTORY_INDEX = 0xC
-INVENTORY_SIZE = 0x4
-COORDS_INDEX = 4
-REDA_COUNT_INDEX = 7
-REDA_PTR_INDEX = 8
-
-CHARACTER_TABLE_BASE = 0x803D30
-CHARACTER_SIZE = 52
-CHARACTER_WRANK_OFFSET = 20
-CHARACTER_STATS_OFFSET = 12
-CHAR_ABILITY_4_OFFSET = 43
-
-JOB_TABLE_BASE = 0x807110
-JOB_SIZE = 84
-JOB_STATS_OFFSET = 11
-
-STATS_COUNT = 6  # HP, Str, Skl, Spd, Def, Res (don't need Lck)
-
-EIRIKA = 1
-EIRIKA_LORD = 2
-EIRIKA_LOCK = 1 << 4
-EPHRAIM = 15
-EPHRAIM_LORD = 1
-EPHRAIM_LOCK = 1 << 5
-
-EIRIKA_RAPIER_OFFSET = 0x9EF088
-ROSS_CH2_HP_OFFSET = 0x9F03B8
-
-MOVEMENT_COST_TABLE_BASE = 0x80B808
-MOVEMENT_COST_ENTRY_SIZE = 65
-MOVEMENT_COST_ENTRY_COUNT = 49
-MOVEMENT_COST_SENTINEL = 31
-
-IMPORTANT_TERRAIN_TYPES = [
-    14,  # Thicket
-    15,  # Sand
-    16,  # Desert
-    17,  # River
-    18,  # Mountain
-    19,  # Peak
-    20,  # Bridge
-    21,  # Bridge 2
-    22,  # Sea
-    23,  # Lake
-    26,  # Fence 1
-    39,  # Cliff
-    47,  # Building 2
-    51,  # Fence 2
-    54,  # Sky
-    55,  # Deeps
-    57,  # Inn
-    58,  # Barrel
-    59,  # Bone
-    60,  # Dark
-    61,  # Water
-    62,  # Gunnels
-]
 
 
 def encode_unit_coords(x: int, y: int) -> int:
@@ -627,7 +598,7 @@ class FE8Randomizer:
                 old_base = self.rom[job_stats_base + i]
                 new_personal_base = min(roll, old_base)
                 self.rom[stats_base + i] += new_personal_base
-                self.rom[stats_base + i] -= new_personal_base
+                self.rom[job_stats_base + i] -= new_personal_base
 
             ability_4_base = character_entry + CHAR_ABILITY_4_OFFSET
             self.rom[ability_4_base] |= lock_mask
