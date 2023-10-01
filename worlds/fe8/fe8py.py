@@ -42,6 +42,8 @@ from .constants import (
     ITEM_SIZE,
     ITEM_ABILITY_1_INDEX,
     UNBREAKABLE_FLAG,
+    LOCKPICK,
+    CHEST_KEY_5,
     HOLY_WEAPON_IDS
 )
 
@@ -433,6 +435,12 @@ class FE8Randomizer:
         return True
 
     def select_new_item(self, job: JobData, item_id: int, logic: dict[str, Any]) -> int:
+        if item_id == LOCKPICK:
+            if "Lockpick" in job.tags:
+                return LOCKPICK
+            else:
+                return CHEST_KEY_5
+
         if item_id not in self.weapons_by_id and item_id not in MONSTER_DARKS:
             return item_id
 
