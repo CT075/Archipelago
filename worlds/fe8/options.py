@@ -80,8 +80,8 @@ class ExcludeLatona(Toggle):
 
 class Easier5x(Toggle):
     """
-    Give Ephraim, Forde and Kyle extra base stats. This can make chapter 5x
-    significantly less of a slog.
+    Give Ephraim, Forde and Kyle extra base stats. This is recommended to make
+    chapter 5x significantly less of a slog.
     """
 
     display_name = "Buff Ephraim's party for chapter 5x"
