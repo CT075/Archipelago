@@ -289,7 +289,7 @@ class CharacterStore:
             # CR cam: figure out how to convince mypy that `data["tags"]` is
             # actually a list of strings
             self.character_tags[name] = set(data["tags"])
-            self.ids_by_name = data["ids"]
+            self.ids_by_name[name] = data["ids"]
 
         self.character_jobs = {}
 
@@ -666,7 +666,7 @@ class FE8Randomizer:
                 char_base = CHARACTER_TABLE_BASE + CHARACTER_SIZE * char_id
                 stats_base = char_base + CHARACTER_STATS_OFFSET
                 for i in range(STATS_COUNT):
-                    self.rom[stats_base + i] += 3
+                    self.rom[stats_base + i] += 2
 
     def apply_infinite_holy_weapons(self) -> None:
         for weapon_id in HOLY_WEAPON_IDS:
