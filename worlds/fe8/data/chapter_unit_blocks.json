@@ -163,8 +163,12 @@
         {"name": "label49", "base": 9142860, "count": 3, "logic": {}},
         {"name": "label50", "base": 9142940, "count": 1, "logic": {}},
         {"name": "label48", "base": 9143000, "count": 8, "logic": {}},
-        {"name": "label38", "base": 9143188, "count": 7, "logic": {}},
-        {"name": "label39", "base": 9143368, "count": 1, "logic": {}},
+        {"name": "MessengerScene", "base": 9143188, "count": 7, "logic": {}},
+        {
+            "name": "MessengerScene2",
+            "base": 9143368,
+            "count": 1,
+            "logic": {"0": {"must_fly": true}}
         {
             "name": "ExtraHardModeStartingEnemies",
             "base": 9141980,
