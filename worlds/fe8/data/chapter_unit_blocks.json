@@ -147,11 +147,12 @@
     "Ch8": [
         {"name": "PlayerDeployment", "base": 9138944, "count": 9, "logic": {}},
         {"name": "StartingEnemies", "base": 9139144, "count": 27, "logic": {}},
-        {"name": "label36", "base": 9139704, "count": 3, "logic": {}},
-        {"name": "label30", "base": 9139964, "count": 3, "logic": {}},
-        {"name": "label31", "base": 9140044, "count": 3, "logic": {}},
+        {"name": "EphraimGroup", "base": 9139704, "count": 3, "logic": {}},
+        {"name": "EirikaIntro", "base": 9139964, "count": 3, "logic": {}},
+        {"name": "TiradoIntro", "base": 9140044, "count": 3, "logic": {}},
         {"name": "CavaliersBehindEphraim", "base": 9139864, "count": 3, "logic": {}},
-        {"name": "MageThiefReinforcements", "base": 9139784, "count": 3, "logic": {}}
+        {"name": "MageThiefReinforcements", "base": 9139784, "count": 3, "logic": {}},
+        {"name": "StartingEnemies2", "base": 9140164, "count": 5, "logic": {}}
     ],
     "Ch9Eir": [
         {"name": "PlayerDeployment", "base": 9141260, "count": 11, "logic": {}},
