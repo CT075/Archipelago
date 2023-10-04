@@ -36,7 +36,7 @@
     "Orson": {"ids": [36, 66, 109], "tags": []},
     "Glen": {"ids": [37, 105], "tags": []},
     "Selena": {"ids": [38, 68], "tags": []},
-    "Valter": {"ids": [39, 67, 69], "tags": []},
+    "Valter": {"ids": [39, 67, 69], "tags": ["must_fight"]},
     "Riev": {"ids": [40, 87], "tags": []},
     "Caellach": {"ids": [41, 83], "tags": []},
     "Pablo": {"ids": [79, 84], "tags": []},

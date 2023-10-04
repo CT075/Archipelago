@@ -290,7 +290,16 @@
             "count": 8,
             "logic": {"5": {"must_fight": true}}
         },
-        {"name": "label39", "base": 9150408, "count": 3, "logic": {}},
+        {
+            "name": "ValterGroup",
+            "base": 9150408,
+            "count": 3,
+            "logic": {
+                "0": {"must_fight": true},
+                "1": {"must_fly": true},
+                "2": {"must_fly": true}
+            }
+        },
         {"name": "label37", "base": 9150488, "count": 1, "logic": {}},
         {"name": "NorthwesternZombies", "base": 9149744, "count": 3, "logic": {}},
         {"name": "NortheasternSkeletons", "base": 9149824, "count": 3, "logic": {}},
