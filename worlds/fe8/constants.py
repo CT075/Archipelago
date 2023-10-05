@@ -41,8 +41,19 @@ CHAR_ABILITY_4_OFFSET = 43
 JOB_TABLE_BASE = 0x807110
 JOB_SIZE = 84
 JOB_STATS_OFFSET = 11
+JOB_ABILITY_1_INDEX = 40
 
 STATS_COUNT = 6  # HP, Str, Skl, Spd, Def, Res (don't need Lck)
+
+MOUNTED_AID_CANTO_MASK = 3
+MOUNTED_MONSTERS = [
+    0x5D,  # Tarvos
+    0x5E,  # Maelduin
+    0x5F,  # Mogall
+    0x60,  # Mogall
+    0x63,  # Gargoyle
+    0x64,  # Deathgoyle
+]
 
 EIRIKA = 1
 EIRIKA_LORD = 2

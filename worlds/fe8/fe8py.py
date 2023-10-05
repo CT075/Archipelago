@@ -44,7 +44,10 @@ from .constants import (
     UNBREAKABLE_FLAG,
     LOCKPICK,
     CHEST_KEY_5,
-    HOLY_WEAPON_IDS
+    HOLY_WEAPON_IDS,
+    MOUNTED_AID_CANTO_MASK,
+    MOUNTED_MONSTERS,
+    JOB_ABILITY_1_INDEX,
 )
 
 
@@ -581,6 +584,12 @@ class FE8Randomizer:
                 continue
             self.randomize_chapter_unit(offset, logic)
 
+    def make_monsters_mounted(self) -> None:
+        for job in MOUNTED_MONSTERS:
+            entry = JOB_TABLE_BASE + job * JOB_SIZE
+            self.rom[entry + JOB_ABILITY_1_INDEX] |= MOUNTED_AID_CANTO_MASK
+
+
     def fix_movement_costs(self) -> None:
         """
         Units that spawn over water or mountains can get stuck, causing crashes
@@ -655,6 +664,7 @@ class FE8Randomizer:
         self.fix_movement_costs()
         self.fix_cutscenes()
         self.tweak_lords()
+        self.make_monsters_mounted()
 
     def apply_5x_buffs(self) -> None:
         for char in ["Ephraim", "Forde", "Kyle"]:
