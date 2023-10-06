@@ -61,6 +61,9 @@ def generate_output(
     if multiworld.easier_5x[player]:
         randomizer.apply_5x_buffs()
 
+    if multiworld.unbreakable_regalia[player]:
+        randomizer.apply_infinite_holy_weapons()
+
     for location in multiworld.get_locations(player):
         assert isinstance(location, FE8Location)
         rom_loc = rom_location(location)

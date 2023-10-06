@@ -18,7 +18,7 @@ from Utils import async_start
 from settings import get_settings
 import Patch
 
-from .data import locations
+from .connector_config import locations
 from .constants import FE8_NAME, FE8_ID_PREFIX
 
 GBA_SOCKET_PORT = 43053

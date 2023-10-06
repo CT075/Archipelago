@@ -80,11 +80,19 @@ class ExcludeLatona(Toggle):
 
 class Easier5x(Toggle):
     """
-    Give Ephraim, Forde and Kyle extra base stats. This can make chapter 5x
-    less of a slog.
+    Give Ephraim, Forde and Kyle extra base stats. This is recommended to make
+    chapter 5x significantly less of a slog.
     """
 
     display_name = "Buff Ephraim's party for chapter 5x"
+    default = 1
+
+class UnbreakableRegalia(Toggle):
+    """
+    Make all holy weapons other than Latona unbreakable.
+    """
+
+    display_name = "Unbreakable Regalia"
     default = 0
 
 
@@ -95,4 +103,5 @@ fe8_options: Dict[str, AssembleOptions] = {
     "required_holy_weapons": MinimumUsableHolyWeapons,
     "exclude_latona": ExcludeLatona,
     "easier_5x": Easier5x,
+    "unbreakable_regalia": UnbreakableRegalia,
 }

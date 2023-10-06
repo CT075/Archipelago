@@ -16,7 +16,7 @@ from worlds.LauncherComponents import (
     SuffixIdentifier,
     launch_subprocess,
 )
-from BaseClasses import Region, ItemClassification, CollectionState
+from BaseClasses import Region, ItemClassification, CollectionState, Tutorial
 import settings
 from Utils import user_path
 
@@ -81,6 +81,20 @@ except IOError:
 
 
 class FE8WebWorld(WebWorld):
+    """
+    Webhost info for FE8
+    """
+
+    theme = "stone"
+    setup_en = Tutorial(
+        "Multiworld Setup Guide",
+        "A guide to playing FE8 with Archipelago",
+        "English",
+        "setup_en.md",
+        "setup/en",
+        ["CT075"],
+    )
+
     tutorials = []
 
 

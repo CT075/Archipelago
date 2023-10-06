@@ -122,7 +122,7 @@
       "Sword"
     ],
     "is_promoted": false,
-    "tags": []
+    "tags": ["Lockpick"]
   },
   {
     "id": 14,
@@ -215,7 +215,7 @@
       "Sword"
     ],
     "is_promoted": true,
-    "tags": ["FastSword"]
+    "tags": ["FastSword", "Lockpick"]
   },
   {
     "id": 24,
@@ -224,7 +224,7 @@
       "Sword"
     ],
     "is_promoted": true,
-    "tags": ["FastSword"]
+    "tags": ["FastSword", "Lockpick"]
   },
   {
     "id": 25,
@@ -493,7 +493,7 @@
       "Sword"
     ],
     "is_promoted": true,
-    "tags": []
+    "tags": ["Lockpick"]
   },
   {
     "id": 53,
