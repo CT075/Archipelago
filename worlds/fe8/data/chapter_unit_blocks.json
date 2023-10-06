@@ -168,7 +168,10 @@
             "name": "MessengerScene2",
             "base": 9143368,
             "count": 1,
-            "logic": {"0": {"must_fly": true}}
+            "logic": {
+                "0": {"nudges": {"start": [0, 5]}}
+            }
+        },
         {
             "name": "ExtraHardModeStartingEnemies",
             "base": 9141980,
