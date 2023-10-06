@@ -123,15 +123,15 @@
             "base": 9134504,
             "count": 27,
             "logic": {
-                "6": {"no_fly": true},
-                "7": {"no_fly": true},
-                "9": {"no_fly": true},
+                "6": {"no_flying": true},
+                "7": {"no_flying": true},
+                "9": {"no_flying": true},
                 "24": {
-                    "no_fly": true,
+                    "no_flying": true,
                     "nudges": {"start": [20, 13]},
                     "comment": "armour knight"
                 },
-                "25": {"no_fly": true}
+                "25": {"no_flying": true}
             }
         },
         {"name": "PlayerDeployment", "base": 9135064, "count": 10, "logic": {}},
@@ -281,7 +281,7 @@
             "name": "LArachelGroup",
             "base": 9149644,
             "count": 2,
-            "logic": {"must_fight": {"at_least": 1}}
+            "logic": {}
         },
         {"name": "label31", "base": 9149984, "count": 6, "logic": {}},
         {
@@ -310,10 +310,10 @@
         {"name": "PlayerDeployment", "base": 9190992, "count": 11, "logic": {}},
         {"name": "label37", "base": 9191232, "count": 10, "logic": {"must_fly": true}},
         {
-            "name": "DozlaSquad",
+            "name": "LArachelGroup",
             "base": 9191452,
             "count": 2,
-            "logic": {"must_fight": {"at_least": 1}}
+            "logic": {}
         },
         {"name": "SecondShipCrew", "base": 9191512, "count": 12, "logic": {}},
         {"name": "SecondShipCrew2", "base": 9191772, "count": 9, "logic": {}},
