@@ -160,7 +160,7 @@
             "name": "StartingEnemies",
             "base": 9141500,
             "count": 23,
-            "logic": {"22": "nudges": {"start", [12, 8]}}
+            "logic": {"22": {"nudges": {"start": [12, 8]}}}
         },
         {"name": "label40", "base": 9142620, "count": 3, "logic": {}},
         {"name": "label41", "base": 9142700, "count": 5, "logic": {}},
