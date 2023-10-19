@@ -48,6 +48,9 @@ from .constants import (
     MOUNTED_AID_CANTO_MASK,
     MOUNTED_MONSTERS,
     JOB_ABILITY_1_INDEX,
+    CH15_AUTO_STEEL_SWORD,
+    CH15_AUTO_STEEL_LANCE,
+    AI1_INDEX,
 )
 
 
@@ -546,6 +549,9 @@ class FE8Randomizer:
         for i, item_id in enumerate(new_inventory):
             self.rom[data_offset + INVENTORY_INDEX + i] = item_id
 
+        if "ai1_mod" in logic and self.rom[data_offset+AI1_INDEX] == logic["ai1_mod"]["from"]:
+            self.rom[data_offset + AI1_INDEX] = logic["ai1_mod"]["to"]
+
         # If an NPC isn't autoleveled, it's probably a boss or important NPC of
         # some kind, so we should force its weapon levels in the character
         # table.
@@ -572,7 +578,7 @@ class FE8Randomizer:
                 affected = list(range(block.count))
 
             for i in affected:
-                block.logic[i][k] = True
+                block.logic[i][k] = v
 
         for i in range(block.count):
             offset = block.base + i * CHAPTER_UNIT_SIZE
@@ -588,7 +594,6 @@ class FE8Randomizer:
         for job in MOUNTED_MONSTERS:
             entry = JOB_TABLE_BASE + job * JOB_SIZE
             self.rom[entry + JOB_ABILITY_1_INDEX] |= MOUNTED_AID_CANTO_MASK
-
 
     def fix_movement_costs(self) -> None:
         """
@@ -648,6 +653,19 @@ class FE8Randomizer:
         # reasonable to save him, we _also_ set his starting HP.
         self.rom[ROSS_CH2_HP_OFFSET] = 15
 
+        # Eirika and Ephraim get automatic steels on rejoining in Ch15, which
+        # need to be adjusted.
+        ch15_auto_steel_sword = self.select_new_item(
+            eirika_job, self.weapons_by_name["Steel Sword"].id, {}
+        )
+        ephraim_job = self.character_store["Ephraim"]
+        ch15_auto_steel_lance = self.select_new_item(
+            ephraim_job, self.weapons_by_name["Steel Lance"].id, {}
+        )
+
+        self.rom[CH15_AUTO_STEEL_SWORD] = ch15_auto_steel_sword
+        self.rom[CH15_AUTO_STEEL_LANCE] = ch15_auto_steel_lance
+
     # TODO: logic
     #   - Flying Duessel vs enemy archers in Ephraim 10 may be unbeatable
     def apply_base_changes(self) -> None:
@@ -655,7 +673,7 @@ class FE8Randomizer:
             for block in chapter:
                 try:
                     self.randomize_block(block)
-                except ValueError as e:
+                except (ValueError, IndexError) as e:
                     logging.error("crash dump:")
                     logging.error(f"  block_data: {chapter_name}, {block.name}")
                     logging.error(f"  {e}")
@@ -683,4 +701,3 @@ class FE8Randomizer:
             weapon_base = ITEM_TABLE_BASE + weapon_id * ITEM_SIZE
             ability_1_base = weapon_base + ITEM_ABILITY_1_INDEX
             self.rom[ability_1_base] |= UNBREAKABLE_FLAG
-

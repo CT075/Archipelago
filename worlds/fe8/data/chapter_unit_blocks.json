@@ -195,21 +195,71 @@
     "Ch9Eph": [
         {"name": "label34", "base": 9143000, "count": 8, "logic": {}},
         {"name": "PlayerDeployment", "base": 9183944, "count": 11, "logic": {}},
-        {"name": "label37", "base": 9184184, "count": 29, "logic": {}},
-        {"name": "label42", "base": 9184784, "count": 6, "logic": {}},
-        {"name": "Amelia", "base": 9184924, "count": 2, "logic": {}},
-        {"name": "TanaGetsJailed", "base": 9184984, "count": 2, "logic": {}},
-        {"name": "TanaIntro", "base": 9185324, "count": 2, "logic": {}},
+        {
+            "name": "label37",
+            "base": 9184184,
+            "count": 29,
+            "logic": {"ai1_mod": {"from": 0, "to": 18}}
+        },
+        {
+            "name": "label42",
+            "base": 9184784,
+            "count": 6,
+            "logic": {"ai1_mod": {"from": 0, "to": 18}}
+        },
+        {
+            "name": "Amelia",
+            "base": 9184924,
+            "count": 2,
+            "logic": {"ai1_mod": {"from": 0, "to": 18}}
+        },
+        {
+            "name": "TanaGetsJailed",
+            "base": 9184984,
+            "count": 2,
+            "logic": {"ai1_mod": {"from": 0, "to": 18}}
+        },
+        {
+            "name": "TanaIntro",
+            "base": 9185324,
+            "count": 2,
+            "logic": {"ai1_mod": {"from": 0, "to": 18}}
+        },
         {"name": "label40", "base": 9185384, "count": 1, "logic": {}},
-        {"name": "AmeliaIntro", "base": 9185424, "count": 2, "logic": {}},
+        {
+            "name": "AmeliaIntro",
+            "base": 9185424,
+            "count": 2,
+            "logic": {"ai1_mod": {"from": 0, "to": 18}}
+        },
         {"name": "label47", "base": 9185484, "count": 3, "logic": {}},
         {"name": "HallwayLyon", "base": 9185664, "count": 3, "logic": {}},
         {"name": "label48", "base": 9185792, "count": 2, "logic": {}},
         {"name": "label49", "base": 9185852, "count": 1, "logic": {}},
-        {"name": "OutsideStairs", "base": 9185124, "count": 1, "logic": {}},
-        {"name": "NearTana", "base": 9185164, "count": 2, "logic": {}},
-        {"name": "RightSide", "base": 9185224, "count": 4, "logic": {}},
-        {"name": "BottomTrio", "base": 9185044, "count": 3, "logic": {}}
+        {
+            "name": "OutsideStairs",
+            "base": 9185124,
+            "count": 1,
+            "logic": {"ai1_mod": {"from": 0, "to": 18}}
+        },
+        {
+            "name": "NearTana",
+            "base": 9185164,
+            "count": 2,
+            "logic": {"ai1_mod": {"from": 0, "to": 18}}
+        },
+        {
+            "name": "RightSide",
+            "base": 9185224,
+            "count": 4,
+            "logic": {"ai1_mod": {"from": 0, "to": 18}}
+        },
+        {
+            "name": "BottomTrio",
+            "base": 9185044,
+            "count": 3,
+            "logic": {"ai1_mod": {"from": 0, "to": 18}}
+        }
     ],
     "Ch10Eir": [
         {"name": "PlayerDeployment", "base": 9143616, "count": 12, "logic": {}},
