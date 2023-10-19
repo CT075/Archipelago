@@ -249,7 +249,7 @@
         {"name": "label50", "base": 9186668, "count": 6, "logic": {}},
         {"name": "label60", "base": 9186808, "count": 1, "logic": {}},
         {"name": "label45", "base": 9186848, "count": 14, "logic": {}},
-        {"name": "label49", "base": 9187248, "count": 4, "logic": {}},
+        {"name": "DuesselSquad2", "base": 9187248, "count": 4, "logic": {}},
         {
             "name": "CormagSquad2",
             "base": 9187408,
@@ -262,7 +262,16 @@
         },
         {"name": "DuesselSquad", "base": 9187688, "count": 4, "logic": {}},
         {"name": "label47", "base": 9187788, "count": 1, "logic": {}},
-        {"name": "CormagSquad", "base": 9187828, "count": 3, "logic": {}},
+        {
+            "name": "CormagSquad",
+            "base": 9187828,
+            "count": 3,
+            "logic": {
+                "0": {"nudges": {"start": [17, 14], "0": [17, 14]}},
+                "1": {"must_fly": true},
+                "2": {"must_fly": true}
+            }
+        },
         {"name": "label54", "base": 9187908, "count": 2, "logic": {}},
         {"name": "label55", "base": 9187968, "count": 8, "logic": {}},
         {"name": "ValterVisits", "base": 9188148, "count": 1, "logic": {}},
