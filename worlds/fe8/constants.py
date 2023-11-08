@@ -22,6 +22,15 @@ NUM_WEAPON_LEVELS = 3
 
 ROM_BASE_ADDRESS = 0x08000000
 
+PROC_SIZE = 0x6C
+PROC_POOL_EWRAM_OFFS = 0x024E68
+TOTAL_NUM_PROCS = 0x40
+
+# These are literal addresses including the ROM offset because we compare
+# against them, rather than reading or writing.
+WM_PROC_ADDRESS = 0x08A3EE74
+E_PLAYERPHASE_PROC_ADDRESS = 0x0859AAD8
+
 LOCKPICK = 0x6B
 CHEST_KEY_5 = 0x79
 
