@@ -21,9 +21,10 @@ WEAPON_TYPES = ["Sword", "Lance", "Axe", "Bow", "Anima", "Light", "Dark", "Staff
 NUM_WEAPON_LEVELS = 3
 
 ROM_BASE_ADDRESS = 0x08000000
+ROM_NAME_ADDR = 0x080000A0
 
 PROC_SIZE = 0x6C
-PROC_POOL_EWRAM_OFFS = 0x024E68
+PROC_POOL_ADDR = 0x02024E68
 TOTAL_NUM_PROCS = 0x40
 
 # These are literal addresses including the ROM offset because we compare

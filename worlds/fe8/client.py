@@ -20,11 +20,19 @@ import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
 from NetUtils import ClientStatus
 from Utils import async_start
-from settings import get_settings
 import Patch
 
-from .connector_config import locations, EXPECTED_ROM_NAME
-from .constants import FE8_NAME, FE8_ID_PREFIX
+from .connector_config import locations, EXPECTED_ROM_NAME, FLAGS_ADDR
+from .constants import (
+    FE8_NAME,
+    FE8_ID_PREFIX,
+    ROM_NAME_ADDR,
+    PROC_SIZE,
+    PROC_POOL_ADDR,
+    TOTAL_NUM_PROCS,
+    WM_PROC_ADDRESS,
+    E_PLAYERPHASE_PROC_ADDRESS,
+)
 
 if TYPE_CHECKING:
     from worlds._bizhawk.context import BizHawkClientContext
@@ -51,9 +59,9 @@ class FE8Client(BizHawkClient):
         from CommonClient import logger
 
         try:
-            rom_name_bytes = (await bizhawk.read(ctx.bizhawk_ctx, [(0xA0, 16, "ROM")]))[
-                0
-            ]
+            rom_name_bytes = (
+                await bizhawk.read(ctx.bizhawk_ctx, [(ROM_NAME_ADDR, 16, "System Bus")])
+            )[0]
             rom_name = bytes([byte for byte in rom_name_bytes if byte != 0]).decode(
                 "ascii"
             )
@@ -95,20 +103,12 @@ class FE8Client(BizHawkClient):
         return result
 
     async def update_game_state(self, ctx: BizHawkClientContext) -> None:
-        from .constants import (
-            PROC_SIZE,
-            PROC_POOL_EWRAM_OFFS,
-            TOTAL_NUM_PROCS,
-            WM_PROC_ADDRESS,
-            E_PLAYERPHASE_PROC_ADDRESS,
-        )
-
         active_procs = [
             int.from_bytes(i, byteorder="little")
             for i in await bizhawk.read(
                 ctx.bizhawk_ctx,
                 [
-                    (PROC_POOL_EWRAM_OFFS + i * PROC_SIZE, 4, "EWRAM")
+                    (PROC_POOL_ADDR + i * PROC_SIZE, 4, "System Bus")
                     for i in range(TOTAL_NUM_PROCS)
                 ],
             )
@@ -126,7 +126,7 @@ class FE8Client(BizHawkClient):
         from .connector_config import SLOT_NAME_ADDR
 
         slot_name_bytes = (
-            await bizhawk.read(ctx.bizhawk_ctx, [(SLOT_NAME_ADDR, 64, "ROM")])
+            await bizhawk.read(ctx.bizhawk_ctx, [(SLOT_NAME_ADDR, 64, "System Bus")])
         )[0]
         ctx.auth = bytes([byte for byte in slot_name_bytes if byte != 0]).decode(
             "utf-8"
@@ -178,15 +178,15 @@ class FE8Client(BizHawkClient):
             )
 
     async def game_watcher(self, ctx: BizHawkClientContext) -> None:
-        from .connector_config import FLAGS_OFFSET
-
         try:
             await self.update_game_state(ctx)
 
             if self.game_state_safe:
                 await self.run_locked(ctx, self.maybe_write_next_item)
 
-            flag_bytes = (await bizhawk.read(ctx.bizhawk_ctx, [(FLAGS_OFFSET, 8, "EWRAM")]))[0]
+            flag_bytes = (
+                await bizhawk.read(ctx.bizhawk_ctx, [(FLAGS_ADDR, 8, "System Bus")])
+            )[0]
             local_checked_locations = set()
 
             for byte_i, byte in enumerate(flag_bytes):
