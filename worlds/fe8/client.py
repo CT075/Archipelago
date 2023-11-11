@@ -1,28 +1,23 @@
-import asyncio
 from typing import (
     TYPE_CHECKING,
-    Optional,
-    Dict,
     Set,
-    Tuple,
-    Any,
     Callable,
     TypeVar,
     Awaitable,
 )
-import json
+import sys
 import os
-import subprocess
-from functools import partial
-from argparse import Namespace
 
-import worlds._bizhawk as bizhawk
-from worlds._bizhawk.client import BizHawkClient
 from NetUtils import ClientStatus
-from Utils import async_start
-import Patch
 
-from .connector_config import locations, EXPECTED_ROM_NAME, FLAGS_ADDR
+from .connector_config import (
+    locations,
+    EXPECTED_ROM_NAME,
+    FLAGS_ADDR,
+    ARCHIPELAGO_RECEIVED_ITEM_ADDR,
+    ARCHIPELAGO_NUM_RECEIVED_ITEMS_ADDR,
+    SLOT_NAME_ADDR,
+)
 from .constants import (
     FE8_NAME,
     FE8_ID_PREFIX,
@@ -33,6 +28,29 @@ from .constants import (
     WM_PROC_ADDRESS,
     E_PLAYERPHASE_PROC_ADDRESS,
 )
+
+# TODO: remove once the proper _bizhawk gets released
+if "worlds._bizhawk" not in sys.modules:
+    import importlib
+    import zipimport
+
+    bh_apworld_path = os.path.join(
+        os.path.dirname(sys.modules["worlds"].__file__), "_bizhawk.apworld"
+    )
+    if os.path.isfile(bh_apworld_path):
+        importer = zipimport.zipimporter(bh_apworld_path)
+        spec = importer.find_spec(os.path.basename(bh_apworld_path).rsplit(".", 1)[0])
+        mod = importlib.util.module_from_spec(spec)
+        mod.__package__ = f"worlds.{mod.__package__}"
+        mod.__name__ = f"worlds.{mod.__name__}"
+        sys.modules[mod.__name__] = mod
+        importer.exec_module(mod)
+        bizhawk = mod
+    elif not os.path.isdir(os.path.splitext(bh_apworld_path)[0]):
+        logging.error("Did not find _bizhawk.apworld required to play FE8.")
+
+import worlds._bizhawk as bizhawk
+from worlds._bizhawk.client import BizHawkClient
 
 if TYPE_CHECKING:
     from worlds._bizhawk.context import BizHawkClientContext
@@ -46,12 +64,13 @@ T = TypeVar("T")
 
 class FE8Client(BizHawkClient):
     game = FE8_NAME
-    gba_push_pull_task: Optional[asyncio.Task]
+    system = "GBA"
+    patch_suffix = ".apfe8"
     local_checked_locations: Set[int]
     game_state_safe: bool = False
     goal_flag: int = FOMORTIIS_FLAG
 
-    def __init__(self, server_address: Optional[str], password: Optional[str]):
+    def __init__(self):
         super().__init__()
         self.local_checked_locations = set()
 
@@ -59,19 +78,21 @@ class FE8Client(BizHawkClient):
         from CommonClient import logger
 
         try:
+            # logger.info("FE8 Client: validating")
             rom_name_bytes = (
                 await bizhawk.read(ctx.bizhawk_ctx, [(ROM_NAME_ADDR, 16, "System Bus")])
             )[0]
             rom_name = bytes([byte for byte in rom_name_bytes if byte != 0]).decode(
                 "ascii"
             )
-            if not rom_name.startswith("FIREEMBLEM2E"):
-                return False
+            # logger.info("FE8 Client: rom name is {rom_name}")
             if rom_name == "FIREEMBLEM2EBE8E":
                 logger.info(
                     "ERROR: You seem to be running an unpatched version of FE8. "
                     "Please generate a patch file and use it to create a patched ROM."
                 )
+                return False
+            if not rom_name.startswith("FE8AP"):
                 return False
             if rom_name != EXPECTED_ROM_NAME:
                 logger.info(
@@ -81,8 +102,10 @@ class FE8Client(BizHawkClient):
                 )
                 return False
         except UnicodeDecodeError:
+            # logger.error("FE8 Client: unicode error")
             return False
         except bizhawk.RequestFailedError:
+            # logger.error("FE8 Client: bizhawk request failed")
             return False
 
         ctx.game = self.game
@@ -123,8 +146,6 @@ class FE8Client(BizHawkClient):
             self.game_state_safe = False
 
     async def set_auth(self, ctx: BizHawkClientContext) -> None:
-        from .connector_config import SLOT_NAME_ADDR
-
         slot_name_bytes = (
             await bizhawk.read(ctx.bizhawk_ctx, [(SLOT_NAME_ADDR, 64, "System Bus")])
         )[0]
@@ -134,25 +155,24 @@ class FE8Client(BizHawkClient):
 
     # requires: locked and game_state_safe
     async def maybe_write_next_item(self, ctx: BizHawkClientContext) -> None:
-        from .connector_config import (
-            ARCHIPELAGO_RECEIVED_ITEM_ADDR,
-            ARCHIPELAGO_NUM_RECEIVED_ITEMS_ADDR,
-        )
+        #from CommonClient import logger
 
-        is_filled, num_items_received_bytes = await bizhawk.read(
+        is_filled_byte, num_items_received_bytes = await bizhawk.read(
             ctx.bizhawk_ctx,
             [
-                (ARCHIPELAGO_RECEIVED_ITEM_ADDR + 2, 1, "EWRAM"),
-                (ARCHIPELAGO_NUM_RECEIVED_ITEMS_ADDR, 4, "EWRAM"),
+                (ARCHIPELAGO_RECEIVED_ITEM_ADDR + 2, 1, "System Bus"),
+                (ARCHIPELAGO_NUM_RECEIVED_ITEMS_ADDR, 4, "System Bus"),
             ],
+        )
+
+        is_filled = is_filled_byte[0]
+
+        num_items_received = max(
+            int.from_bytes(num_items_received_bytes, byteorder="little"), 0
         )
 
         if is_filled:
             return
-
-        num_items_received = int.from_bytes(
-            num_items_received_bytes, byteorder="little"
-        )
 
         if num_items_received < len(ctx.items_received):
             next_item = ctx.items_received[num_items_received]
@@ -162,17 +182,17 @@ class FE8Client(BizHawkClient):
                     (
                         ARCHIPELAGO_RECEIVED_ITEM_ADDR + 0,
                         (next_item.item - FE8_ID_PREFIX).to_bytes(2, "little"),
-                        "EWRAM",
+                        "System Bus",
                     ),
                     (
                         ARCHIPELAGO_RECEIVED_ITEM_ADDR + 2,
                         b"\x01",
-                        "EWRAM",
+                        "System Bus",
                     ),
                     (
                         ARCHIPELAGO_NUM_RECEIVED_ITEMS_ADDR,
-                        num_items_received.to_bytes(4, "little"),
-                        "EWRAM",
+                        (num_items_received + 1).to_bytes(4, "little"),
+                        "System Bus",
                     ),
                 ],
             )
@@ -188,6 +208,7 @@ class FE8Client(BizHawkClient):
                 await bizhawk.read(ctx.bizhawk_ctx, [(FLAGS_ADDR, 8, "System Bus")])
             )[0]
             local_checked_locations = set()
+            game_clear = False
 
             for byte_i, byte in enumerate(flag_bytes):
                 for i in range(8):

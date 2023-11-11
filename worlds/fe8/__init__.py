@@ -9,17 +9,11 @@ import pkgutil
 from typing import ClassVar, Optional, Callable, Set
 
 from worlds.AutoWorld import World, WebWorld
-from worlds.LauncherComponents import (
-    components,
-    Component,
-    Type as ComponentType,
-    SuffixIdentifier,
-    launch_subprocess,
-)
 from BaseClasses import Region, ItemClassification, CollectionState, Tutorial
 import settings
 from Utils import user_path
 
+from .client import FE8Client
 from .options import fe8_options
 from .constants import (
     FE8_NAME,
@@ -28,7 +22,6 @@ from .constants import (
     WEAPON_TYPES,
     NUM_WEAPON_LEVELS,
     HOLY_WEAPONS,
-    CLIENT_TITLE,
 )
 from .locations import FE8Location
 from .items import FE8Item
@@ -36,22 +29,9 @@ from .connector_config import locations, items
 
 from .rom import FE8DeltaPatch, generate_output
 
-
-def launch_client(*args) -> None:
-    from .client import launch
-
-    launch_subprocess(launch, name=CLIENT_TITLE)
-
-
-components.append(
-    Component(
-        "FE8 Client",
-        CLIENT_TITLE,
-        component_type=ComponentType.CLIENT,
-        func=launch_client,
-        file_identifier=SuffixIdentifier(".apfe8"),
-    )
-)
+# We need to import FE8Client to register it properly, so we use it to disable
+# the unused import warning
+_ = FE8Client
 
 try:
     connector_script_path = os.path.join(user_path("data", "lua"), "connector_fe8.lua")

@@ -9,15 +9,17 @@ from settings import get_settings
 
 from .items import FE8Item
 from .locations import FE8Location
-from .constants import FE8_NAME
+from .constants import FE8_NAME, ROM_BASE_ADDRESS
 from .util import write_short_le
 from .connector_config import (
-    SLOT_NAME_OFFS,
+    SLOT_NAME_ADDR,
     SUPER_DEMON_KING_OFFS,
     LOCATION_INFO_OFFS,
     LOCATION_INFO_SIZE,
 )
 from .fe8py import FE8Randomizer
+
+SLOT_NAME_OFFS = SLOT_NAME_ADDR - ROM_BASE_ADDRESS
 
 BASE_PATCH = "data/base_patch.bsdiff4"
 PATCH_FILE_EXT = ".apfe8"
@@ -77,6 +79,7 @@ def generate_output(
     patched_rom[SUPER_DEMON_KING_OFFS] = int(bool(multiworld.super_demon_king[player]))
 
     for i, byte in enumerate(multiworld.player_name[player].encode("utf-8")):
+        # TODO: cap length at 63
         patched_rom[SLOT_NAME_OFFS + i] = byte
 
     outfile_player_name = f"_P{player}"
