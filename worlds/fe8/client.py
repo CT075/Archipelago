@@ -29,6 +29,8 @@ from .constants import (
     E_PLAYERPHASE_PROC_ADDRESS,
 )
 
+from worlds.LauncherComponents import SuffixIdentifier, components
+
 # TODO: remove once the proper _bizhawk gets released
 if "worlds._bizhawk" not in sys.modules:
     import importlib
@@ -60,6 +62,12 @@ else:
 FOMORTIIS_FLAG = dict(locations)["Defeat Formortiis"]
 
 T = TypeVar("T")
+
+# Add .apemerald suffix to bizhawk client
+for component in components:
+    if component.script_name == "BizHawkClient":
+        component.file_identifier = SuffixIdentifier(*(*component.file_identifier.suffixes, ".apfe8"))
+        break
 
 
 class FE8Client(BizHawkClient):
