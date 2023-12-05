@@ -1065,5 +1065,110 @@
         {"name": "FomortiisGroup", "base": 9183384, "count": 1, "logic": {}},
         {"name": "EmptyGroup", "base": 9221792, "count": 0, "logic": {}},
         {"name": "FomortiisSummons", "base": 9248596, "count": 12, "logic": {}}
-    ]
+    ],
+	"Valni1": [
+		{"name": "PlayerDeployment", "base": 9221832, "count": 8, "logic": {}},
+		{"name": "StartingEnemies", "base": 9222012, "count": 17, "logic": {}}
+	],
+	"Valni2": [
+		{"name": "PlayerDeployment", "base": 9222424, "count": 8, "logic": {}},
+		{"name": "StartingEnemies", "base": 9222604, "count": 25, "logic": {}},
+		{"name": "RearReinforcements", "base": 9223124, "count": 4, "logic": {}}
+	],
+	"Valni3": [
+		{"name": "PlayerDeployment", "base": 9223224, "count": 8, "logic": {}},
+		{"name": "StartingEnemies", "base": 9223404, "count": 26, "logic": {}}
+	],
+	"Valni4": [
+		{"name": "PlayerDeployment", "base": 9223972, "count": 8, "logic": {}},
+		{"name": "StartingEnemies", "base": 9224152, "count": 20, "logic": {}}
+	],
+	"Valni5": [
+		{"name": "PlayerDeployment", "base": 9224592, "count": 8, "logic": {}},
+		{"name": "StartingEnemies", "base": 9224772, "count": 40, "logic": {}},
+		{"name": "StairsReinforcements", "base": 9225612, "count": 2, "logic": {}}
+	],
+	"Valni6": [
+		{"name": "PlayerDeployment", "base": 9225672, "count": 8, "logic": {}},
+		{"name": "StartingEnemies", "base": 9225852, "count": 37, "logic": {}}
+	],
+	"Valni7": [
+		{"name": "PlayerDeployment", "base": 9226680, "count": 8, "logic": {}},
+		{"name": "StartingEnemies", "base": 9226860, "count": 31, "logic": {}},
+		{"name": "WesternGargoyles", "base": 9227520, "count": 2, "logic": {}},
+		{"name": "CentralGargoyles", "base": 9227580, "count": 2, "logic": {}},
+		{"name": "EasternGargoyles", "base": 9227640, "count": 2, "logic": {}}
+	],
+	"Valni8": [
+		{"name": "PlayerDeployment", "base": 9227700, "count": 8, "logic": {}},
+		{"name": "StartingEnemies", "base": 9227880, "count": 28, "logic": {}}
+	],
+	"Lagdou1": [
+		{"name": "PlayerDeployment", "base": 9228480, "count": 8, "logic": {}},
+		{"name": "StartingEnemies", "base": 9228660, "count": 40, "logic": {}},
+		{"name": "T6Reinforcements", "base": 9229500, "count": 2, "logic": {}},
+		{"name": "T8Reinforcements", "base": 9229560, "count": 2, "logic": {}}
+	],
+	"Lagdou2": [
+		{"name": "PlayerDeployment", "base": 9229620, "count": 8, "logic": {}},
+		{"name": "StartingEnemies", "base": 9229800, "count": 50, "logic": {}}
+	],
+	"Lagdou3": [
+		{"name": "PlayerDeployment", "base": 9230840, "count": 8, "logic": {}},
+		{"name": "StartingEnemies", "base": 9231020, "count": 45, "logic": {}},
+		{"name": "StairsReinforcement", "base": 9231960, "count": 1, "logic": {}},
+		{"name": "NorthernReinforcement", "base": 9232000, "count": 2, "logic": {}},
+		{"name": "WesternReinforcement", "base": 9232060, "count": 1, "logic": {}},
+		{"name": "SouthwesternReinforcement", "base": 9232100, "count": 1, "logic": {}},
+		{"name": "EasternReinforcement", "base": 9232140, "count": 1, "logic": {}}
+	],
+	"Lagdou4": [
+		{"name": "PlayerDeployment", "base": 9232200, "count": 10, "logic": {}},
+		{"name": "StartingEnemies", "base": 9232420, "count": 36, "logic": {}},
+		{"name": "T4Thief", "base": 9233180, "count": 1, "logic": {}},
+		{"name": "T6Thief", "base": 9233220, "count": 1, "logic": {}}
+	],
+	"Lagdou5": [
+		{"name": "PlayerDeployment", "base": 9233260, "count": 9, "logic": {}},
+		{"name": "StartingEnemies", "base": 9233460, "count": 31, "logic": {}},
+		{"name": "T8Thief", "base": 9234120, "count": 1, "logic": {}},
+		{"name": "T2Thief", "base": 9234160, "count": 1, "logic": {}},
+		{"name": "T4Thief", "base": 9234200, "count": 1, "logic": {}}
+	],
+	"Lagdou6": [
+		{"name": "PlayerDeployment", "base": 9234240, "count": 10, "logic": {}},
+		{"name": "StartingEnemies", "base": 9234460, "count": 42, "logic": {}},
+		{"name": "T4Reinforcements", "base": 9235340, "count": 2, "logic": {}},
+		{"name": "T5Reinforcements", "base": 9235400, "count": 2, "logic": {}},
+		{"name": "T7Reinforcements", "base": 9235460, "count": 2, "logic": {}},
+		{"name": "T9Reinforcements", "base": 9235520, "count": 2, "logic": {}}
+	],
+	"Lagdou7": [
+		{"name": "PlayerDeployment", "base": 9235588, "count": 11, "logic": {}},
+		{"name": "StartingEnemies", "base": 9235828, "count": 27, "logic": {}},
+		{"name": "T3Reinforcement", "base": 9236408, "count": 1, "logic": {}},
+		{"name": "T4EdgeReinforcements", "base": 9236448, "count": 2, "logic": {}},
+		{"name": "T4ChestReinforcement", "base": 9236548, "count": 1, "logic": {}},
+		{"name": "ChestRoomReinforcement", "base": 9236588, "count": 1, "logic": {}},
+		{"name": "SoutheasternRoomReinforcement", "base": 9236628, "count": 1, "logic": {}},
+		{"name": "SouthernCorridorReinforcement", "base": 9236668, "count": 1, "logic": {}},
+		{"name": "T9Reinforcement", "base": 9236708, "count": 1, "logic": {}}
+		],
+	"Lagdou8": [
+		{"name": "PlayerDeployment", "base": 9236748, "count": 9, "logic": {}},
+		{"name": "StartingEnemies", "base": 9236948, "count": 40, "logic": {}},
+		{"name": "CentralReinforcement", "base": 9237788, "count": 1, "logic": {}},
+		{"name": "SoutheasternReinforcement", "base": 9237828, "count": 1, "logic": {}},
+		{"name": "EasternReinforcement", "base": 9237868, "count": 2, "logic": {}},
+		{"name": "NortheasternReinforcement", "base": 9237928, "count": 1, "logic": {}}
+		],
+	"Lagdou9": [
+		{"name": "PlayerDeployment", "base": 9237968, "count": 8, "logic": {}},
+		{"name": "StartingEnemies", "base": 9238148, "count": 43, "logic": {}},
+		{"name": "NorthwesternReinforcement", "base": 9239048, "count": 1, "logic": {}}
+		],
+	"Lagdou10": [
+		{"name": "PlayerDeployment", "base": 9239088, "count": 8, "logic": {}},
+		{"name": "StartingEnemies", "base": 9239268, "count": 10, "logic": {}}
+	]
 }
