@@ -1067,108 +1067,277 @@
         {"name": "FomortiisSummons", "base": 9248596, "count": 12, "logic": {}}
     ],
 	"Valni1": [
-		{"name": "PlayerDeployment", "base": 9221832, "count": 8, "logic": {}},
-		{"name": "StartingEnemies", "base": 9222012, "count": 17, "logic": {}}
+		{"name": "PlayerDeployment", "base": 9221832, "count": 8, "logic": {"valni": true}},
+		{"name": "StartingEnemies", "base": 9222012, "count": 17, "logic": {
+			"valni": true,
+			"monster": true,
+			"0": {"monster": false}
+		}}
 	],
 	"Valni2": [
-		{"name": "PlayerDeployment", "base": 9222424, "count": 8, "logic": {}},
-		{"name": "StartingEnemies", "base": 9222604, "count": 25, "logic": {}},
-		{"name": "RearReinforcements", "base": 9223124, "count": 4, "logic": {}}
+		{"name": "PlayerDeployment", "base": 9222424, "count": 8, "logic": {"valni": true}},
+		{"name": "StartingEnemies", "base": 9222604, "count": 25, "logic": {
+			"valni": true,
+			"monster": true,
+			"0": {"monster": false},
+			"22": {"monster": false},
+			"23": {"monster": false}
+		}},
+		{"name": "RearReinforcements", "base": 9223124, "count": 4, "logic": {"valni": true, "monster": true}}
 	],
 	"Valni3": [
-		{"name": "PlayerDeployment", "base": 9223224, "count": 8, "logic": {}},
-		{"name": "StartingEnemies", "base": 9223404, "count": 26, "logic": {}}
+		{"name": "PlayerDeployment", "base": 9223224, "count": 8, "logic": {"valni": true}},
+		{"name": "StartingEnemies", "base": 9223404, "count": 26, "logic": {
+			"valni": true,
+			"monster": true,
+			"0": {"monster": false}
+		}}
 	],
 	"Valni4": [
-		{"name": "PlayerDeployment", "base": 9223972, "count": 8, "logic": {}},
-		{"name": "StartingEnemies", "base": 9224152, "count": 20, "logic": {}}
+		{"name": "PlayerDeployment", "base": 9223972, "count": 8, "logic": {"valni": true}},
+		{"name": "StartingEnemies", "base": 9224152, "count": 20, "logic": {
+			"valni": true,
+			"monster": true,
+			"0": {"monster": false}
+		}}
 	],
 	"Valni5": [
-		{"name": "PlayerDeployment", "base": 9224592, "count": 8, "logic": {}},
-		{"name": "StartingEnemies", "base": 9224772, "count": 40, "logic": {}},
-		{"name": "StairsReinforcements", "base": 9225612, "count": 2, "logic": {}}
+		{"name": "PlayerDeployment", "base": 9224592, "count": 8, "logic": {"valni": true}},
+		{"name": "StartingEnemies", "base": 9224772, "count": 40, "logic": {
+			"valni": true,
+			"monster": true,
+			"0": {"monster": false},
+			"1": {"monster": false}
+		}},
+		{"name": "StairsReinforcements", "base": 9225612, "count": 2, "logic": {"valni": true, "monster": true}}
 	],
 	"Valni6": [
-		{"name": "PlayerDeployment", "base": 9225672, "count": 8, "logic": {}},
-		{"name": "StartingEnemies", "base": 9225852, "count": 37, "logic": {}}
+		{"name": "PlayerDeployment", "base": 9225672, "count": 8, "logic": {"valni": true}},
+		{"name": "StartingEnemies", "base": 9225852, "count": 37, "logic": {
+			"valni": true,
+			"1":  {"monster": true},
+			"16": {"monster": true},
+			"17": {"monster": true},
+			"18": {"monster": true},
+			"20": {"monster": true},
+			"21": {"monster": true},
+			"22": {"monster": true},
+			"23": {"monster": true},
+			"24": {"monster": true},
+			"25": {"monster": true},
+			"26": {"monster": true},
+			"28": {"monster": true},
+			"29": {"monster": true},
+			"30": {"monster": true},
+			"31": {"monster": true},
+			"32": {"monster": true},
+			"33": {"monster": true},
+			"34": {"monster": true},
+			"35": {"monster": true},
+			"36": {"monster": true}
+		}}
 	],
 	"Valni7": [
-		{"name": "PlayerDeployment", "base": 9226680, "count": 8, "logic": {}},
-		{"name": "StartingEnemies", "base": 9226860, "count": 31, "logic": {}},
-		{"name": "WesternGargoyles", "base": 9227520, "count": 2, "logic": {}},
-		{"name": "CentralGargoyles", "base": 9227580, "count": 2, "logic": {}},
-		{"name": "EasternGargoyles", "base": 9227640, "count": 2, "logic": {}}
+		{"name": "PlayerDeployment", "base": 9226680, "count": 8, "logic": {"valni": true}},
+		{"name": "StartingEnemies", "base": 9226860, "count": 31, "logic": {
+			"valni": true,
+			"monster": true,
+			"0": {"monster": false},
+			"1": {"monster": false},
+			"2": {"monster": false},
+			"4": {"monster": false},
+			"17": {"monster": false},
+			"19": {"monster": false},
+			"26": {"monster": false},
+			"29": {"monster": false}
+		}},
+		{"name": "WesternGargoyles", "base": 9227520, "count": 2, "logic": {"valni": true}},
+		{"name": "CentralGargoyles", "base": 9227580, "count": 2, "logic": {"valni": true}},
+		{"name": "EasternGargoyles", "base": 9227640, "count": 2, "logic": {"valni": true}}
 	],
 	"Valni8": [
-		{"name": "PlayerDeployment", "base": 9227700, "count": 8, "logic": {}},
-		{"name": "StartingEnemies", "base": 9227880, "count": 28, "logic": {}}
+		{"name": "PlayerDeployment", "base": 9227700, "count": 8, "logic": {"valni": true}},
+		{"name": "StartingEnemies", "base": 9227880, "count": 28, "logic": {
+			"valni": true,
+			"monster": true,
+			"1": {"monster": false},
+			"2": {"monster": false},
+			"27": {"monster": false}
+		}}
 	],
 	"Lagdou1": [
-		{"name": "PlayerDeployment", "base": 9228480, "count": 8, "logic": {}},
-		{"name": "StartingEnemies", "base": 9228660, "count": 40, "logic": {}},
-		{"name": "T6Reinforcements", "base": 9229500, "count": 2, "logic": {}},
-		{"name": "T8Reinforcements", "base": 9229560, "count": 2, "logic": {}}
+		{"name": "PlayerDeployment", "base": 9228480, "count": 8, "logic": {"lagdou": true}},
+		{"name": "StartingEnemies", "base": 9228660, "count": 40, "logic": {
+			"lagdou": true,
+			"monster": true,
+			"0": {"monster": false},
+			"1": {"monster": false},
+			"2": {"monster": false},
+			"3": {"monster": false},
+			"21": {"monster": false}
+		}},
+		{"name": "T6Reinforcements", "base": 9229500, "count": 2, "logic": {"lagdou": true, "monster": true}},
+		{"name": "T8Reinforcements", "base": 9229560, "count": 2, "logic": {"lagdou": true, "monster": true}}
 	],
 	"Lagdou2": [
-		{"name": "PlayerDeployment", "base": 9229620, "count": 8, "logic": {}},
-		{"name": "StartingEnemies", "base": 9229800, "count": 50, "logic": {}}
+		{"name": "PlayerDeployment", "base": 9229620, "count": 8, "logic": {"lagdou": true}},
+		{"name": "StartingEnemies", "base": 9229800, "count": 50, "logic": {
+			"lagdou": true,
+			"monster": true,
+			"0": {"monster": false},
+			"1": {"monster": false},
+			"49": {"monster": false}
+		}}
 	],
 	"Lagdou3": [
-		{"name": "PlayerDeployment", "base": 9230840, "count": 8, "logic": {}},
-		{"name": "StartingEnemies", "base": 9231020, "count": 45, "logic": {}},
-		{"name": "StairsReinforcement", "base": 9231960, "count": 1, "logic": {}},
-		{"name": "NorthernReinforcement", "base": 9232000, "count": 2, "logic": {}},
-		{"name": "WesternReinforcement", "base": 9232060, "count": 1, "logic": {}},
-		{"name": "SouthwesternReinforcement", "base": 9232100, "count": 1, "logic": {}},
-		{"name": "EasternReinforcement", "base": 9232140, "count": 1, "logic": {}}
+		{"name": "PlayerDeployment", "base": 9230840, "count": 8, "logic": {"lagdou": true}},
+		{"name": "StartingEnemies", "base": 9231020, "count": 45, "logic": {
+			"lagdou": true,
+			"monster": true,
+			"0": {"monster": false},
+			"1": {"monster": false},
+			"2": {"monster": false},
+			"3": {"monster": false},
+			"4": {"monster": false},
+			"5": {"monster": false},
+			"6": {"monster": false},
+			"7": {"monster": false},
+			"44": {"monster": false}
+		}},
+		{"name": "StairsReinforcement", "base": 9231960, "count": 1, "logic": {"lagdou": true, "monster": true}},
+		{"name": "NorthernReinforcement", "base": 9232000, "count": 2, "logic": {"lagdou": true, "monster": true}},
+		{"name": "WesternReinforcement", "base": 9232060, "count": 1, "logic": {"lagdou": true}},
+		{"name": "SouthwesternReinforcement", "base": 9232100, "count": 1, "logic": {"lagdou": true}},
+		{"name": "EasternReinforcement", "base": 9232140, "count": 1, "logic": {"lagdou": true}}
 	],
 	"Lagdou4": [
-		{"name": "PlayerDeployment", "base": 9232200, "count": 10, "logic": {}},
-		{"name": "StartingEnemies", "base": 9232420, "count": 36, "logic": {}},
-		{"name": "T4Thief", "base": 9233180, "count": 1, "logic": {}},
-		{"name": "T6Thief", "base": 9233220, "count": 1, "logic": {}}
+		{"name": "PlayerDeployment", "base": 9232200, "count": 10, "logic": {"lagdou": true}},
+		{"name": "StartingEnemies", "base": 9232420, "count": 36, "logic": {
+			"lagdou": true,
+			"monster": true,
+			"0": {"monster": false},
+			"31": {"monster": false},
+			"32": {"monster": false},
+			"33": {"monster": false},
+			"34": {"monster": false},
+			"35": {"monster": false}
+		}},
+		{"name": "T4Thief", "base": 9233180, "count": 1, "logic": {"lagdou": true}},
+		{"name": "T6Thief", "base": 9233220, "count": 1, "logic": {"lagdou": true}}
 	],
 	"Lagdou5": [
-		{"name": "PlayerDeployment", "base": 9233260, "count": 9, "logic": {}},
-		{"name": "StartingEnemies", "base": 9233460, "count": 31, "logic": {}},
-		{"name": "T8Thief", "base": 9234120, "count": 1, "logic": {}},
-		{"name": "T2Thief", "base": 9234160, "count": 1, "logic": {}},
-		{"name": "T4Thief", "base": 9234200, "count": 1, "logic": {}}
+		{"name": "PlayerDeployment", "base": 9233260, "count": 9, "logic": {"lagdou": true}},
+		{"name": "StartingEnemies", "base": 9233460, "count": 31, "logic": {
+			"lagdou": true,
+			"monster": true,
+			"0": {"monster": false},
+			"1": {"monster": false},
+			"2": {"monster": false}
+		}},
+		{"name": "T8Thief", "base": 9234120, "count": 1, "logic": {"lagdou": true}},
+		{"name": "T2Thief", "base": 9234160, "count": 1, "logic": {"lagdou": true}},
+		{"name": "T4Thief", "base": 9234200, "count": 1, "logic": {"lagdou": true}}
 	],
 	"Lagdou6": [
-		{"name": "PlayerDeployment", "base": 9234240, "count": 10, "logic": {}},
-		{"name": "StartingEnemies", "base": 9234460, "count": 42, "logic": {}},
-		{"name": "T4Reinforcements", "base": 9235340, "count": 2, "logic": {}},
-		{"name": "T5Reinforcements", "base": 9235400, "count": 2, "logic": {}},
-		{"name": "T7Reinforcements", "base": 9235460, "count": 2, "logic": {}},
-		{"name": "T9Reinforcements", "base": 9235520, "count": 2, "logic": {}}
+		{"name": "PlayerDeployment", "base": 9234240, "count": 10, "logic": {"lagdou": true}},
+		{"name": "StartingEnemies", "base": 9234460, "count": 42, "logic": {
+			"lagdou": true,
+			"11": {"monster": true},
+			"12": {"monster": true},
+			"13": {"monster": true},
+			"14": {"monster": true},
+			"15": {"monster": true},
+			"16": {"monster": true},
+			"17": {"monster": true},
+			"18": {"monster": true},
+			"19": {"monster": true},
+			"20": {"monster": true},
+			"21": {"monster": true},
+			"22": {"monster": true},
+			"23": {"monster": true},
+			"24": {"monster": true},
+			"25": {"monster": true},
+			"36": {"monster": true},
+			"37": {"monster": true},
+			"38": {"monster": true},
+			"39": {"monster": true},
+			"41": {"monster": true}
+		}},
+		{"name": "T4Reinforcements", "base": 9235340, "count": 2, "logic": {"lagdou": true, "monster": true}},
+		{"name": "T5Reinforcements", "base": 9235400, "count": 2, "logic": {"lagdou": true, "monster": true}},
+		{"name": "T7Reinforcements", "base": 9235460, "count": 2, "logic": {"lagdou": true, "monster": true}},
+		{"name": "T9Reinforcements", "base": 9235520, "count": 2, "logic": {"lagdou": true, "monster": true}}
 	],
 	"Lagdou7": [
-		{"name": "PlayerDeployment", "base": 9235588, "count": 11, "logic": {}},
-		{"name": "StartingEnemies", "base": 9235828, "count": 27, "logic": {}},
-		{"name": "T3Reinforcement", "base": 9236408, "count": 1, "logic": {}},
-		{"name": "T4EdgeReinforcements", "base": 9236448, "count": 2, "logic": {}},
-		{"name": "T4ChestReinforcement", "base": 9236548, "count": 1, "logic": {}},
-		{"name": "ChestRoomReinforcement", "base": 9236588, "count": 1, "logic": {}},
-		{"name": "SoutheasternRoomReinforcement", "base": 9236628, "count": 1, "logic": {}},
-		{"name": "SouthernCorridorReinforcement", "base": 9236668, "count": 1, "logic": {}},
-		{"name": "T9Reinforcement", "base": 9236708, "count": 1, "logic": {}}
+		{"name": "PlayerDeployment", "base": 9235588, "count": 11, "logic": {"lagdou": true}},
+		{"name": "StartingEnemies", "base": 9235828, "count": 27, "logic": {
+			"lagdou": true,
+			"monster": true,
+			"0": {"monster": false},
+			"1": {"monster": false},
+			"2": {"monster": false},
+			"3": {"monster": false},
+			"4": {"monster": false},
+			"5": {"monster": false},
+			"6": {"monster": false},
+			"7": {"monster": false},
+			"8": {"monster": false},
+			"9": {"monster": false},
+			"25": {"monster": false}
+		}},
+		{"name": "T3Reinforcement", "base": 9236408, "count": 1, "logic": {"lagdou": true, "monster": true}},
+		{"name": "T4EdgeReinforcements", "base": 9236448, "count": 2, "logic": {"lagdou": true, "monster": true}},
+		{"name": "T4ChestReinforcement", "base": 9236548, "count": 1, "logic": {"lagdou": true, "monster": true}},
+		{"name": "ChestRoomReinforcement", "base": 9236588, "count": 1, "logic": {"lagdou": true, "monster": true}},
+		{"name": "SoutheasternRoomReinforcement", "base": 9236628, "count": 1, "logic": {"lagdou": true, "monster": true}},
+		{"name": "SouthernCorridorReinforcement", "base": 9236668, "count": 1, "logic": {"lagdou": true, "monster": true}},
+		{"name": "T9Reinforcement", "base": 9236708, "count": 1, "logic": {"lagdou": true, "monster": true}}
 		],
 	"Lagdou8": [
-		{"name": "PlayerDeployment", "base": 9236748, "count": 9, "logic": {}},
-		{"name": "StartingEnemies", "base": 9236948, "count": 40, "logic": {}},
-		{"name": "CentralReinforcement", "base": 9237788, "count": 1, "logic": {}},
-		{"name": "SoutheasternReinforcement", "base": 9237828, "count": 1, "logic": {}},
-		{"name": "EasternReinforcement", "base": 9237868, "count": 2, "logic": {}},
-		{"name": "NortheasternReinforcement", "base": 9237928, "count": 1, "logic": {}}
+		{"name": "PlayerDeployment", "base": 9236748, "count": 9, "logic": {"lagdou": true}},
+		{"name": "StartingEnemies", "base": 9236948, "count": 40, "logic": {
+			"lagdou": true,
+			"monster": true,
+			"0": {"monster": false},
+			"1": {"monster": false},
+			"2": {"monster": false},
+			"3": {"monster": false},
+			"4": {"monster": false},
+			"5": {"monster": false},
+			"6": {"monster": false},
+			"7": {"monster": false}
+		}},
+		{"name": "CentralReinforcement", "base": 9237788, "count": 1, "logic": {"lagdou": true, "monster": true}},
+		{"name": "SoutheasternReinforcement", "base": 9237828, "count": 1, "logic": {"lagdou": true, "monster": true}},
+		{"name": "EasternReinforcement", "base": 9237868, "count": 2, "logic": {"lagdou": true, "monster": true}},
+		{"name": "NortheasternReinforcement", "base": 9237928, "count": 1, "logic": {"lagdou": true, "monster": true}}
 		],
 	"Lagdou9": [
-		{"name": "PlayerDeployment", "base": 9237968, "count": 8, "logic": {}},
-		{"name": "StartingEnemies", "base": 9238148, "count": 43, "logic": {}},
-		{"name": "NorthwesternReinforcement", "base": 9239048, "count": 1, "logic": {}}
+		{"name": "PlayerDeployment", "base": 9237968, "count": 8, "logic": {"lagdou": true}},
+		{"name": "StartingEnemies", "base": 9238148, "count": 43, "logic": {
+			"lagdou": true,
+			"monster": true,
+			"0": {"monster": false},
+			"1": {"monster": false},
+			"2": {"monster": false},
+			"3": {"monster": false},
+			"4": {"monster": false},
+			"5": {"monster": false},
+			"6": {"monster": false},
+			"7": {"monster": false},
+			"8": {"monster": false}
+		}},
+		{"name": "NorthwesternReinforcement", "base": 9239048, "count": 1, "logic": {"lagdou": true, "monster": true}}
 		],
 	"Lagdou10": [
-		{"name": "PlayerDeployment", "base": 9239088, "count": 8, "logic": {}},
-		{"name": "StartingEnemies", "base": 9239268, "count": 10, "logic": {}}
+		{"name": "PlayerDeployment", "base": 9239088, "count": 8, "logic": {"lagdou": true}},
+		{"name": "StartingEnemies", "base": 9239268, "count": 10, "logic": {
+			"lagdou": true,
+			"2": {"monster": true},
+			"3": {"monster": true},
+			"5": {"monster": true},
+			"6": {"monster": true},
+			"7": {"monster": true}
+		}}
 	]
 }
