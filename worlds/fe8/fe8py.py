@@ -216,6 +216,7 @@ class WeaponData:
 
 # This is a hack until we get monster weapons set up in `weapondata.json`
 # properly.
+# This should probably be removed? - Darr
 MONSTER_DARKS = {
     0xAB: {
         "id": 0xAB,
@@ -416,6 +417,13 @@ class FE8Randomizer:
 
         # Dark has no E-ranked weapons, so we add Flux
         self.weapons_by_rank[WeaponRank.E].append(self.weapons_by_name["Flux"])
+        
+        # Let's do the same thing with dogs
+        self.weapons_by_rank[WeaponRank.D].append(self.weapons_by_name["Fiery Fang"])
+        self.weapons_by_rank[WeaponRank.C].append(self.weapons_by_name["Fiery Fang"])
+        self.weapons_by_rank[WeaponRank.A].append(self.weapons_by_name["Hellfang"])
+        # Dragon zombies experience the same problem. I've disabled them for now;
+        # they only have one weapon and E-rank Wretched Air does not sound fun. - Darr
 
     def job_valid(self, job: JobData, char: int, logic: dict[str, Any]) -> bool:
         # get list of tags that make the job invalid (notags)

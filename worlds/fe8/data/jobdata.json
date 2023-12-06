@@ -727,23 +727,29 @@
   {
     "id": 82,
     "name": "Revenant",
-    "usable_weapons": [],
+    "usable_weapons": [
+	  "Monster Weapon"
+	],
     "is_promoted": false,
     "tags": [
       "monster",
       "special",
-      "generic"
+      "generic",
+	  "Claw"
     ]
   },
   {
     "id": 83,
     "name": "Entombed",
-    "usable_weapons": [],
+    "usable_weapons": [
+	  "Monster Weapon"
+	],
     "is_promoted": true,
     "tags": [
       "monster",
       "special",
-      "generic"
+      "generic",
+	  "Claw"
     ]
   },
   {
@@ -801,21 +807,26 @@
   {
     "id": 88,
     "name": "Bael",
-    "usable_weapons": [],
+    "usable_weapons": [
+	  "Monster Weapon"
+	],
     "is_promoted": false,
     "tags": [
       "monster",
-      "special"
+      "special",
+	  "Claw"
     ]
   },
   {
     "id": 89,
     "name": "Elder Bael",
-    "usable_weapons": [],
+    "usable_weapons": [
+	  "Monster Weapon"],
     "is_promoted": true,
     "tags": [
       "monster",
-      "special"
+      "special",
+	  "Claw"
     ]
   },
   {
@@ -833,21 +844,27 @@
   {
     "id": 91,
     "name": "Mauthe Doog",
-    "usable_weapons": [],
+    "usable_weapons": [
+	  "Monster Weapon"
+	],
     "is_promoted": false,
     "tags": [
       "monster",
-      "special"
+      "special",
+	  "Fang"
     ]
   },
   {
     "id": 92,
     "name": "Gwyllgi",
-    "usable_weapons": [],
+    "usable_weapons": [
+	  "Monster Weapon"
+	],
     "is_promoted": true,
     "tags": [
       "monster",
-      "special"
+      "special",
+	  "Fang"
     ]
   },
   {
@@ -885,7 +902,8 @@
     "tags": [
       "monster",
       "special",
-      "flying"
+      "flying",
+	  "MonsterDark"
     ]
   },
   {
@@ -898,7 +916,8 @@
     "tags": [
       "monster",
       "special",
-      "flying"
+      "flying",
+	  "MonsterDark"
     ]
   },
   {
@@ -910,7 +929,8 @@
     "is_promoted": true,
     "tags": [
       "monster",
-      "special"
+      "special",
+	  "MonsterDark"
     ]
   },
   {
@@ -942,9 +962,15 @@
   {
     "id": 101,
     "name": "Dracozombie",
-    "usable_weapons": [],
+    "usable_weapons": [
+	  
+	],
     "is_promoted": true,
     "tags": [
+	  "monster",
+	  "special",
+	  "flying",
+	  "Breath"
     ]
   },
   {
