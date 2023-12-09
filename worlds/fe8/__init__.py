@@ -202,6 +202,8 @@ class FE8World(World):
     def create_regions(self) -> None:
         smooth_level_caps = self.multiworld.smooth_level_caps[self.player]
         min_endgame_level_cap = self.multiworld.min_endgame_level_cap[self.player]
+        tower_enabled = self.multiworld.tower_enabled[self.player]
+        ruins_enabled = self.multiworld.ruins_enabled[self.player]
 
         menu = Region("Menu", self.player, self.multiworld)
         finalboss = Region("FinalBoss", self.player, self.multiworld)
@@ -310,6 +312,67 @@ class FE8World(World):
             )
 
             self.multiworld.regions.append(campaign)
-
+            
+        if tower_enabled:
+            tower = Region("Tower of Valni", self.player, self.multiworld)
+            self.multiworld.regions.append(tower)
+            
+            self.add_location_to_region("Complete Tower of Valni 1", None, tower)
+            self.add_location_to_region("Complete Tower of Valni 2", None, tower)
+            self.add_location_to_region("Complete Tower of Valni 3", None, tower)
+            self.add_location_to_region("Complete Tower of Valni 4", None, tower)
+            self.add_location_to_region("Complete Tower of Valni 5", None, tower)
+            self.add_location_to_region("Complete Tower of Valni 6", None, tower)
+            self.add_location_to_region("Complete Tower of Valni 7", None, tower)
+            self.add_location_to_region("Complete Tower of Valni 8", None, tower)
+            
+            if smooth_level_caps:
+                route_split.add_exits(
+                    {"Tower of Valni": "Complete Chapter 15"},
+                    {"Tower of Valni": level_cap_at_least(20)}
+                )
+                tower.add_exits(
+                    {"Post-routesplit": "Complete Tower of Valni 8"},
+                    {"Post-routesplit": level_cap_at_least(25)}
+                )
+            else:
+                campaign.add_exits(
+                    {"Tower of Valni": "Complete Chapter 15"}
+                )
+                tower.add_exits(
+                    {"Campaign": "Complete Tower of Valni 8"}
+                )
+            
+        if ruins_enabled:
+            ruins = Region("Lagdou Ruins", self.player, self.multiworld)
+            self.multiworld.regions.append(ruins)
+            
+            self.add_location_to_region("Complete Lagdou Ruins 1", None, ruins)
+            self.add_location_to_region("Complete Lagdou Ruins 2", None, ruins)
+            self.add_location_to_region("Complete Lagdou Ruins 3", None, ruins)
+            self.add_location_to_region("Complete Lagdou Ruins 4", None, ruins)
+            self.add_location_to_region("Complete Lagdou Ruins 5", None, ruins)
+            self.add_location_to_region("Complete Lagdou Ruins 6", None, ruins)
+            self.add_location_to_region("Complete Lagdou Ruins 7", None, ruins)
+            self.add_location_to_region("Complete Lagdou Ruins 8", None, ruins)
+            self.add_location_to_region("Complete Lagdou Ruins 9", None, ruins)
+            self.add_location_to_region("Complete Lagdou Ruins 10", None, ruins)
+            
+            if smooth_level_caps:
+                lategame.add_exits(
+                    {"Lagdou Ruins": "Complete Chapter 19"},
+                    {"Lagdou Ruins": finalboss_rule}
+                )
+                ruins.add_exits(
+                    {"Post-routesplit": "Complete Lagdou Ruins 10"}
+                )
+            else:
+                campaign.add_exits(
+                    {"Lagdou Ruins": "Complete Chapter 19"}
+                )
+                tower.add_exits(
+                    {"Campaign": "Complete Lagdou Ruins 10"}
+                )
+            
     def generate_output(self, output_directory: str) -> None:
         generate_output(self.multiworld, self.player, output_directory, self.random)

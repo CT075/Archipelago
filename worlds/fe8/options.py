@@ -94,7 +94,23 @@ class UnbreakableRegalia(Toggle):
 
     display_name = "Unbreakable Regalia"
     default = 0
+    
+class EnableTower(Toggle):
+    """
+    Make each floor of the Tower of Valni a chapter to complete.
+    
+    """
 
+    display_name = "Include Tower of Valni"
+    default = 0
+    
+class EnableRuins(Toggle):
+    """
+    Make each floor of the Lagdou Ruins a chapter to complete.
+    """
+    
+    display_name = "Include Lagdou Ruins"
+    default = 0
 
 fe8_options: Dict[str, AssembleOptions] = {
     "super_demon_king": SuperDemonKing,
@@ -104,4 +120,6 @@ fe8_options: Dict[str, AssembleOptions] = {
     "exclude_latona": ExcludeLatona,
     "easier_5x": Easier5x,
     "unbreakable_regalia": UnbreakableRegalia,
+    "tower_enabled": EnableTower,
+    "ruins_enabled": EnableRuins,
 }
