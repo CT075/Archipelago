@@ -22,6 +22,7 @@ from .constants import (
     WEAPON_TYPES,
     NUM_WEAPON_LEVELS,
     HOLY_WEAPONS,
+    FILLER_ITEMS,
 )
 from .locations import FE8Location
 from .items import FE8Item
@@ -187,6 +188,14 @@ class FE8World(World):
                     ItemClassification.progression
                     if hw in progression_holy_weapons
                     else ItemClassification.useful,
+                )
+            )
+        
+        for f in FILLER_ITEMS:
+            self.multiworld.itempool.append(
+                self.create_item_with_classification(
+                    f,
+                    ItemClassification.filler
                 )
             )
 

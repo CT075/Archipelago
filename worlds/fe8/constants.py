@@ -20,6 +20,25 @@ HOLY_WEAPONS = {
 WEAPON_TYPES = ["Sword", "Lance", "Axe", "Bow", "Anima", "Light", "Dark", "Staff"]
 NUM_WEAPON_LEVELS = 3
 
+FILLER_ITEMS = [
+    "AngelicRobe",
+    "EnergyRing",
+    "SecretBook",
+    "Speedwings",
+    "GoddessIcon",
+    "DragonShield",
+    "Talisman",
+    "BodyRing",
+    "Boots",
+    "KnightCrest",
+    "HeroCrest",
+    "OrionsBolt",
+    "GuidingRing",
+    "ElysianWhip",
+    "OceanSeal",
+    "MasterSeal",
+]
+
 ROM_BASE_ADDRESS = 0x08000000
 ROM_NAME_ADDR = 0x080000A0
 
