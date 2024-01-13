@@ -191,10 +191,10 @@ class FE8World(World):
                 )
             )
 
-        for f in FILLER_ITEMS:
-            self.multiworld.itempool.append(
-                self.create_item_with_classification(f, ItemClassification.filler)
-            )
+        #for f in FILLER_ITEMS:
+        #    self.multiworld.itempool.append(
+        #        self.create_item_with_classification(f, ItemClassification.filler)
+        #    )
 
     def add_location_to_region(self, name: str, addr: Optional[int], region: Region):
         if addr is None:
