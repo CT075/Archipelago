@@ -81,9 +81,9 @@ class UnitBlock:
     base: int
     count: int
 
-    # Currently, the names of blocks in `chapter_unit_blocks.json` are all
+    # Currently, the names of blocks in `chapter_unit_blocks.json` are mostly
     # automatically generated from chapter event disassembly and are tagged
-    # with any relevant information about the block. However,
+    # with any relevant information about the block.
     logic: defaultdict[Union[int, str], dict[str, Any]]
 
     def __init__(
@@ -212,48 +212,6 @@ class WeaponData:
             kind=WeaponKind.of_str(obj["kind"]),
             locks=obj.get("locks", []),
         )
-
-
-# This is a hack until we get monster weapons set up in `weapondata.json`
-# properly.
-# This should probably be removed? - Darr
-MONSTER_DARKS = {
-    0xAB: {
-        "id": 0xAB,
-        "name": "Demon Surge",
-        "rank": WeaponRank.B,
-        "kind": WeaponKind.DARK,
-        "locks": set(),
-    },
-    0xAC: {
-        "id": 0xAC,
-        "name": "Shadowshot",
-        "rank": WeaponRank.A,
-        "kind": WeaponKind.DARK,
-        "locks": set(),
-    },
-    0xB3: {
-        "id": 0xB3,
-        "name": "Evil Eye",
-        "rank": WeaponRank.D,
-        "kind": WeaponKind.DARK,
-        "locks": set(),
-    },
-    0xB4: {
-        "id": 0xB4,
-        "name": "Crimson Eye",
-        "rank": WeaponRank.B,
-        "kind": WeaponKind.DARK,
-        "locks": set(),
-    },
-    0xB5: {
-        "id": 0xB5,
-        "name": "Stone",
-        "rank": WeaponRank.B,
-        "kind": WeaponKind.DARK,
-        "locks": set(),
-    },
-}
 
 
 @dataclass
@@ -417,13 +375,20 @@ class FE8Randomizer:
 
         # Dark has no E-ranked weapons, so we add Flux
         self.weapons_by_rank[WeaponRank.E].append(self.weapons_by_name["Flux"])
-        
+
         # Let's do the same thing with dogs
         self.weapons_by_rank[WeaponRank.D].append(self.weapons_by_name["Fiery Fang"])
         self.weapons_by_rank[WeaponRank.C].append(self.weapons_by_name["Fiery Fang"])
         self.weapons_by_rank[WeaponRank.A].append(self.weapons_by_name["Hellfang"])
-        # Dragon zombies experience the same problem. I've disabled them for now;
-        # they only have one weapon and E-rank Wretched Air does not sound fun. - Darr
+
+        self.weapons_by_rank[WeaponRank.A].append(self.weapons_by_name["Fetid Claw"])
+
+        # CR-soon cam:
+        # Darr: Dragon zombies experience the same problem. I've disabled them for now;
+        # they only have one weapon and E-rank Wretched Air does not sound fun.
+        # Cam: What we need to do is prevent units from randomizing into Dracozombies
+        # unless they have an A rank weapon. There are a few easy ways to hack that
+        # in, but I'm going to punt on it for now.
 
     def job_valid(self, job: JobData, char: int, logic: dict[str, Any]) -> bool:
         # get list of tags that make the job invalid (notags)
@@ -435,6 +400,10 @@ class FE8Randomizer:
                 notags.add(x.removeprefix("no_"))
         # job is invalid if it has any of the tags in notags
         if notags and notags & job.tags:
+            return False
+
+        # CR-soon cam: see above
+        if job.name == "Dracozombie":
             return False
 
         if ("must_fly" in logic and logic["must_fly"]) and "flying" not in job.tags:
@@ -455,22 +424,15 @@ class FE8Randomizer:
             else:
                 return CHEST_KEY_5
 
-        if item_id not in self.weapons_by_id and item_id not in MONSTER_DARKS:
+        if item_id not in self.weapons_by_id:
             return item_id
-
-        if item_id in MONSTER_DARKS:
-            weapon_attrs: WeaponData = WeaponData(**MONSTER_DARKS[item_id])  # type: ignore
-        else:
-            weapon_attrs = self.weapons_by_id[item_id]
+        weapon_attrs = self.weapons_by_id[item_id]
 
         choices = [
             weap
             for weap in self.weapons_by_rank[weapon_attrs.rank]
             if weapon_usable(weap, job, logic)
         ]
-
-        if item_id in MONSTER_DARKS and WeaponKind.DARK in job.usable_weapons:
-            choices.append(weapon_attrs)
 
         if not choices:
             import json
@@ -557,7 +519,10 @@ class FE8Randomizer:
         for i, item_id in enumerate(new_inventory):
             self.rom[data_offset + INVENTORY_INDEX + i] = item_id
 
-        if "ai1_mod" in logic and self.rom[data_offset+AI1_INDEX] == logic["ai1_mod"]["from"]:
+        if (
+            "ai1_mod" in logic
+            and self.rom[data_offset + AI1_INDEX] == logic["ai1_mod"]["from"]
+        ):
             self.rom[data_offset + AI1_INDEX] = logic["ai1_mod"]["to"]
 
         # If an NPC isn't autoleveled, it's probably a boss or important NPC of
