@@ -2,19 +2,15 @@
 Archipelago World definition for Fire Emblem: Sacred Stones
 """
 
-import os
+from typing import ClassVar, Optional, Callable, Set, Tuple
 import logging
-import hashlib
-import pkgutil
-from typing import ClassVar, Optional, Callable, Set
 
 from worlds.AutoWorld import World, WebWorld
 from BaseClasses import Region, ItemClassification, CollectionState, Tutorial
 import settings
-from Utils import user_path
 
 from .client import FE8Client
-from .options import FE8Options
+from .options import FE8Options, Goal
 from .constants import (
     FE8_NAME,
     FE8_ID_PREFIX,
@@ -33,6 +29,7 @@ from .rom import FE8DeltaPatch, generate_output
 # We need to import FE8Client to register it properly, so we use it to disable
 # the unused import warning
 _ = FE8Client
+
 
 class FE8WebWorld(WebWorld):
     """
@@ -83,11 +80,39 @@ class FE8World(World):
     topology_present = False
     web = FE8WebWorld()
     progression_holy_weapons: Set[str] = set()
+    options: FE8Options
 
     # TODO: populate for real
     item_name_to_id = {name: id + FE8_ID_PREFIX for name, id in items}
     location_name_to_id = {name: id + FE8_ID_PREFIX for name, id in locations}
     item_name_groups = {"holy weapons": set(HOLY_WEAPONS.keys())}
+
+    # CR-soon cam: We should set these once, on world instantiation.
+    def tower_enabled(self) -> bool:
+        return (
+            bool(self.options.tower_enabled)
+            or self.options.goal == Goal.option_ClearValni
+        )
+
+    def ruins_enabled(self) -> bool:
+        return (
+            bool(self.options.ruins_enabled)
+            or self.options.goal == Goal.option_ClearLagdou
+        )
+
+    def total_locations(self) -> int:
+        tower_enabled = self.tower_enabled()
+        ruins_enabled = self.ruins_enabled()
+
+        def is_included(loc: Tuple[str, int]):
+            name = loc[0]
+            if "Valni" in name and not tower_enabled:
+                return False
+            if "Lagdou" in name and not ruins_enabled:
+                return False
+            return True
+
+        return len([loc for loc in locations if is_included(loc)])
 
     def create_item_with_classification(
         self, item: str, cls: ItemClassification
@@ -110,7 +135,6 @@ class FE8World(World):
         )
 
     def create_items(self) -> None:
-        assert isinstance(self.options, FE8Options)
         smooth_level_caps = self.options.smooth_level_caps
         min_endgame_level_cap = int(self.options.min_endgame_level_cap)
         exclude_latona = self.options.exclude_latona
@@ -122,14 +146,22 @@ class FE8World(World):
             max(min_endgame_level_cap, smooth_levelcap_max) - 10
         ) // 5
 
+        progression_items: list[FE8Item] = []
+        other_items: list[FE8Item] = []
+
+        def register(name: str, cls: ItemClassification):
+            (
+                progression_items
+                if cls == ItemClassification.progression
+                else other_items
+            ).append(self.create_item_with_classification(name, cls))
+
         for i in range(NUM_LEVELCAPS):
-            self.multiworld.itempool.append(
-                self.create_item_with_classification(
-                    "Progressive Level Cap",
-                    ItemClassification.progression
-                    if i < needed_level_uncaps
-                    else ItemClassification.useful,
-                )
+            register(
+                "Progressive Level Cap",
+                ItemClassification.progression
+                if i < needed_level_uncaps
+                else ItemClassification.useful,
             )
 
         holy_weapon_pool = set(HOLY_WEAPONS.keys())
@@ -146,29 +178,40 @@ class FE8World(World):
 
         for wtype in WEAPON_TYPES:
             for _ in range(NUM_WEAPON_LEVELS):
-                self.multiworld.itempool.append(
-                    self.create_item_with_classification(
-                        "Progressive Weapon Level ({})".format(wtype),
-                        ItemClassification.progression
-                        if wtype in progression_weapon_types
-                        else ItemClassification.useful,
-                    )
+                register(
+                    "Progressive Weapon Level ({})".format(wtype),
+                    ItemClassification.progression
+                    if wtype in progression_weapon_types
+                    else ItemClassification.useful,
                 )
 
         for hw in HOLY_WEAPONS:
-            self.multiworld.itempool.append(
-                self.create_item_with_classification(
-                    hw,
-                    ItemClassification.progression
-                    if hw in progression_holy_weapons
-                    else ItemClassification.useful,
-                )
+            register(
+                hw,
+                ItemClassification.progression
+                if hw in progression_holy_weapons
+                else ItemClassification.useful,
             )
 
-        for f in FILLER_ITEMS:
-            self.multiworld.itempool.append(
-                self.create_item_with_classification(f, ItemClassification.filler)
+        total_locations = self.total_locations()
+
+        if len(progression_items) > total_locations:
+            raise ValueError(
+                "Could not place all requested weapon levels and level uncaps. "
+                "Reduce the number of required Holy Weapons or disable smooth level caps."
             )
+
+        for item in progression_items:
+            self.multiworld.itempool.append(item)
+
+        self.random.shuffle(other_items)
+        for _ in range(len(progression_items), total_locations):
+            if other_items:
+                self.multiworld.itempool.append(other_items.pop())
+            else:
+                self.multiworld.itempool.append(
+                    self.create_item(self.random.choice(FILLER_ITEMS))
+                )
 
     def add_location_to_region(self, name: str, addr: Optional[int], region: Region):
         if addr is None:
@@ -180,11 +223,8 @@ class FE8World(World):
         region.locations.append(FE8Location(self.player, name, address, region))
 
     def create_regions(self) -> None:
-        assert isinstance(self.options, FE8Options)
         smooth_level_caps = self.options.smooth_level_caps
         min_endgame_level_cap = int(self.options.min_endgame_level_cap)
-        tower_enabled = self.options.tower_enabled
-        ruins_enabled = self.options.ruins_enabled
 
         menu = Region("Menu", self.player, self.multiworld)
         finalboss = Region("FinalBoss", self.player, self.multiworld)
@@ -294,7 +334,7 @@ class FE8World(World):
 
             self.multiworld.regions.append(campaign)
 
-        if tower_enabled:
+        if self.tower_enabled():
             tower = Region("Tower of Valni", self.player, self.multiworld)
             self.multiworld.regions.append(tower)
 
@@ -320,7 +360,7 @@ class FE8World(World):
                 campaign.add_exits({"Tower of Valni": "Complete Chapter 15"})
                 tower.add_exits({"Campaign": "Complete Tower of Valni 8"})
 
-        if ruins_enabled:
+        if self.ruins_enabled():
             ruins = Region("Lagdou Ruins", self.player, self.multiworld)
             self.multiworld.regions.append(ruins)
 
@@ -346,4 +386,6 @@ class FE8World(World):
                 tower.add_exits({"Campaign": "Complete Lagdou Ruins 10"})
 
     def generate_output(self, output_directory: str) -> None:
-        generate_output(self.multiworld, self.options, self.player, output_directory, self.random)
+        generate_output(
+            self.multiworld, self.options, self.player, output_directory, self.random
+        )

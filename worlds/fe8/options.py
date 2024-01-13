@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from Options import Range, Toggle, PerGameCommonOptions
+from Options import Choice, Range, Toggle, PerGameCommonOptions
 
 
 def round_up_to(x, mod):
@@ -100,11 +100,12 @@ class UnbreakableRegalia(Toggle):
 
 class EnableTower(Toggle):
     """
-    Make each floor of the Tower of Valni a check.
+    Make each floor of the Tower of Valni a check. This can help balance the
+    amount of early/lategame checks a bit more.
     """
 
     display_name = "Enable Tower of Valni checks"
-    default = 1
+    default = 0
 
 
 class EnableRuins(Toggle):
@@ -113,9 +114,35 @@ class EnableRuins(Toggle):
     """
 
     display_name = "Enable Lagdou Ruins checks"
-    default = 1
+    default = 0
 
 
+# CR-someday cam: think about how this interacts with chapter select mode
+class Goal(Choice):
+    """
+    Set the goal of the game.
+
+    - Defeat Fomortiis: Defeat the usual final boss, which can take a long time.
+    - Clear Valni: Clear the 8th floor of the Tower of Valni. Implies Enable Tower.
+      Recommended for short- to medium-length games.
+    - Defeat Tirado: Clear Chapter 8. Recommended for short games.
+    - Clear Lagdou: Clear the 10th floor of the Lagdou Ruins. Implies Enable Ruins.
+
+    Note that this option only change which check is considered the goal and
+    does not affect progressing logic at all.
+
+    Supported values: traditional, inactive
+    Default value: traditional
+    """
+
+    display_name = "Goal"
+    option_DefeatFormortiis = 0
+    option_ClearValni = 1
+    option_DefeatTirado = 2
+    option_ClearLagdou = 3
+
+
+# CR-someday cam: Eventually, it would be nice to be able to generate this.
 @dataclass
 class FE8Options(PerGameCommonOptions):
     super_demon_king: SuperDemonKing
@@ -127,3 +154,4 @@ class FE8Options(PerGameCommonOptions):
     unbreakable_regalia: UnbreakableRegalia
     tower_enabled: EnableTower
     ruins_enabled: EnableRuins
+    goal: Goal
