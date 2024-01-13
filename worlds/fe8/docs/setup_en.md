@@ -3,7 +3,7 @@
 ## Required Software
 
 - [Archipelago](https://github.com/ArchipelagoMW/Archipelago/releases)
-(Make sure to select `FE8 Client` during installation)
+(Make sure to select `Bizhawk Client` during installation)
 - An English FE: Sacred Stones ROM. The Archipelago community cannot provide this.
 - [BizHawk](https://tasvideos.org/BizHawk/ReleaseHistory) 2.8 or later
 
@@ -42,7 +42,7 @@ game, continue to the next section.
 1. Once the emulator and client are running you need to connect them. In EmuHawk, go to `Tools > Lua Console`. This
 window must stay open while you're playing.
 2. In this new window, go to `Script > Open Script…` (you can also press `Ctrl+O` or click the folder icon).
-3. Navigate to your Archipelago install folder and open `data/lua/connector_pkmn_emerald.lua`. The Lua Console window
+3. Navigate to your Archipelago install folder and open `data/lua/connector_bizhawk.lua`. The Lua Console window
 should indicate that it connected to the client.
 4. To connect the client to the server, put `<address>:<port>` into the top text field and click `Connect`. (If the
 server uses a password, type `/connect <address>:<port> <password>` into the bottom text field and press enter.)
