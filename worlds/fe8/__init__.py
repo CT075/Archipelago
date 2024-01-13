@@ -137,8 +137,9 @@ class FE8World(World):
         )
 
     def create_items(self) -> None:
+        assert isinstance(self.options, FE8Options)
         smooth_level_caps = self.options.smooth_level_caps
-        min_endgame_level_cap = self.options.min_endgame_level_cap
+        min_endgame_level_cap = int(self.options.min_endgame_level_cap)
         exclude_latona = self.options.exclude_latona
         required_holy_weapons = self.options.required_holy_weapons
 
@@ -191,10 +192,10 @@ class FE8World(World):
                 )
             )
 
-        #for f in FILLER_ITEMS:
-        #    self.multiworld.itempool.append(
-        #        self.create_item_with_classification(f, ItemClassification.filler)
-        #    )
+        for f in FILLER_ITEMS:
+            self.multiworld.itempool.append(
+                self.create_item_with_classification(f, ItemClassification.filler)
+            )
 
     def add_location_to_region(self, name: str, addr: Optional[int], region: Region):
         if addr is None:
@@ -206,8 +207,9 @@ class FE8World(World):
         region.locations.append(FE8Location(self.player, name, address, region))
 
     def create_regions(self) -> None:
+        assert isinstance(self.options, FE8Options)
         smooth_level_caps = self.options.smooth_level_caps
-        min_endgame_level_cap = self.options.min_endgame_level_cap
+        min_endgame_level_cap = int(self.options.min_endgame_level_cap)
         tower_enabled = self.options.tower_enabled
         ruins_enabled = self.options.ruins_enabled
 
