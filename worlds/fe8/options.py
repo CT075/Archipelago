@@ -78,6 +78,7 @@ class ExcludeLatona(Toggle):
     default = 1
 
 
+# Cam: Should we make this a sliding scale?
 class Easier5x(Toggle):
     """
     Give Ephraim, Forde and Kyle extra base stats. This is recommended to make
@@ -87,6 +88,7 @@ class Easier5x(Toggle):
     display_name = "Buff Ephraim's party for chapter 5x"
     default = 1
 
+
 class UnbreakableRegalia(Toggle):
     """
     Make all holy weapons other than Latona unbreakable.
@@ -94,23 +96,25 @@ class UnbreakableRegalia(Toggle):
 
     display_name = "Unbreakable Regalia"
     default = 0
-    
+
+
 class EnableTower(Toggle):
     """
-    Make each floor of the Tower of Valni a chapter to complete.
-    
+    Make each floor of the Tower of Valni a check.
     """
 
-    display_name = "Include Tower of Valni"
-    default = 0
-    
+    display_name = "Enable Tower of Valni checks"
+    default = 1
+
+
 class EnableRuins(Toggle):
     """
-    Make each floor of the Lagdou Ruins a chapter to complete.
+    Make each floor of the Lagdou Ruins a check.
     """
-    
-    display_name = "Include Lagdou Ruins"
-    default = 0
+
+    display_name = "Enable Lagdou Ruins checks"
+    default = 1
+
 
 fe8_options: Dict[str, AssembleOptions] = {
     "super_demon_king": SuperDemonKing,
