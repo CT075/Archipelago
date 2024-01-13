@@ -1,6 +1,6 @@
-from typing import Dict
+from dataclasses import dataclass
 
-from Options import AssembleOptions, Range, Toggle
+from Options import Range, Toggle, PerGameCommonOptions
 
 
 def round_up_to(x, mod):
@@ -116,14 +116,14 @@ class EnableRuins(Toggle):
     default = 1
 
 
-fe8_options: Dict[str, AssembleOptions] = {
-    "super_demon_king": SuperDemonKing,
-    "smooth_level_caps": SmoothLevelCapProgression,
-    "min_endgame_level_cap": MinimumEndgameLevelCapRange,
-    "required_holy_weapons": MinimumUsableHolyWeapons,
-    "exclude_latona": ExcludeLatona,
-    "easier_5x": Easier5x,
-    "unbreakable_regalia": UnbreakableRegalia,
-    "tower_enabled": EnableTower,
-    "ruins_enabled": EnableRuins,
-}
+@dataclass
+class FE8Options(PerGameCommonOptions):
+    super_demon_king: SuperDemonKing
+    smooth_level_caps: SmoothLevelCapProgression
+    min_endgame_level_cap: MinimumEndgameLevelCapRange
+    required_holy_weapons: MinimumUsableHolyWeapons
+    exclude_latona: ExcludeLatona
+    easier_5x: Easier5x
+    unbreakable_regalia: UnbreakableRegalia
+    tower_enabled: EnableTower
+    ruins_enabled: EnableRuins

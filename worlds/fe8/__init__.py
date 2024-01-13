@@ -14,7 +14,7 @@ import settings
 from Utils import user_path
 
 from .client import FE8Client
-from .options import fe8_options
+from .options import FE8Options
 from .constants import (
     FE8_NAME,
     FE8_ID_PREFIX,
@@ -104,7 +104,7 @@ class FE8World(World):
 
     game = FE8_NAME
     base_id = FE8_ID_PREFIX
-    option_definitions = fe8_options
+    options_dataclass = FE8Options
     settings_key = "fe8_settings"
     settings: ClassVar[FE8Settings]
     topology_present = False
@@ -137,10 +137,10 @@ class FE8World(World):
         )
 
     def create_items(self) -> None:
-        smooth_level_caps = self.multiworld.smooth_level_caps[self.player]
-        min_endgame_level_cap = self.multiworld.min_endgame_level_cap[self.player]
-        exclude_latona = self.multiworld.exclude_latona[self.player]
-        required_holy_weapons = self.multiworld.required_holy_weapons[self.player]
+        smooth_level_caps = self.options.smooth_level_caps
+        min_endgame_level_cap = self.options.min_endgame_level_cap
+        exclude_latona = self.options.exclude_latona
+        required_holy_weapons = self.options.required_holy_weapons
 
         smooth_levelcap_max = 25 if smooth_level_caps else 10
 
@@ -190,13 +190,10 @@ class FE8World(World):
                     else ItemClassification.useful,
                 )
             )
-        
+
         for f in FILLER_ITEMS:
             self.multiworld.itempool.append(
-                self.create_item_with_classification(
-                    f,
-                    ItemClassification.filler
-                )
+                self.create_item_with_classification(f, ItemClassification.filler)
             )
 
     def add_location_to_region(self, name: str, addr: Optional[int], region: Region):
@@ -209,10 +206,10 @@ class FE8World(World):
         region.locations.append(FE8Location(self.player, name, address, region))
 
     def create_regions(self) -> None:
-        smooth_level_caps = self.multiworld.smooth_level_caps[self.player]
-        min_endgame_level_cap = self.multiworld.min_endgame_level_cap[self.player]
-        tower_enabled = self.multiworld.tower_enabled[self.player]
-        ruins_enabled = self.multiworld.ruins_enabled[self.player]
+        smooth_level_caps = self.options.smooth_level_caps
+        min_endgame_level_cap = self.options.min_endgame_level_cap
+        tower_enabled = self.options.tower_enabled
+        ruins_enabled = self.options.ruins_enabled
 
         menu = Region("Menu", self.player, self.multiworld)
         finalboss = Region("FinalBoss", self.player, self.multiworld)
@@ -321,11 +318,11 @@ class FE8World(World):
             )
 
             self.multiworld.regions.append(campaign)
-            
+
         if tower_enabled:
             tower = Region("Tower of Valni", self.player, self.multiworld)
             self.multiworld.regions.append(tower)
-            
+
             self.add_location_to_region("Complete Tower of Valni 1", None, tower)
             self.add_location_to_region("Complete Tower of Valni 2", None, tower)
             self.add_location_to_region("Complete Tower of Valni 3", None, tower)
@@ -334,28 +331,24 @@ class FE8World(World):
             self.add_location_to_region("Complete Tower of Valni 6", None, tower)
             self.add_location_to_region("Complete Tower of Valni 7", None, tower)
             self.add_location_to_region("Complete Tower of Valni 8", None, tower)
-            
+
             if smooth_level_caps:
                 route_split.add_exits(
                     {"Tower of Valni": "Complete Chapter 15"},
-                    {"Tower of Valni": level_cap_at_least(20)}
+                    {"Tower of Valni": level_cap_at_least(20)},
                 )
                 tower.add_exits(
                     {"Post-routesplit": "Complete Tower of Valni 8"},
-                    {"Post-routesplit": level_cap_at_least(25)}
+                    {"Post-routesplit": level_cap_at_least(25)},
                 )
             else:
-                campaign.add_exits(
-                    {"Tower of Valni": "Complete Chapter 15"}
-                )
-                tower.add_exits(
-                    {"Campaign": "Complete Tower of Valni 8"}
-                )
-            
+                campaign.add_exits({"Tower of Valni": "Complete Chapter 15"})
+                tower.add_exits({"Campaign": "Complete Tower of Valni 8"})
+
         if ruins_enabled:
             ruins = Region("Lagdou Ruins", self.player, self.multiworld)
             self.multiworld.regions.append(ruins)
-            
+
             self.add_location_to_region("Complete Lagdou Ruins 1", None, ruins)
             self.add_location_to_region("Complete Lagdou Ruins 2", None, ruins)
             self.add_location_to_region("Complete Lagdou Ruins 3", None, ruins)
@@ -366,22 +359,16 @@ class FE8World(World):
             self.add_location_to_region("Complete Lagdou Ruins 8", None, ruins)
             self.add_location_to_region("Complete Lagdou Ruins 9", None, ruins)
             self.add_location_to_region("Complete Lagdou Ruins 10", None, ruins)
-            
+
             if smooth_level_caps:
                 lategame.add_exits(
                     {"Lagdou Ruins": "Complete Chapter 19"},
-                    {"Lagdou Ruins": finalboss_rule}
+                    {"Lagdou Ruins": finalboss_rule},
                 )
-                ruins.add_exits(
-                    {"Post-routesplit": "Complete Lagdou Ruins 10"}
-                )
+                ruins.add_exits({"Post-routesplit": "Complete Lagdou Ruins 10"})
             else:
-                campaign.add_exits(
-                    {"Lagdou Ruins": "Complete Chapter 19"}
-                )
-                tower.add_exits(
-                    {"Campaign": "Complete Lagdou Ruins 10"}
-                )
-            
+                campaign.add_exits({"Lagdou Ruins": "Complete Chapter 19"})
+                tower.add_exits({"Campaign": "Complete Lagdou Ruins 10"})
+
     def generate_output(self, output_directory: str) -> None:
-        generate_output(self.multiworld, self.player, output_directory, self.random)
+        generate_output(self.multiworld, self.options, self.player, output_directory, self.random)
