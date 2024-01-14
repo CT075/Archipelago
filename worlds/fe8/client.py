@@ -8,8 +8,9 @@ from typing import (
 
 from NetUtils import ClientStatus
 
+from .options import Goal
 from .connector_config import (
-    locations,
+    locations as locations_raw,
     EXPECTED_ROM_NAME,
     FLAGS_ADDR,
     ARCHIPELAGO_RECEIVED_ITEM_ADDR,
@@ -35,7 +36,12 @@ if TYPE_CHECKING:
 else:
     BizHawkClientContext = object
 
-FOMORTIIS_FLAG = dict(locations)["Defeat Formortiis"]
+locations = dict(locations_raw)
+
+FOMORTIIS_FLAG = locations["Defeat Formortiis"]
+TIRADO_FLAG = locations["Complete Chapter 8"]
+TOWER_CLEAR_FLAG = locations["Complete Tower of Valni 8"]
+RUINS_CLEAR_FLAG = locations["Complete Lagdou Ruins 10"]
 
 T = TypeVar("T")
 
@@ -46,11 +52,12 @@ class FE8Client(BizHawkClient):
     patch_suffix = ".apfe8"
     local_checked_locations: Set[int]
     game_state_safe: bool = False
-    goal_flag: int = FOMORTIIS_FLAG
+    goal_flag: int
 
     def __init__(self):
         super().__init__()
         self.local_checked_locations = set()
+        self.goal_flag == FOMORTIIS_FLAG
 
     async def validate_rom(self, ctx: BizHawkClientContext) -> bool:
         from CommonClient import logger
@@ -176,6 +183,17 @@ class FE8Client(BizHawkClient):
             )
 
     async def game_watcher(self, ctx: BizHawkClientContext) -> None:
+        if ctx.slot_data is not None:
+            match ctx.slot_data['goal']:
+                case Goal.option_DefeatFormortiis:
+                    self.goal_flag = FOMORTIIS_FLAG
+                case Goal.option_ClearValni:
+                    self.goal_flag = TOWER_CLEAR_FLAG
+                case Goal.option_DefeatTirado:
+                    self.goal_flag = TIRADO_FLAG
+                case Goal.option_ClearLagdou:
+                    self.goal_flag = RUINS_CLEAR_FLAG
+
         try:
             await self.update_game_state(ctx)
 
