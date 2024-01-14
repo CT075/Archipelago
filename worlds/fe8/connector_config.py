@@ -27,25 +27,25 @@ locations = [
   ("Complete Chapter 19", 20),
   ("Complete Chapter 20", 21),
   ("Defeat Lyon", 22),
-  ("Complete Tower of Valni 1", 23),
-  ("Complete Tower of Valni 2", 24),
-  ("Complete Tower of Valni 3", 25),
-  ("Complete Tower of Valni 4", 26),
-  ("Complete Tower of Valni 5", 27),
-  ("Complete Tower of Valni 6", 28),
-  ("Complete Tower of Valni 7", 29),
-  ("Complete Tower of Valni 8", 30),
-  ("Complete Lagdou Ruins 1", 31),
-  ("Complete Lagdou Ruins 2", 32),
-  ("Complete Lagdou Ruins 3", 33),
-  ("Complete Lagdou Ruins 4", 34),
-  ("Complete Lagdou Ruins 5", 35),
-  ("Complete Lagdou Ruins 6", 36),
-  ("Complete Lagdou Ruins 7", 37),
-  ("Complete Lagdou Ruins 8", 38),
-  ("Complete Lagdou Ruins 9", 39),
-  ("Complete Lagdou Ruins 10", 40),
-  ("Defeat Formortiis", 41),
+  ("Defeat Formortiis", 23),
+  ("Complete Tower of Valni 1", 24),
+  ("Complete Tower of Valni 2", 25),
+  ("Complete Tower of Valni 3", 26),
+  ("Complete Tower of Valni 4", 27),
+  ("Complete Tower of Valni 5", 28),
+  ("Complete Tower of Valni 6", 29),
+  ("Complete Tower of Valni 7", 30),
+  ("Complete Tower of Valni 8", 31),
+  ("Complete Lagdou Ruins 1", 32),
+  ("Complete Lagdou Ruins 2", 33),
+  ("Complete Lagdou Ruins 3", 34),
+  ("Complete Lagdou Ruins 4", 35),
+  ("Complete Lagdou Ruins 5", 36),
+  ("Complete Lagdou Ruins 6", 37),
+  ("Complete Lagdou Ruins 7", 38),
+  ("Complete Lagdou Ruins 8", 39),
+  ("Complete Lagdou Ruins 9", 40),
+  ("Complete Lagdou Ruins 10", 41),
   ("Sieglinde Received", 42),
   ("Siegmund Received", 43),
   ("Gleipnir Received", 44),
@@ -95,13 +95,13 @@ items = [
   ("OceanSeal", 33),
   ("MasterSeal", 34),
 ]
-SLOT_NAME_ADDR = 0x8EFD1B4
-SUPER_DEMON_KING_OFFS = 0xEFD1F4
-LOCATION_INFO_OFFS = 0xEFD1F8
+SLOT_NAME_ADDR = 0x8EFD1C4
+SUPER_DEMON_KING_OFFS = 0xEFD204
+LOCATION_INFO_OFFS = 0xEFD208
 LOCATION_INFO_SIZE = 4
 ARCHIPELAGO_RECEIVED_ITEM_ADDR = 0x2026E38
 ARCHIPELAGO_NUM_RECEIVED_ITEMS_ADDR = 0x2026E3C
 FLAGS_ADDR = 0x2026E30
 FLAGS_SIZE = 8
 
-EXPECTED_ROM_NAME = "FE8APEF5A279D42D"
+EXPECTED_ROM_NAME = "FE8APD0DD310DFF6"
