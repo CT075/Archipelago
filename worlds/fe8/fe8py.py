@@ -403,7 +403,7 @@ class FE8Randomizer:
             return False
 
         # CR-soon cam: see above
-        if job.name == "Dracozombie":
+        if job.name in ("Dracozombie", "Revenant", "Entombed"):
             return False
 
         if ("must_fly" in logic and logic["must_fly"]) and "flying" not in job.tags:
@@ -481,6 +481,10 @@ class FE8Randomizer:
         # If the unit's class is is not a "standard" class that can be given to
         # players, it's probably some NPC or enemy that shouldn't be touched.
         if job_id not in self.jobs_by_id:
+            return
+
+        # CR cam: this is dracozombie. prevents randomizing existing dracozombies.
+        if job_id == 101:
             return
 
         job = self.jobs_by_id[job_id]
