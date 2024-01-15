@@ -126,6 +126,10 @@
                 "6": {"no_flying": true},
                 "7": {"no_flying": true},
                 "9": {"no_flying": true},
+                "16": {
+                    "no_flying": true,
+                    "comment": "spider"
+                },
                 "24": {
                     "no_flying": true,
                     "nudges": {"start": [20, 13]},
