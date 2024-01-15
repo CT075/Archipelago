@@ -140,7 +140,7 @@ class FE8Client(BizHawkClient):
 
     # requires: locked and game_state_safe
     async def maybe_write_next_item(self, ctx: BizHawkClientContext) -> None:
-        #from CommonClient import logger
+        # from CommonClient import logger
 
         is_filled_byte, num_items_received_bytes = await bizhawk.read(
             ctx.bizhawk_ctx,
@@ -170,13 +170,13 @@ class FE8Client(BizHawkClient):
                         "System Bus",
                     ),
                     (
-                        ARCHIPELAGO_RECEIVED_ITEM_ADDR + 2,
-                        b"\x01",
+                        ARCHIPELAGO_NUM_RECEIVED_ITEMS_ADDR,
+                        (num_items_received + 1).to_bytes(4, "little"),
                         "System Bus",
                     ),
                     (
-                        ARCHIPELAGO_NUM_RECEIVED_ITEMS_ADDR,
-                        (num_items_received + 1).to_bytes(4, "little"),
+                        ARCHIPELAGO_RECEIVED_ITEM_ADDR + 2,
+                        b"\x01",
                         "System Bus",
                     ),
                 ],
@@ -184,7 +184,7 @@ class FE8Client(BizHawkClient):
 
     async def game_watcher(self, ctx: BizHawkClientContext) -> None:
         if ctx.slot_data is not None:
-            match ctx.slot_data['goal']:
+            match ctx.slot_data["goal"]:
                 case Goal.option_DefeatFormortiis:
                     self.goal_flag = FOMORTIIS_FLAG
                 case Goal.option_ClearValni:
