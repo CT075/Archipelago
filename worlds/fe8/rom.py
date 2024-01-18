@@ -59,7 +59,12 @@ def generate_output(
     base_patch = pkgutil.get_data(__name__, BASE_PATCH)
     patched_rom = bytearray(bsdiff4.patch(base_rom, base_patch))
 
-    randomizer = FE8Randomizer(rom=patched_rom, random=random)
+    randoconfig = {
+        "player_rando": bool(options.player_unit_rando),
+        "player_monster": bool(options.player_unit_monsters)
+    }
+
+    randomizer = FE8Randomizer(rom=patched_rom, random=random, settings=randoconfig)
     randomizer.apply_base_changes()
 
     if options.easier_5x:
