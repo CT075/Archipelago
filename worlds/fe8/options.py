@@ -15,6 +15,7 @@ class PlayerRando(Toggle):
     display_name = "Randomize Player Units"
     default = 1
 
+
 class PlayerMonsters(Toggle):
     """
     Allow playable units to randomize into monsters when enabled
@@ -22,7 +23,8 @@ class PlayerMonsters(Toggle):
 
     display_name = "Enable Playable Monsters"
     default = 1
-    
+
+
 class SuperDemonKing(Toggle):
     """
     Buffs the final boss to have higher stats and to take less damage from

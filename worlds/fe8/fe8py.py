@@ -3,9 +3,10 @@
 from random import Random
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Union, Optional
 from enum import IntEnum
 import logging
+
+from typing import Any, Union, Optional, Callable, Iterable, Tuple
 
 from .util import fetch_json, write_short_le, read_short_le, read_word_le
 from .constants import (
@@ -51,6 +52,15 @@ from .constants import (
     CH15_AUTO_STEEL_SWORD,
     CH15_AUTO_STEEL_LANCE,
     AI1_INDEX,
+    INTERNAL_RANDO_CLASS_WEIGHTS_OFFS,
+    INTERNAL_RANDO_CLASS_WEIGHT_ENTRY_SIZE,
+    INTERNAL_RANDO_CLASS_WEIGHTS_COUNT,
+    INTERNAL_RANDO_CLASS_WEIGHT_NUM_CLASSES,
+    INTERNAL_RANDO_WEAPONS_OFFS,
+    INTERNAL_RANDO_WEAPONS_ENTRY_SIZE,
+    INTERNAL_RANDO_WEAPONS_NUM_ITEMS,
+    INTERNAL_RANDO_WEAPONS_MAX_CLASSES,
+    INTERNAL_RANDO_WEAPON_TABLE_ROWS,
 )
 
 
@@ -110,6 +120,23 @@ class WeaponKind(IntEnum):
     MONSTER_WEAPON = 0x0B
     RING = 0x0C
     DRAGONSTONE = 0x11
+
+    @classmethod
+    def get_valid_names(cls) -> list[str]:
+        return [
+            "Sword",
+            "Lance",
+            "Axe",
+            "Bow",
+            "Staff",
+            "Anima",
+            "Light",
+            "Dark",
+            "Item",
+            "Monster Weapon",
+            "Ring",
+            "Dragonstone",
+        ]
 
     @classmethod
     def of_str(cls, s: str) -> "WeaponKind":
@@ -210,7 +237,7 @@ class WeaponData:
             name=obj["name"],
             rank=WeaponRank.of_str(obj["rank"]),
             kind=WeaponKind.of_str(obj["kind"]),
-            locks=obj.get("locks", []),
+            locks=obj.get("locks", set()),
         )
 
 
@@ -233,6 +260,14 @@ class JobData:
             ),
             tags=set(obj["tags"]),
         )
+
+    def __hash__(self):
+        return self.id
+
+    def __eq__(self, other):
+        if not isinstance(other, JobData):
+            return False
+        return self.id == other.id
 
 
 class CharacterStore:
@@ -390,7 +425,8 @@ class FE8Randomizer:
         # they only have one weapon and E-rank Wretched Air does not sound fun.
         # Cam: What we need to do is prevent units from randomizing into Dracozombies
         # unless they have an A rank weapon. There are a few easy ways to hack that
-        # in, but I'm going to punt on it for now.
+        # in, but I'm going to punt on it for now because that's a bunch of design
+        # decisions we can make later.
 
     def job_valid(self, job: JobData, char: int, logic: dict[str, Any]) -> bool:
         # get list of tags that make the job invalid (notags)
@@ -451,9 +487,7 @@ class FE8Randomizer:
     def select_new_inventory(
         self, job: JobData, items: bytes, logic: dict[str, Any]
     ) -> list[int]:
-        return [
-            self.select_new_item(job, item_id, logic) for i, item_id in enumerate(items)
-        ]
+        return [self.select_new_item(job, item_id, logic) for item_id in items]
 
     def rewrite_coords(self, offset: int, x: int, y: int):
         old_coords = read_short_le(self.rom, offset)
@@ -476,6 +510,16 @@ class FE8Randomizer:
                 x, y = nudges[str(i)]
                 reda_offs = redas_offs + 8 * i
                 self.rewrite_coords(reda_offs, x, y)
+
+    def select_new_job(
+        self,
+        job: JobData,
+        unpromoted_pool: Iterable[JobData],
+        promoted_pool: Iterable[JobData],
+        job_valid: Callable[[JobData], [bool]],
+    ) -> JobData:
+        new_job_pool = promoted_pool if job.is_promoted else unpromoted_pool
+        return self.random.choice([job for job in new_job_pool if job_valid(job)])
 
     def randomize_chapter_unit(self, data_offset: int, logic: dict[str, Any]) -> None:
         # We *could* read the full struct, but we only need a few individual
@@ -518,11 +562,11 @@ class FE8Randomizer:
         if char in self.character_store:
             new_job = self.character_store[char]
         else:
-            new_job_pool = (
-                self.promoted_jobs if job.is_promoted else self.unpromoted_jobs
-            )
-            new_job = self.random.choice(
-                [job for job in new_job_pool if self.job_valid(job, char, logic)]
+            new_job = self.select_new_job(
+                job,
+                unpromoted_pool=self.unpromoted_jobs,
+                promoted_pool=self.promoted_jobs,
+                job_valid=lambda job: self.job_valid(job, char, logic),
             )
 
             if "no_store" not in logic or not logic["no_store"]:
@@ -576,7 +620,149 @@ class FE8Randomizer:
                 self.apply_nudges(offset, logic["nudges"])
             if "ignore" in logic and logic["ignore"]:
                 continue
+            # If this unit is tagged as a monster, its class gets selected by
+            # the in-game randomizer, meaning we don't have to touch it.
+            if "monster" in logic and logic["monster"]:
+                continue
             self.randomize_chapter_unit(offset, logic)
+
+    # Randomize the classes and possible invtories for the game's internal
+    # randomizer (used for skirmishes, tower/ruins, and the two random Wights
+    # with Lyon for some reason).
+    def randomize_monster_gen(self) -> None:
+        class JobSet:
+            promoted: set[JobData]
+            unpromoted: set[JobData]
+
+            def __init__(self):
+                self.promoted = set()
+                self.unpromoted = set()
+
+            def add(self, job: JobData) -> None:
+                (self.promoted if job.is_promoted else self.unpromoted).add(job)
+
+            def __len__(self):
+                return len(self.promoted) + len(self.unpromoted)
+
+            def pools(self) -> Tuple[set[JobData], set[JobData]]:
+                return self.unpromoted, self.promoted
+
+            def iter(self):
+                for j in self.unpromoted:
+                    yield j
+                for j in self.promoted:
+                    yield j
+
+        def job_valid_for_internal_rando(job: JobData) -> bool:
+            # We disable mages because there aren't any entries for them in the
+            # base weapon tables. Eventually we'll add them back in, but for
+            # now we can just disable them.
+            # CR-soon cam: Add these back in
+            if any(
+                map(
+                    job.name.startswith,
+                    (
+                        # catches both regular Mages and "Mage Knight"
+                        "Mage",
+                        "Sage",
+                        "Shaman",
+                        "Druid",
+                        "Priest",
+                        "Cleric",
+                        "Bishop",
+                        "Summoner",
+                        "Pupil",
+                        "Journeyman",
+                        "Recruit",
+                        "Dracozombie",
+                    ),
+                )
+            ):
+                return False
+
+            return True
+
+        # CR-soon cam: do this better
+        weapon_tables = {
+            (
+                WeaponKind.of_str(ty) if ty in WeaponKind.get_valid_names() else ty,
+                level,
+            ): i
+            for i, (ty, level) in enumerate(INTERNAL_RANDO_WEAPON_TABLE_ROWS)
+        }
+        jobset = JobSet()
+
+        for i in range(INTERNAL_RANDO_CLASS_WEIGHTS_COUNT):
+            offs = (
+                INTERNAL_RANDO_CLASS_WEIGHTS_OFFS
+                + i * INTERNAL_RANDO_CLASS_WEIGHT_ENTRY_SIZE
+            )
+            for j in range(INTERNAL_RANDO_CLASS_WEIGHT_NUM_CLASSES):
+                job_id = self.rom[offs + j]
+                if not job_id:
+                    break
+                job = self.jobs_by_id[job_id]
+                if job.name == "Dracozombie":
+                    continue
+                unpromoted_pool, promoted_pool = (
+                    jobset.pools()
+                    # We _could_ repoint this and not need to check, but eh
+                    if len(jobset) >= INTERNAL_RANDO_WEAPONS_MAX_CLASSES
+                    else (self.unpromoted_jobs, self.promoted_jobs)
+                )
+                new_job = self.select_new_job(
+                    job,
+                    unpromoted_pool=unpromoted_pool,
+                    promoted_pool=promoted_pool,
+                    job_valid=job_valid_for_internal_rando,
+                )
+                jobset.add(new_job)
+
+        # CR-someday cam: There is a lot of hardcoding going on here. It would
+        # be nice to move some of the special-casing here to the data files.
+        for i, job in enumerate(jobset.iter()):
+            offs = INTERNAL_RANDO_WEAPONS_OFFS + i * INTERNAL_RANDO_WEAPONS_ENTRY_SIZE
+            row1: Tuple[int, int, int, int, int]
+            row1weights: Tuple[int, int, int, int, int]
+            row1distrib: Tuple[int, int, int, int, int]
+            if "Claw" in job.tags:
+                pwr, distrib = {
+                    "Revenant": (0, 1),
+                    "Entombed": (1, 3),
+                    "Bael": (2, 26),
+                    "Elder Bael": (3, 27),
+                }[job.name]
+                idx = weapon_tables[("Claw", pwr)]
+                row1 = (idx, 0, 0, 0, 0)
+                row1weights = (100, 0, 0, 0, 0)
+                row1distrib = (distrib, 0, 0, 0, 0)
+            elif "Fang" in job.tags:
+                pwr = 1 if job.is_promoted else 0
+                idx = weapon_tables[("Fang", pwr)]
+                row1 = (idx, 0, 0, 0, 0)
+                row1weights = ((25, 75) if job.is_promoted else (75, 25)) + (0, 0, 0)
+                row1distrib = (13, 0, 0, 0, 0)
+            elif "MonsterDark" in job.tags:
+                # TODO
+                if "Mogall" in job.name:
+                    pass
+                else:
+                    # Gorgon
+                    idx = weapon_tables[("MonsterDark", 3)]
+                    row1 = (idx, 0, 0, 0, 0)
+            elif len(job.usable_weapons) > 1:
+                weapon_kinds = self.random.sample(list(job.usable_weapons), k=2)
+                for weapon_kind in weapon_kinds:
+                    # TODO
+                    pass
+            else:
+                # TODO
+                wtype = list(job.usable_weapons)[0]
+
+            self.rom[offs] = job.id
+            self.rom[offs + 1 : offs + 6] = bytes(row1)
+            self.rom[offs + 11 : offs + 16] = bytes(row1weights)
+            self.rom[offs + 21 : offs + 26] = bytes(row1distrib)
 
     def make_monsters_mounted(self) -> None:
         for job in MOUNTED_MONSTERS:

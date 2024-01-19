@@ -3,7 +3,7 @@ Archipelago World definition for Fire Emblem: Sacred Stones
 """
 
 from typing import ClassVar, Optional, Callable, Set, Tuple
-import logging
+#import logging
 
 from worlds.AutoWorld import World, WebWorld
 from BaseClasses import Region, ItemClassification, CollectionState, Tutorial
