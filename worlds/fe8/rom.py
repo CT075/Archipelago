@@ -4,13 +4,13 @@ import os
 from random import Random
 
 from BaseClasses import MultiWorld
-from Options import PerGameCommonOptions
 from worlds.Files import APDeltaPatch
 from settings import get_settings
 
 from .items import FE8Item
 from .locations import FE8Location
 from .constants import FE8_NAME, ROM_BASE_ADDRESS
+from .options import FE8Options
 from .util import write_short_le
 from .connector_config import (
     SLOT_NAME_ADDR,
@@ -52,8 +52,11 @@ def rom_location(loc: FE8Location):
 
 
 def generate_output(
-        multiworld: MultiWorld,
-        options: PerGameCommonOptions, player: int, output_dir: str, random: Random
+    multiworld: MultiWorld,
+    options: FE8Options,
+    player: int,
+    output_dir: str,
+    random: Random,
 ) -> None:
     base_rom = get_base_rom_as_bytes()
     base_patch = pkgutil.get_data(__name__, BASE_PATCH)
@@ -61,7 +64,7 @@ def generate_output(
 
     randoconfig = {
         "player_rando": bool(options.player_unit_rando),
-        "player_monster": bool(options.player_unit_monsters)
+        "player_monster": bool(options.player_unit_monsters),
     }
 
     randomizer = FE8Randomizer(rom=patched_rom, random=random, settings=randoconfig)

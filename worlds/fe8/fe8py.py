@@ -334,7 +334,7 @@ class FE8Randomizer:
     rom: bytearray
     config: dict[str, Any]
 
-    def __init__(self, rom: bytearray, random: Random, settings:dict[str, Any]):
+    def __init__(self, rom: bytearray, random: Random, settings: dict[str, Any]):
         self.random = random
         self.rom = rom
         unit_blocks = fetch_json(CHAPTER_UNIT_BLOCKS)
@@ -502,10 +502,10 @@ class FE8Randomizer:
         for t in ctags:
             if t not in logic:
                 logic[t] = True
-        
-        #config option for disabling player unit randomization
+
+        # config option for disabling player unit randomization
         if not self.config["player_rando"] and "player" in logic and logic["player"]:
-            if char not in self.character_store: 
+            if char not in self.character_store:
                 self.character_store[char] = job
             return
 
