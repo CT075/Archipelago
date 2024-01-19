@@ -332,11 +332,13 @@ class FE8Randomizer:
     unpromoted_jobs: list[JobData]
     random: Random
     rom: bytearray
+    config: dict[str, Any]
 
-    def __init__(self, rom: bytearray, random: Random):
+    def __init__(self, rom: bytearray, random: Random, settings: dict[str, Any]):
         self.random = random
         self.rom = rom
         unit_blocks = fetch_json(CHAPTER_UNIT_BLOCKS)
+        self.config = settings
 
         self.unit_blocks = {
             name: [UnitBlock(**block) for block in blocks]
@@ -395,6 +397,9 @@ class FE8Randomizer:
         # the "no_" prefix adds the tag to the invalid tag list
         # "no_flying" makes any job with "flying" tag invalid
         notags = set()
+        # config option for disabling player unit monsters
+        if "player" in logic and logic["player"] and not self.config["player_monster"]:
+            notags.add("monster")
         for x in logic:
             if x.startswith("no_") and logic[x]:
                 notags.add(x.removeprefix("no_"))
@@ -497,6 +502,12 @@ class FE8Randomizer:
         for t in ctags:
             if t not in logic:
                 logic[t] = True
+
+        # config option for disabling player unit randomization
+        if not self.config["player_rando"] and "player" in logic and logic["player"]:
+            if char not in self.character_store:
+                self.character_store[char] = job
+            return
 
         # Affiliation = bits 1,2; unit is player if they're unset
         is_player = not bool(unit[3] & 0b0110)

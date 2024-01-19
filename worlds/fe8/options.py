@@ -7,6 +7,22 @@ def round_up_to(x, mod):
     return ((x + mod - 1) // mod) * mod
 
 
+class PlayerRando(Toggle):
+    """
+    If enabled, playable units will be randomzied
+    """
+
+    display_name = "Randomize Player Units"
+    default = 1
+
+class PlayerMonsters(Toggle):
+    """
+    Allow playable units to randomize into monsters when enabled
+    """
+
+    display_name = "Enable Playable Monsters"
+    default = 1
+    
 class SuperDemonKing(Toggle):
     """
     Buffs the final boss to have higher stats and to take less damage from
@@ -145,6 +161,8 @@ class Goal(Choice):
 # CR-someday cam: Eventually, it would be nice to be able to generate this.
 @dataclass
 class FE8Options(PerGameCommonOptions):
+    player_unit_rando: PlayerRando
+    player_unit_monsters: PlayerMonsters
     super_demon_king: SuperDemonKing
     smooth_level_caps: SmoothLevelCapProgression
     min_endgame_level_cap: MinimumEndgameLevelCapRange

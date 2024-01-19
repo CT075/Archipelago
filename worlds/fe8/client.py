@@ -57,7 +57,7 @@ class FE8Client(BizHawkClient):
     def __init__(self):
         super().__init__()
         self.local_checked_locations = set()
-        self.goal_flag == FOMORTIIS_FLAG
+        self.goal_flag = FOMORTIIS_FLAG
 
     async def validate_rom(self, ctx: BizHawkClientContext) -> bool:
         from CommonClient import logger
