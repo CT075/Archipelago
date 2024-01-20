@@ -73,6 +73,7 @@ WEAPON_DATA = "data/weapondata.json"
 JOB_DATA = "data/jobdata.json"
 CHARACTERS = "data/characters.json"
 CHAPTER_UNIT_BLOCKS = "data/chapter_unit_blocks.json"
+INTERNAL_RANDO_VALID_DISTRIBS = "data/internal_rando_distribs.json"
 
 
 def encode_unit_coords(x: int, y: int) -> int:
@@ -363,8 +364,10 @@ class FE8Randomizer:
     weapons_by_rank: dict[WeaponRank, list[WeaponData]]
     character_store: CharacterStore
     jobs_by_id: dict[int, JobData]
+    valid_distribs_by_row: dict[int, list[int]]
     promoted_jobs: list[JobData]
     unpromoted_jobs: list[JobData]
+
     random: Random
     rom: bytearray
     config: dict[str, Any]
@@ -379,6 +382,8 @@ class FE8Randomizer:
             name: [UnitBlock(**block) for block in blocks]
             for name, blocks in unit_blocks.items()
         }
+
+        self.valid_distribs_by_row = fetch_json(INTERNAL_RANDO_VALID_DISTRIBS)
 
         item_data = fetch_json(WEAPON_DATA, object_hook=WeaponData.of_object)
 
@@ -743,21 +748,61 @@ class FE8Randomizer:
                 row1weights = ((25, 75) if job.is_promoted else (75, 25)) + (0, 0, 0)
                 row1distrib = (13, 0, 0, 0, 0)
             elif "MonsterDark" in job.tags:
-                # TODO
-                if "Mogall" in job.name:
-                    pass
-                else:
-                    # Gorgon
-                    idx = weapon_tables[("MonsterDark", 3)]
-                    row1 = (idx, 0, 0, 0, 0)
+                match job.name:
+                    case "Mogall":
+                        idx = weapon_tables[("MonsterDark", 0)]
+                        distrib_idx = 45
+                    case "Arch Mogall":
+                        idx = weapon_tables[("MonsterDark", 1)]
+                        distrib_idx = 47
+                    case "Gorgon":
+                        idx = weapon_tables[("MonsterDark", 3)]
+                        distrib_idx = 49
+                    case other:
+                        raise ValueError(
+                            f"BUG: unhandled class {other} tagged as `MonsterDark`"
+                        )
+                row1 = (idx, 0, 0, 0, 0)
+                row1weights = (100, 0, 0, 0, 0)
+                row1distrib = (distrib_idx, 0, 0, 0, 0)
             elif len(job.usable_weapons) > 1:
-                weapon_kinds = self.random.sample(list(job.usable_weapons), k=2)
-                for weapon_kind in weapon_kinds:
-                    # TODO
-                    pass
+                lo_pwr, mid_pwr, hi_pwr = (2, 3, 4) if job.is_promoted else (0, 1, 2)
+                lo_kind1, lo_kind2 = self.random.sample(list(job.usable_weapons), k=2)
+                lo_idx1 = weapon_tables[(lo_kind1, lo_pwr)]
+                lo_idx2 = weapon_tables[(lo_kind2, lo_pwr)]
+                hi_kind1, hi_kind2 = self.random.sample(list(job.usable_weapons), k=2)
+                hi_idx1 = weapon_tables[(hi_kind1, hi_pwr)]
+                hi_idx2 = weapon_tables[(hi_kind2, hi_pwr)]
+                mid_kind = self.random.choice((lo_kind1, lo_kind2, hi_kind1, hi_kind2))
+                mid_idx = weapon_tables[(mid_kind, mid_pwr)]
+                row1 = (lo_idx1, hi_idx1, mid_idx, lo_idx2, hi_idx2)
+                row1weights = (23, 15, 25, 22, 15)
+                # doens't typecheck
+                # row1distrib = tuple(
+                #    self.random.choice(self.valid_distribs_by_row[row]) for row in row1
+                # )
+                row1distrib = (
+                    self.random.choice(self.valid_distribs_by_row[row1[0]]),
+                    self.random.choice(self.valid_distribs_by_row[row1[1]]),
+                    self.random.choice(self.valid_distribs_by_row[row1[2]]),
+                    self.random.choice(self.valid_distribs_by_row[row1[3]]),
+                    self.random.choice(self.valid_distribs_by_row[row1[4]]),
+                )
             else:
-                # TODO
-                wtype = list(job.usable_weapons)[0]
+                kind = list(job.usable_weapons)[0]
+                lo_pwr, mid_pwr, hi_pwr = (2, 3, 4) if job.is_promoted else (0, 1, 2)
+                lo_idx = weapon_tables[(kind, lo_pwr)]
+                mid_idx = weapon_tables[(kind, mid_pwr)]
+                hi_idx = weapon_tables[(kind, hi_pwr)]
+                row1 = (lo_idx, mid_idx, hi_idx, 0, 0)
+                row1weights = (30, 35, 35, 0, 0)
+                row1distrib = (
+                    self.random.choice(self.valid_distribs_by_row[row1[0]]),
+                    self.random.choice(self.valid_distribs_by_row[row1[1]]),
+                    self.random.choice(self.valid_distribs_by_row[row1[2]]),
+                    0,
+                    0,
+                )
 
             self.rom[offs] = job.id
             self.rom[offs + 1 : offs + 6] = bytes(row1)
