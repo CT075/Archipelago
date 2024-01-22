@@ -115,4 +115,4 @@ def generate_output(
         patched_path=output_path,
     )
     patch.write()
-    #os.unlink(output_path)
+    os.unlink(output_path)
