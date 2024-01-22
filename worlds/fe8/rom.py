@@ -62,13 +62,17 @@ def generate_output(
     base_patch = pkgutil.get_data(__name__, BASE_PATCH)
     patched_rom = bytearray(bsdiff4.patch(base_rom, base_patch))
 
-    randoconfig = {
+    # CR cam: we could just pass `options`
+    config = {
         "player_rando": bool(options.player_unit_rando),
         "player_monster": bool(options.player_unit_monsters),
     }
 
-    randomizer = FE8Randomizer(rom=patched_rom, random=random, settings=randoconfig)
+    randomizer = FE8Randomizer(rom=patched_rom, random=random, config=config)
     randomizer.apply_base_changes()
+
+    if options.shuffle_skirmish_tables:
+        randomizer.randomize_monster_gen()
 
     if options.easier_5x:
         randomizer.apply_5x_buffs()
@@ -111,4 +115,4 @@ def generate_output(
         patched_path=output_path,
     )
     patch.write()
-    os.unlink(output_path)
+    #os.unlink(output_path)

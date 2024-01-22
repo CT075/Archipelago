@@ -1094,7 +1094,7 @@
     "id":101,
     "name":"Dracozombie",
     "usable_weapons":[
-      
+      "Monster Weapon"
     ],
     "is_promoted":true,
     "tags":[
@@ -1120,12 +1120,13 @@
     "id":125,
     "name":"Elder Bael",
     "usable_weapons":[
-
+      "Monster Weapon"
     ],
     "is_promoted":true,
     "tags":[
       "monster",
-      "special"
+      "special",
+      "Claw"
     ]
   },
   {

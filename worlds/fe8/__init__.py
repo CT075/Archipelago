@@ -87,28 +87,16 @@ class FE8World(World):
     location_name_to_id = {name: id + FE8_ID_PREFIX for name, id in locations}
     item_name_groups = {"holy weapons": set(HOLY_WEAPONS.keys())}
 
-    # CR-soon cam: We should set these once, on world instantiation.
-    def tower_enabled(self) -> bool:
-        return (
-            bool(self.options.tower_enabled)
-            or self.options.goal == Goal.option_ClearValni
-        )
-
-    def ruins_enabled(self) -> bool:
-        return (
-            bool(self.options.ruins_enabled)
-            or self.options.goal == Goal.option_ClearLagdou
-        )
 
     def total_locations(self) -> int:
-        tower_enabled = self.tower_enabled()
-        ruins_enabled = self.ruins_enabled()
+        tower_checks_enabled = self.options.tower_checks_enabled()
+        ruins_checks_enabled = self.options.ruins_checks_enabled()
 
         def is_included(loc: Tuple[str, int]):
             name = loc[0]
-            if "Valni" in name and not tower_enabled:
+            if "Valni" in name and not tower_checks_enabled:
                 return False
-            if "Lagdou" in name and not ruins_enabled:
+            if "Lagdou" in name and not ruins_checks_enabled:
                 return False
             return True
 
@@ -334,7 +322,7 @@ class FE8World(World):
 
             self.multiworld.regions.append(campaign)
 
-        if self.tower_enabled():
+        if self.options.tower_checks_enabled():
             tower = Region("Tower of Valni", self.player, self.multiworld)
             self.multiworld.regions.append(tower)
 
@@ -360,7 +348,7 @@ class FE8World(World):
                 campaign.add_exits({"Tower of Valni": "Complete Chapter 15"})
                 tower.add_exits({"Campaign": "Complete Tower of Valni 8"})
 
-        if self.ruins_enabled():
+        if self.options.ruins_checks_enabled():
             ruins = Region("Lagdou Ruins", self.player, self.multiworld)
             self.multiworld.regions.append(ruins)
 

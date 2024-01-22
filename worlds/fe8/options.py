@@ -135,6 +135,15 @@ class EnableRuins(Toggle):
     default = 0
 
 
+class ShuffleSkirmishTables(Toggle):
+    """
+    Shuffle enemy spawn tables for the Tower, Ruins and skirmishes.
+    """
+
+    display_name = "Shuffle internal randomizer tables"
+    default = 1
+
+
 # CR-someday cam: think about how this interacts with chapter select mode
 class Goal(Choice):
     """
@@ -174,4 +183,13 @@ class FE8Options(PerGameCommonOptions):
     unbreakable_regalia: UnbreakableRegalia
     tower_enabled: EnableTower
     ruins_enabled: EnableRuins
+    shuffle_skirmish_tables: ShuffleSkirmishTables
     goal: Goal
+
+    # Convenience methods for options that imply each other
+
+    def tower_checks_enabled(self):
+        return bool(self.tower_enabled) or self.goal == Goal.option_ClearValni
+
+    def ruins_checks_enabled(self):
+        return bool(self.ruins_enabled) or self.goal == Goal.option_ClearLagdou

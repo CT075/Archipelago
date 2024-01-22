@@ -58,7 +58,6 @@ from .constants import (
     INTERNAL_RANDO_CLASS_WEIGHT_NUM_CLASSES,
     INTERNAL_RANDO_WEAPONS_OFFS,
     INTERNAL_RANDO_WEAPONS_ENTRY_SIZE,
-    INTERNAL_RANDO_WEAPONS_NUM_ITEMS,
     INTERNAL_RANDO_WEAPONS_MAX_CLASSES,
     INTERNAL_RANDO_WEAPON_TABLE_ROWS,
 )
@@ -372,18 +371,21 @@ class FE8Randomizer:
     rom: bytearray
     config: dict[str, Any]
 
-    def __init__(self, rom: bytearray, random: Random, settings: dict[str, Any]):
+    def __init__(self, rom: bytearray, random: Random, config: dict[str, Any]):
         self.random = random
         self.rom = rom
         unit_blocks = fetch_json(CHAPTER_UNIT_BLOCKS)
-        self.config = settings
+        self.config = config
 
         self.unit_blocks = {
             name: [UnitBlock(**block) for block in blocks]
             for name, blocks in unit_blocks.items()
         }
 
-        self.valid_distribs_by_row = fetch_json(INTERNAL_RANDO_VALID_DISTRIBS)
+        valid_distribs_by_row = fetch_json(INTERNAL_RANDO_VALID_DISTRIBS)
+        self.valid_distribs_by_row = {
+            int(k): v for k, v in valid_distribs_by_row.items()
+        }
 
         item_data = fetch_json(WEAPON_DATA, object_hook=WeaponData.of_object)
 
@@ -674,8 +676,12 @@ class FE8Randomizer:
                         "Druid",
                         "Priest",
                         "Cleric",
+                        "Monk",
                         "Bishop",
+                        "Troubadour",
+                        "Valkyrie",
                         "Summoner",
+                        "Necromancer",
                         "Pupil",
                         "Journeyman",
                         "Recruit",
@@ -704,7 +710,7 @@ class FE8Randomizer:
             )
             for j in range(INTERNAL_RANDO_CLASS_WEIGHT_NUM_CLASSES):
                 job_id = self.rom[offs + j]
-                if not job_id:
+                if not job_id or job_id >= 255:
                     break
                 job = self.jobs_by_id[job_id]
                 if job.name == "Dracozombie":
