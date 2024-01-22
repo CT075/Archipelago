@@ -3,7 +3,8 @@ Archipelago World definition for Fire Emblem: Sacred Stones
 """
 
 from typing import ClassVar, Optional, Callable, Set, Tuple, Any
-#import logging
+
+# import logging
 
 from worlds.AutoWorld import World, WebWorld
 from BaseClasses import Region, ItemClassification, CollectionState, Tutorial
@@ -86,7 +87,6 @@ class FE8World(World):
     item_name_to_id = {name: id + FE8_ID_PREFIX for name, id in items}
     location_name_to_id = {name: id + FE8_ID_PREFIX for name, id in locations}
     item_name_groups = {"holy weapons": set(HOLY_WEAPONS.keys())}
-
 
     def total_locations(self) -> int:
         tower_checks_enabled = self.options.tower_checks_enabled()
@@ -373,10 +373,9 @@ class FE8World(World):
                 campaign.add_exits({"Lagdou Ruins": "Complete Chapter 19"})
                 tower.add_exits({"Campaign": "Complete Lagdou Ruins 10"})
 
-    def fill_slot_data(self) -> Dict[str, Any]:
+    def fill_slot_data(self) -> dict[str, Any]:
         slot_data = self.options.as_dict("goal")
         return slot_data
-
 
     def generate_output(self, output_directory: str) -> None:
         generate_output(
