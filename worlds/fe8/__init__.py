@@ -3,15 +3,16 @@ Archipelago World definition for Fire Emblem: Sacred Stones
 """
 
 from typing import ClassVar, Optional, Callable, Set, Tuple, Any
+import os
 
 # import logging
 
 from worlds.AutoWorld import World, WebWorld
-from BaseClasses import Region, ItemClassification, CollectionState, Tutorial
+from BaseClasses import Region, ItemClassification, CollectionState, Tutorial, MultiWorld
 import settings
 
 from .client import FE8Client
-from .options import FE8Options, Goal
+from .options import FE8Options
 from .constants import (
     FE8_NAME,
     FE8_ID_PREFIX,
@@ -87,6 +88,11 @@ class FE8World(World):
     item_name_to_id = {name: id + FE8_ID_PREFIX for name, id in items}
     location_name_to_id = {name: id + FE8_ID_PREFIX for name, id in locations}
     item_name_groups = {"holy weapons": set(HOLY_WEAPONS.keys())}
+
+    @classmethod
+    def stage_assert_generate(cls, multiworld: MultiWorld) -> None:
+        if not os.path.exists(cls.settings.rom_file):
+            raise FileNotFoundError(cls.settings.rom_file)
 
     def total_locations(self) -> int:
         tower_checks_enabled = self.options.tower_checks_enabled()
