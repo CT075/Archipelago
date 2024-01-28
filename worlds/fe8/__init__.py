@@ -229,8 +229,9 @@ class FE8World(World):
         self.add_location_to_region("Defeat Formortiis", None, finalboss)
 
         def level_cap_at_least(n: int) -> Callable[[CollectionState], bool]:
+            player = self.player
             def wrapped(state: CollectionState) -> bool:
-                return 10 + state.count("Progressive Level Cap", self.player) * 5 >= n
+                return 10 + state.count("Progressive Level Cap", player) * 5 >= n
 
             return wrapped
 
