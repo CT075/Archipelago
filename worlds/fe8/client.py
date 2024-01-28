@@ -24,7 +24,8 @@ from .constants import (
     PROC_SIZE,
     PROC_POOL_ADDR,
     TOTAL_NUM_PROCS,
-    WM_PROC_ADDRESS,
+    # TODO: world map item receiving
+    # WM_PROC_ADDRESS,
     E_PLAYERPHASE_PROC_ADDRESS,
 )
 
@@ -123,7 +124,7 @@ class FE8Client(BizHawkClient):
         ]
 
         if any(
-            proc in (WM_PROC_ADDRESS, E_PLAYERPHASE_PROC_ADDRESS)
+            proc in (E_PLAYERPHASE_PROC_ADDRESS,)
             for proc in active_procs
         ):
             self.game_state_safe = True
@@ -167,11 +168,6 @@ class FE8Client(BizHawkClient):
                     (
                         ARCHIPELAGO_RECEIVED_ITEM_ADDR + 0,
                         (next_item.item - FE8_ID_PREFIX).to_bytes(2, "little"),
-                        "System Bus",
-                    ),
-                    (
-                        ARCHIPELAGO_NUM_RECEIVED_ITEMS_ADDR,
-                        (num_items_received + 1).to_bytes(4, "little"),
                         "System Bus",
                     ),
                     (
