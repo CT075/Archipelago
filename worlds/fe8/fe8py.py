@@ -730,6 +730,7 @@ class FE8Randomizer:
                     promoted_pool=promoted_pool,
                     job_valid=job_valid_for_internal_rando,
                 )
+                self.rom[offs + j] = new_job.id
                 jobset.add(new_job)
 
         # CR-someday cam: There is a lot of hardcoding going on here. It would
