@@ -454,14 +454,15 @@ class FE8Randomizer:
         if job.name in ("Dracozombie", "Revenant", "Entombed"):
             return False
 
-        if ("must_fly" in logic and logic["must_fly"]) and "flying" not in job.tags:
+        if "must_fly" in logic and logic["must_fly"] and "flying" not in job.tags:
             # demand that valid job has the "flying" tag
             return False
 
-        if ("must_fight" in logic and logic["must_fight"]) and all(
-            not wtype.damaging() for wtype in job.usable_weapons
-        ):
-            return False
+        if "must_fight" in logic and logic["must_fight"]:
+            if "cannot_fight" in job.tags:
+                return False
+            if all(not wtype.damaging() for wtype in job.usable_weapons):
+                return False
 
         return True
 
@@ -554,9 +555,11 @@ class FE8Randomizer:
             if t not in logic:
                 logic[t] = True
 
+        no_store = "no_store" in logic and logic["no_store"]
+
         # config option for disabling player unit randomization
         if not self.config["player_rando"] and "player" in logic and logic["player"]:
-            if char not in self.character_store:
+            if char not in self.character_store and not no_store:
                 self.character_store[char] = job
             return
 
@@ -576,7 +579,7 @@ class FE8Randomizer:
                 job_valid=lambda job: self.job_valid(job, char, logic),
             )
 
-            if "no_store" not in logic or not logic["no_store"]:
+            if not no_store:
                 self.character_store[char] = new_job
 
         new_inventory = self.select_new_inventory(new_job, inventory, logic)

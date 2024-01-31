@@ -94,7 +94,12 @@
         {"name": "label33", "base": 9132408, "count": 3, "logic": {}},
         {"name": "label34", "base": 9132488, "count": 1, "logic": {}},
         {"name": "label37", "base": 9132528, "count": 2, "logic": {}},
-        {"name": "label44", "base": 9140284, "count": 2, "logic": {}},
+        {
+            "name": "label44",
+            "base": 9140284,
+            "count": 2,
+            "logic": {"1": {"no_store": true}}
+        },
         {"name": "label45", "base": 9140364, "count": 1, "logic": {}},
         {"name": "Turn2Brigands", "base": 9132128, "count": 2, "logic": {}},
         {"name": "Turn6Brigands", "base": 9132188, "count": 2, "logic": {}},
@@ -105,7 +110,7 @@
             "name": "PlayerDeployment",
             "base": 9132644,
             "count": 4,
-            "logic": {"must_fight": {"at_least": 2}}
+            "logic": {"must_fight": {"at_least": 3}}
         },
         {"name": "label22", "base": 9132744, "count": 31, "logic": {}},
         {"name": "label23", "base": 9133384, "count": 3, "logic": {}},
