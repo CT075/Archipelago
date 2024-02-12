@@ -1,10 +1,28 @@
-from typing import Dict
+from dataclasses import dataclass
 
-from Options import AssembleOptions, Range, Toggle
+from Options import Choice, Range, Toggle, PerGameCommonOptions
 
 
 def round_up_to(x, mod):
     return ((x + mod - 1) // mod) * mod
+
+
+class PlayerRando(Toggle):
+    """
+    If enabled, playable units will be randomzied
+    """
+
+    display_name = "Randomize Player Units"
+    default = 1
+
+
+class PlayerMonsters(Toggle):
+    """
+    Allow playable units to randomize into monsters when enabled
+    """
+
+    display_name = "Enable Playable Monsters"
+    default = 1
 
 
 class SuperDemonKing(Toggle):
@@ -78,6 +96,7 @@ class ExcludeLatona(Toggle):
     default = 1
 
 
+# Cam: Should we make this a sliding scale?
 class Easier5x(Toggle):
     """
     Give Ephraim, Forde and Kyle extra base stats. This is recommended to make
@@ -86,6 +105,7 @@ class Easier5x(Toggle):
 
     display_name = "Buff Ephraim's party for chapter 5x"
     default = 1
+
 
 class UnbreakableRegalia(Toggle):
     """
@@ -96,12 +116,80 @@ class UnbreakableRegalia(Toggle):
     default = 0
 
 
-fe8_options: Dict[str, AssembleOptions] = {
-    "super_demon_king": SuperDemonKing,
-    "smooth_level_caps": SmoothLevelCapProgression,
-    "min_endgame_level_cap": MinimumEndgameLevelCapRange,
-    "required_holy_weapons": MinimumUsableHolyWeapons,
-    "exclude_latona": ExcludeLatona,
-    "easier_5x": Easier5x,
-    "unbreakable_regalia": UnbreakableRegalia,
-}
+class EnableTower(Toggle):
+    """
+    Make each floor of the Tower of Valni a check. This can help balance the
+    amount of early/lategame checks a bit more.
+    """
+
+    display_name = "Enable Tower of Valni checks"
+    default = 0
+
+
+class EnableRuins(Toggle):
+    """
+    Make each floor of the Lagdou Ruins a check.
+    """
+
+    display_name = "Enable Lagdou Ruins checks"
+    default = 0
+
+
+class ShuffleSkirmishTables(Toggle):
+    """
+    Shuffle enemy spawn tables for the Tower, Ruins and skirmishes.
+    """
+
+    display_name = "Shuffle internal randomizer tables"
+    default = 1
+
+
+# CR-someday cam: think about how this interacts with chapter select mode
+class Goal(Choice):
+    """
+    Set the goal of the game.
+
+    - Defeat Fomortiis: Defeat the usual final boss, which can take a long time.
+    - Clear Valni: Clear the 8th floor of the Tower of Valni. Implies Enable Tower.
+      Recommended for short- to medium-length games.
+    - Defeat Tirado: Clear Chapter 8. Recommended for short games.
+    - Clear Lagdou: Clear the 10th floor of the Lagdou Ruins. Implies Enable Ruins.
+
+    Note that this option only change which check is considered the goal and
+    does not affect progressing logic at all.
+
+    Supported values: traditional, inactive
+    Default value: traditional
+    """
+
+    display_name = "Goal"
+    option_DefeatFormortiis = 0
+    option_ClearValni = 1
+    option_DefeatTirado = 2
+    option_ClearLagdou = 3
+
+
+# CR-someday cam: Eventually, it would be nice to be able to generate this.
+@dataclass
+class FE8Options(PerGameCommonOptions):
+    player_unit_rando: PlayerRando
+    player_unit_monsters: PlayerMonsters
+    super_demon_king: SuperDemonKing
+    smooth_level_caps: SmoothLevelCapProgression
+    min_endgame_level_cap: MinimumEndgameLevelCapRange
+    required_holy_weapons: MinimumUsableHolyWeapons
+    exclude_latona: ExcludeLatona
+    easier_5x: Easier5x
+    unbreakable_regalia: UnbreakableRegalia
+    tower_enabled: EnableTower
+    ruins_enabled: EnableRuins
+    shuffle_skirmish_tables: ShuffleSkirmishTables
+    goal: Goal
+
+    # Convenience methods for options that imply each other
+
+    def tower_checks_enabled(self):
+        return bool(self.tower_enabled) or self.goal == Goal.option_ClearValni
+
+    def ruins_checks_enabled(self):
+        return bool(self.ruins_enabled) or self.goal == Goal.option_ClearLagdou

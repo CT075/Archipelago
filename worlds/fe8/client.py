@@ -5,13 +5,12 @@ from typing import (
     TypeVar,
     Awaitable,
 )
-import sys
-import os
 
 from NetUtils import ClientStatus
 
+from .options import Goal
 from .connector_config import (
-    locations,
+    locations as locations_raw,
     EXPECTED_ROM_NAME,
     FLAGS_ADDR,
     ARCHIPELAGO_RECEIVED_ITEM_ADDR,
@@ -25,31 +24,10 @@ from .constants import (
     PROC_SIZE,
     PROC_POOL_ADDR,
     TOTAL_NUM_PROCS,
-    WM_PROC_ADDRESS,
+    # TODO: world map item receiving
+    # WM_PROC_ADDRESS,
     E_PLAYERPHASE_PROC_ADDRESS,
 )
-
-from worlds.LauncherComponents import SuffixIdentifier, components
-
-# TODO: remove once the proper _bizhawk gets released
-if "worlds._bizhawk" not in sys.modules:
-    import importlib
-    import zipimport
-
-    bh_apworld_path = os.path.join(
-        os.path.dirname(sys.modules["worlds"].__file__), "_bizhawk.apworld"
-    )
-    if os.path.isfile(bh_apworld_path):
-        importer = zipimport.zipimporter(bh_apworld_path)
-        spec = importer.find_spec(os.path.basename(bh_apworld_path).rsplit(".", 1)[0])
-        mod = importlib.util.module_from_spec(spec)
-        mod.__package__ = f"worlds.{mod.__package__}"
-        mod.__name__ = f"worlds.{mod.__name__}"
-        sys.modules[mod.__name__] = mod
-        importer.exec_module(mod)
-        bizhawk = mod
-    elif not os.path.isdir(os.path.splitext(bh_apworld_path)[0]):
-        logging.error("Did not find _bizhawk.apworld required to play FE8.")
 
 import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
@@ -59,16 +37,14 @@ if TYPE_CHECKING:
 else:
     BizHawkClientContext = object
 
-FOMORTIIS_FLAG = dict(locations)["Defeat Formortiis"]
+locations = dict(locations_raw)
+
+FOMORTIIS_FLAG = locations["Defeat Formortiis"]
+TIRADO_FLAG = locations["Complete Chapter 8"]
+TOWER_CLEAR_FLAG = locations["Complete Tower of Valni 8"]
+RUINS_CLEAR_FLAG = locations["Complete Lagdou Ruins 10"]
 
 T = TypeVar("T")
-
-# Add .apemerald suffix to bizhawk client
-for component in components:
-    if component.script_name == "BizHawkClient":
-        component.file_identifier = SuffixIdentifier(*(*component.file_identifier.suffixes, ".apfe8"))
-        break
-
 
 class FE8Client(BizHawkClient):
     game = FE8_NAME
@@ -76,11 +52,12 @@ class FE8Client(BizHawkClient):
     patch_suffix = ".apfe8"
     local_checked_locations: Set[int]
     game_state_safe: bool = False
-    goal_flag: int = FOMORTIIS_FLAG
+    goal_flag: int
 
     def __init__(self):
         super().__init__()
         self.local_checked_locations = set()
+        self.goal_flag = FOMORTIIS_FLAG
 
     async def validate_rom(self, ctx: BizHawkClientContext) -> bool:
         from CommonClient import logger
@@ -146,7 +123,7 @@ class FE8Client(BizHawkClient):
         ]
 
         if any(
-            proc in (WM_PROC_ADDRESS, E_PLAYERPHASE_PROC_ADDRESS)
+            proc in (E_PLAYERPHASE_PROC_ADDRESS,)
             for proc in active_procs
         ):
             self.game_state_safe = True
@@ -163,7 +140,7 @@ class FE8Client(BizHawkClient):
 
     # requires: locked and game_state_safe
     async def maybe_write_next_item(self, ctx: BizHawkClientContext) -> None:
-        #from CommonClient import logger
+        # from CommonClient import logger
 
         is_filled_byte, num_items_received_bytes = await bizhawk.read(
             ctx.bizhawk_ctx,
@@ -197,15 +174,21 @@ class FE8Client(BizHawkClient):
                         b"\x01",
                         "System Bus",
                     ),
-                    (
-                        ARCHIPELAGO_NUM_RECEIVED_ITEMS_ADDR,
-                        (num_items_received + 1).to_bytes(4, "little"),
-                        "System Bus",
-                    ),
                 ],
             )
 
     async def game_watcher(self, ctx: BizHawkClientContext) -> None:
+        if ctx.slot_data is not None:
+            match ctx.slot_data["goal"]:
+                case Goal.option_DefeatFormortiis:
+                    self.goal_flag = FOMORTIIS_FLAG
+                case Goal.option_ClearValni:
+                    self.goal_flag = TOWER_CLEAR_FLAG
+                case Goal.option_DefeatTirado:
+                    self.goal_flag = TIRADO_FLAG
+                case Goal.option_ClearLagdou:
+                    self.goal_flag = RUINS_CLEAR_FLAG
+
         try:
             await self.update_game_state(ctx)
 

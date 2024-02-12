@@ -20,6 +20,25 @@ HOLY_WEAPONS = {
 WEAPON_TYPES = ["Sword", "Lance", "Axe", "Bow", "Anima", "Light", "Dark", "Staff"]
 NUM_WEAPON_LEVELS = 3
 
+FILLER_ITEMS = [
+    "AngelicRobe",
+    "EnergyRing",
+    "SecretBook",
+    "Speedwings",
+    "GoddessIcon",
+    "DragonShield",
+    "Talisman",
+    "BodyRing",
+    "Boots",
+    "KnightCrest",
+    "HeroCrest",
+    "OrionsBolt",
+    "GuidingRing",
+    "ElysianWhip",
+    "OceanSeal",
+    "MasterSeal",
+]
+
 ROM_BASE_ADDRESS = 0x08000000
 ROM_NAME_ADDR = 0x080000A0
 
@@ -127,3 +146,48 @@ CH15_AUTO_STEEL_SWORD = 0x086674
 
 AI1_INDEX = 0x10
 AI1_IGNORE_LIST_12 = 0x5A8A24
+
+INTERNAL_RANDO_CLASS_WEIGHTS_OFFS = 0x8D2060
+INTERNAL_RANDO_CLASS_WEIGHT_ENTRY_SIZE = 12
+INTERNAL_RANDO_CLASS_WEIGHTS_COUNT = 30
+INTERNAL_RANDO_CLASS_WEIGHT_NUM_CLASSES = 5
+INTERNAL_RANDO_WEAPONS_OFFS = 0x8D2440
+INTERNAL_RANDO_WEAPONS_ENTRY_SIZE = 0x20
+INTERNAL_RANDO_WEAPONS_NUM_ITEMS = 5
+INTERNAL_RANDO_WEAPONS_MAX_CLASSES = 22
+
+# CR-soon cam: This is stretching the definition of a "constant" and should
+# probably go into a data file instead
+INTERNAL_RANDO_WEAPON_TABLE_ROWS = [
+    ("None", -1),
+    ("Sword", 0),
+    ("Sword", 1),
+    ("Sword", 3),
+    ("Sword", 2),
+    ("Sword", 4),
+    ("Lance", 0),
+    # CR-soon cam: this row has both Runesword and Javelin in it.
+    ("Lance", 1),
+    ("Lance", 3),
+    ("Lance", 2),
+    ("Lance", 4),
+    ("Axe", 0),
+    ("Axe", 1),
+    ("Axe", 3),
+    ("Axe", 2),
+    ("Axe", 4),
+    ("Bow", 0),
+    ("Bow", 1),
+    ("Bow", 3),
+    ("Bow", 2),
+    ("Bow", 4),
+    ("Claw", 0),
+    ("Claw", 1),
+    ("Claw", 2),
+    ("Claw", 3),
+    ("MonsterDark", 0),
+    ("MonsterDark", 1),
+    ("Fang", 0),
+    ("Fang", 1),
+    ("MonsterDark", 3),
+]

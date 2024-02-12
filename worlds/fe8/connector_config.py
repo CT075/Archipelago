@@ -28,16 +28,34 @@ locations = [
   ("Complete Chapter 20", 21),
   ("Defeat Lyon", 22),
   ("Defeat Formortiis", 23),
-  ("Sieglinde Received", 24),
-  ("Siegmund Received", 25),
-  ("Gleipnir Received", 26),
-  ("Garm Received", 27),
-  ("Nidhogg Received", 28),
-  ("Vidofnir Received", 29),
-  ("Excalibur Received", 30),
-  ("Audhulma Received", 31),
-  ("Ivaldi Received", 32),
-  ("Latona Received", 33),
+  ("Complete Tower of Valni 1", 24),
+  ("Complete Tower of Valni 2", 25),
+  ("Complete Tower of Valni 3", 26),
+  ("Complete Tower of Valni 4", 27),
+  ("Complete Tower of Valni 5", 28),
+  ("Complete Tower of Valni 6", 29),
+  ("Complete Tower of Valni 7", 30),
+  ("Complete Tower of Valni 8", 31),
+  ("Complete Lagdou Ruins 1", 32),
+  ("Complete Lagdou Ruins 2", 33),
+  ("Complete Lagdou Ruins 3", 34),
+  ("Complete Lagdou Ruins 4", 35),
+  ("Complete Lagdou Ruins 5", 36),
+  ("Complete Lagdou Ruins 6", 37),
+  ("Complete Lagdou Ruins 7", 38),
+  ("Complete Lagdou Ruins 8", 39),
+  ("Complete Lagdou Ruins 9", 40),
+  ("Complete Lagdou Ruins 10", 41),
+  ("Sieglinde Received", 42),
+  ("Siegmund Received", 43),
+  ("Gleipnir Received", 44),
+  ("Garm Received", 45),
+  ("Nidhogg Received", 46),
+  ("Vidofnir Received", 47),
+  ("Excalibur Received", 48),
+  ("Audhulma Received", 49),
+  ("Ivaldi Received", 50),
+  ("Latona Received", 51),
 ]
 
 items = [
@@ -60,14 +78,30 @@ items = [
   ("Audhulma", 16),
   ("Ivaldi", 17),
   ("Latona", 18),
+  ("AngelicRobe", 19),
+  ("EnergyRing", 20),
+  ("SecretBook", 21),
+  ("Speedwings", 22),
+  ("GoddessIcon", 23),
+  ("DragonShield", 24),
+  ("Talisman", 25),
+  ("BodyRing", 26),
+  ("Boots", 27),
+  ("KnightCrest", 28),
+  ("HeroCrest", 29),
+  ("OrionsBolt", 30),
+  ("GuidingRing", 31),
+  ("ElysianWhip", 32),
+  ("OceanSeal", 33),
+  ("MasterSeal", 34),
 ]
-SLOT_NAME_ADDR = 0x8EFD02C
-SUPER_DEMON_KING_OFFS = 0xEFD06C
-LOCATION_INFO_OFFS = 0xEFD070
+SLOT_NAME_ADDR = 0x8EFD26C
+SUPER_DEMON_KING_OFFS = 0xEFD2AC
+LOCATION_INFO_OFFS = 0xEFD2B0
 LOCATION_INFO_SIZE = 4
 ARCHIPELAGO_RECEIVED_ITEM_ADDR = 0x2026E38
 ARCHIPELAGO_NUM_RECEIVED_ITEMS_ADDR = 0x2026E3C
 FLAGS_ADDR = 0x2026E30
 FLAGS_SIZE = 8
 
-EXPECTED_ROM_NAME = "FE8AP3F81B4DCA34"
+EXPECTED_ROM_NAME = "FE8APEFF111CC17C"

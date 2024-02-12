@@ -10,6 +10,7 @@ from settings import get_settings
 from .items import FE8Item
 from .locations import FE8Location
 from .constants import FE8_NAME, ROM_BASE_ADDRESS
+from .options import FE8Options
 from .util import write_short_le
 from .connector_config import (
     SLOT_NAME_ADDR,
@@ -51,19 +52,32 @@ def rom_location(loc: FE8Location):
 
 
 def generate_output(
-    multiworld: MultiWorld, player: int, output_dir: str, random: Random
+    multiworld: MultiWorld,
+    options: FE8Options,
+    player: int,
+    output_dir: str,
+    random: Random,
 ) -> None:
     base_rom = get_base_rom_as_bytes()
     base_patch = pkgutil.get_data(__name__, BASE_PATCH)
     patched_rom = bytearray(bsdiff4.patch(base_rom, base_patch))
 
-    randomizer = FE8Randomizer(rom=patched_rom, random=random)
+    # CR cam: we could just pass `options`
+    config = {
+        "player_rando": bool(options.player_unit_rando),
+        "player_monster": bool(options.player_unit_monsters),
+    }
+
+    randomizer = FE8Randomizer(rom=patched_rom, random=random, config=config)
     randomizer.apply_base_changes()
 
-    if multiworld.easier_5x[player]:
+    if options.shuffle_skirmish_tables:
+        randomizer.randomize_monster_gen()
+
+    if options.easier_5x:
         randomizer.apply_5x_buffs()
 
-    if multiworld.unbreakable_regalia[player]:
+    if options.unbreakable_regalia:
         randomizer.apply_infinite_holy_weapons()
 
     for location in multiworld.get_locations(player):
@@ -76,7 +90,7 @@ def generate_output(
         else:
             write_short_le(patched_rom, rom_loc, AP_ITEM_KIND)
 
-    patched_rom[SUPER_DEMON_KING_OFFS] = int(bool(multiworld.super_demon_king[player]))
+    patched_rom[SUPER_DEMON_KING_OFFS] = int(bool(options.super_demon_king))
 
     for i, byte in enumerate(multiworld.player_name[player].encode("utf-8")):
         # TODO: cap length at 63

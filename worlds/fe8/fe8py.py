@@ -3,9 +3,10 @@
 from random import Random
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Union, Optional
 from enum import IntEnum
 import logging
+
+from typing import Any, Union, Optional, Callable, Iterable, Tuple
 
 from .util import fetch_json, write_short_le, read_short_le, read_word_le
 from .constants import (
@@ -51,6 +52,14 @@ from .constants import (
     CH15_AUTO_STEEL_SWORD,
     CH15_AUTO_STEEL_LANCE,
     AI1_INDEX,
+    INTERNAL_RANDO_CLASS_WEIGHTS_OFFS,
+    INTERNAL_RANDO_CLASS_WEIGHT_ENTRY_SIZE,
+    INTERNAL_RANDO_CLASS_WEIGHTS_COUNT,
+    INTERNAL_RANDO_CLASS_WEIGHT_NUM_CLASSES,
+    INTERNAL_RANDO_WEAPONS_OFFS,
+    INTERNAL_RANDO_WEAPONS_ENTRY_SIZE,
+    INTERNAL_RANDO_WEAPONS_MAX_CLASSES,
+    INTERNAL_RANDO_WEAPON_TABLE_ROWS,
 )
 
 
@@ -63,6 +72,7 @@ WEAPON_DATA = "data/weapondata.json"
 JOB_DATA = "data/jobdata.json"
 CHARACTERS = "data/characters.json"
 CHAPTER_UNIT_BLOCKS = "data/chapter_unit_blocks.json"
+INTERNAL_RANDO_VALID_DISTRIBS = "data/internal_rando_distribs.json"
 
 
 def encode_unit_coords(x: int, y: int) -> int:
@@ -81,9 +91,9 @@ class UnitBlock:
     base: int
     count: int
 
-    # Currently, the names of blocks in `chapter_unit_blocks.json` are all
+    # Currently, the names of blocks in `chapter_unit_blocks.json` are mostly
     # automatically generated from chapter event disassembly and are tagged
-    # with any relevant information about the block. However,
+    # with any relevant information about the block.
     logic: defaultdict[Union[int, str], dict[str, Any]]
 
     def __init__(
@@ -110,6 +120,23 @@ class WeaponKind(IntEnum):
     MONSTER_WEAPON = 0x0B
     RING = 0x0C
     DRAGONSTONE = 0x11
+
+    @classmethod
+    def get_valid_names(cls) -> list[str]:
+        return [
+            "Sword",
+            "Lance",
+            "Axe",
+            "Bow",
+            "Staff",
+            "Anima",
+            "Light",
+            "Dark",
+            "Item",
+            "Monster Weapon",
+            "Ring",
+            "Dragonstone",
+        ]
 
     @classmethod
     def of_str(cls, s: str) -> "WeaponKind":
@@ -210,49 +237,8 @@ class WeaponData:
             name=obj["name"],
             rank=WeaponRank.of_str(obj["rank"]),
             kind=WeaponKind.of_str(obj["kind"]),
-            locks=obj.get("locks", []),
+            locks=obj.get("locks", set()),
         )
-
-
-# This is a hack until we get monster weapons set up in `weapondata.json`
-# properly.
-MONSTER_DARKS = {
-    0xAB: {
-        "id": 0xAB,
-        "name": "Demon Surge",
-        "rank": WeaponRank.B,
-        "kind": WeaponKind.DARK,
-        "locks": set(),
-    },
-    0xAC: {
-        "id": 0xAC,
-        "name": "Shadowshot",
-        "rank": WeaponRank.A,
-        "kind": WeaponKind.DARK,
-        "locks": set(),
-    },
-    0xB3: {
-        "id": 0xB3,
-        "name": "Evil Eye",
-        "rank": WeaponRank.D,
-        "kind": WeaponKind.DARK,
-        "locks": set(),
-    },
-    0xB4: {
-        "id": 0xB4,
-        "name": "Crimson Eye",
-        "rank": WeaponRank.B,
-        "kind": WeaponKind.DARK,
-        "locks": set(),
-    },
-    0xB5: {
-        "id": 0xB5,
-        "name": "Stone",
-        "rank": WeaponRank.B,
-        "kind": WeaponKind.DARK,
-        "locks": set(),
-    },
-}
 
 
 @dataclass
@@ -274,6 +260,14 @@ class JobData:
             ),
             tags=set(obj["tags"]),
         )
+
+    def __hash__(self):
+        return self.id
+
+    def __eq__(self, other):
+        if not isinstance(other, JobData):
+            return False
+        return self.id == other.id
 
 
 class CharacterStore:
@@ -369,19 +363,28 @@ class FE8Randomizer:
     weapons_by_rank: dict[WeaponRank, list[WeaponData]]
     character_store: CharacterStore
     jobs_by_id: dict[int, JobData]
+    valid_distribs_by_row: dict[int, list[int]]
     promoted_jobs: list[JobData]
     unpromoted_jobs: list[JobData]
+
     random: Random
     rom: bytearray
+    config: dict[str, Any]
 
-    def __init__(self, rom: bytearray, random: Random):
+    def __init__(self, rom: bytearray, random: Random, config: dict[str, Any]):
         self.random = random
         self.rom = rom
         unit_blocks = fetch_json(CHAPTER_UNIT_BLOCKS)
+        self.config = config
 
         self.unit_blocks = {
             name: [UnitBlock(**block) for block in blocks]
             for name, blocks in unit_blocks.items()
+        }
+
+        valid_distribs_by_row = fetch_json(INTERNAL_RANDO_VALID_DISTRIBS)
+        self.valid_distribs_by_row = {
+            int(k): v for k, v in valid_distribs_by_row.items()
         }
 
         item_data = fetch_json(WEAPON_DATA, object_hook=WeaponData.of_object)
@@ -417,11 +420,29 @@ class FE8Randomizer:
         # Dark has no E-ranked weapons, so we add Flux
         self.weapons_by_rank[WeaponRank.E].append(self.weapons_by_name["Flux"])
 
+        # Let's do the same thing with dogs
+        self.weapons_by_rank[WeaponRank.D].append(self.weapons_by_name["Fiery Fang"])
+        self.weapons_by_rank[WeaponRank.C].append(self.weapons_by_name["Fiery Fang"])
+        self.weapons_by_rank[WeaponRank.A].append(self.weapons_by_name["Hellfang"])
+
+        self.weapons_by_rank[WeaponRank.A].append(self.weapons_by_name["Fetid Claw"])
+
+        # CR-soon cam:
+        # Darr: Dragon zombies experience the same problem. I've disabled them for now;
+        # they only have one weapon and E-rank Wretched Air does not sound fun.
+        # Cam: What we need to do is prevent units from randomizing into Dracozombies
+        # unless they have an A rank weapon. There are a few easy ways to hack that
+        # in, but I'm going to punt on it for now because that's a bunch of design
+        # decisions we can make later.
+
     def job_valid(self, job: JobData, char: int, logic: dict[str, Any]) -> bool:
         # get list of tags that make the job invalid (notags)
         # the "no_" prefix adds the tag to the invalid tag list
         # "no_flying" makes any job with "flying" tag invalid
         notags = set()
+        # config option for disabling player unit monsters
+        if "player" in logic and logic["player"] and not self.config["player_monster"]:
+            notags.add("monster")
         for x in logic:
             if x.startswith("no_") and logic[x]:
                 notags.add(x.removeprefix("no_"))
@@ -429,14 +450,19 @@ class FE8Randomizer:
         if notags and notags & job.tags:
             return False
 
-        if ("must_fly" in logic and logic["must_fly"]) and "flying" not in job.tags:
+        # CR-soon cam: see above
+        if job.name in ("Dracozombie", "Revenant", "Entombed"):
+            return False
+
+        if "must_fly" in logic and logic["must_fly"] and "flying" not in job.tags:
             # demand that valid job has the "flying" tag
             return False
 
-        if ("must_fight" in logic and logic["must_fight"]) and all(
-            not wtype.damaging() for wtype in job.usable_weapons
-        ):
-            return False
+        if "must_fight" in logic and logic["must_fight"]:
+            if "cannot_fight" in job.tags:
+                return False
+            if all(not wtype.damaging() for wtype in job.usable_weapons):
+                return False
 
         return True
 
@@ -447,22 +473,15 @@ class FE8Randomizer:
             else:
                 return CHEST_KEY_5
 
-        if item_id not in self.weapons_by_id and item_id not in MONSTER_DARKS:
+        if item_id not in self.weapons_by_id:
             return item_id
-
-        if item_id in MONSTER_DARKS:
-            weapon_attrs: WeaponData = WeaponData(**MONSTER_DARKS[item_id])  # type: ignore
-        else:
-            weapon_attrs = self.weapons_by_id[item_id]
+        weapon_attrs = self.weapons_by_id[item_id]
 
         choices = [
             weap
             for weap in self.weapons_by_rank[weapon_attrs.rank]
             if weapon_usable(weap, job, logic)
         ]
-
-        if item_id in MONSTER_DARKS and WeaponKind.DARK in job.usable_weapons:
-            choices.append(weapon_attrs)
 
         if not choices:
             import json
@@ -476,9 +495,7 @@ class FE8Randomizer:
     def select_new_inventory(
         self, job: JobData, items: bytes, logic: dict[str, Any]
     ) -> list[int]:
-        return [
-            self.select_new_item(job, item_id, logic) for i, item_id in enumerate(items)
-        ]
+        return [self.select_new_item(job, item_id, logic) for item_id in items]
 
     def rewrite_coords(self, offset: int, x: int, y: int):
         old_coords = read_short_le(self.rom, offset)
@@ -502,6 +519,16 @@ class FE8Randomizer:
                 reda_offs = redas_offs + 8 * i
                 self.rewrite_coords(reda_offs, x, y)
 
+    def select_new_job(
+        self,
+        job: JobData,
+        unpromoted_pool: Iterable[JobData],
+        promoted_pool: Iterable[JobData],
+        job_valid: Callable[[JobData], [bool]],
+    ) -> JobData:
+        new_job_pool = promoted_pool if job.is_promoted else unpromoted_pool
+        return self.random.choice([job for job in new_job_pool if job_valid(job)])
+
     def randomize_chapter_unit(self, data_offset: int, logic: dict[str, Any]) -> None:
         # We *could* read the full struct, but we only need a few individual
         # bytes, so we may as well extract them ad-hoc.
@@ -511,6 +538,10 @@ class FE8Randomizer:
         # If the unit's class is is not a "standard" class that can be given to
         # players, it's probably some NPC or enemy that shouldn't be touched.
         if job_id not in self.jobs_by_id:
+            return
+
+        # CR cam: this is dracozombie. prevents randomizing existing dracozombies.
+        if job_id == 101:
             return
 
         job = self.jobs_by_id[job_id]
@@ -524,6 +555,14 @@ class FE8Randomizer:
             if t not in logic:
                 logic[t] = True
 
+        no_store = "no_store" in logic and logic["no_store"]
+
+        # config option for disabling player unit randomization
+        if not self.config["player_rando"] and "player" in logic and logic["player"]:
+            if char not in self.character_store and not no_store:
+                self.character_store[char] = job
+            return
+
         # Affiliation = bits 1,2; unit is player if they're unset
         is_player = not bool(unit[3] & 0b0110)
         # Autolevel is LSB
@@ -533,14 +572,14 @@ class FE8Randomizer:
         if char in self.character_store:
             new_job = self.character_store[char]
         else:
-            new_job_pool = (
-                self.promoted_jobs if job.is_promoted else self.unpromoted_jobs
-            )
-            new_job = self.random.choice(
-                [job for job in new_job_pool if self.job_valid(job, char, logic)]
+            new_job = self.select_new_job(
+                job,
+                unpromoted_pool=self.unpromoted_jobs,
+                promoted_pool=self.promoted_jobs,
+                job_valid=lambda job: self.job_valid(job, char, logic),
             )
 
-            if "no_store" not in logic or not logic["no_store"]:
+            if not no_store:
                 self.character_store[char] = new_job
 
         new_inventory = self.select_new_inventory(new_job, inventory, logic)
@@ -549,7 +588,10 @@ class FE8Randomizer:
         for i, item_id in enumerate(new_inventory):
             self.rom[data_offset + INVENTORY_INDEX + i] = item_id
 
-        if "ai1_mod" in logic and self.rom[data_offset+AI1_INDEX] == logic["ai1_mod"]["from"]:
+        if (
+            "ai1_mod" in logic
+            and self.rom[data_offset + AI1_INDEX] == logic["ai1_mod"]["from"]
+        ):
             self.rom[data_offset + AI1_INDEX] = logic["ai1_mod"]["to"]
 
         # If an NPC isn't autoleveled, it's probably a boss or important NPC of
@@ -588,7 +630,194 @@ class FE8Randomizer:
                 self.apply_nudges(offset, logic["nudges"])
             if "ignore" in logic and logic["ignore"]:
                 continue
+            # If this unit is tagged as a monster, its class gets selected by
+            # the in-game randomizer, meaning we don't have to touch it.
+            if "monster" in logic and logic["monster"]:
+                continue
             self.randomize_chapter_unit(offset, logic)
+
+    # Randomize the classes and possible invtories for the game's internal
+    # randomizer (used for skirmishes, tower/ruins, and the two random Wights
+    # with Lyon for some reason).
+    def randomize_monster_gen(self) -> None:
+        class JobSet:
+            promoted: set[JobData]
+            unpromoted: set[JobData]
+
+            def __init__(self):
+                self.promoted = set()
+                self.unpromoted = set()
+
+            def add(self, job: JobData) -> None:
+                (self.promoted if job.is_promoted else self.unpromoted).add(job)
+
+            def __len__(self):
+                return len(self.promoted) + len(self.unpromoted)
+
+            def pools(self) -> Tuple[set[JobData], set[JobData]]:
+                return self.unpromoted, self.promoted
+
+            def iter(self):
+                for j in self.unpromoted:
+                    yield j
+                for j in self.promoted:
+                    yield j
+
+        def job_valid_for_internal_rando(job: JobData) -> bool:
+            # We disable mages because there aren't any entries for them in the
+            # base weapon tables. Eventually we'll add them back in, but for
+            # now we can just disable them.
+            # CR-soon cam: Add these back in
+            if any(
+                map(
+                    job.name.startswith,
+                    (
+                        # catches both regular Mages and "Mage Knight"
+                        "Mage",
+                        "Sage",
+                        "Shaman",
+                        "Druid",
+                        "Priest",
+                        "Cleric",
+                        "Monk",
+                        "Bishop",
+                        "Troubadour",
+                        "Valkyrie",
+                        "Summoner",
+                        "Necromancer",
+                        "Pupil",
+                        "Journeyman",
+                        "Recruit",
+                        "Dracozombie",
+                    ),
+                )
+            ):
+                return False
+
+            return True
+
+        # CR-soon cam: do this better
+        weapon_tables = {
+            (
+                WeaponKind.of_str(ty) if ty in WeaponKind.get_valid_names() else ty,
+                level,
+            ): i
+            for i, (ty, level) in enumerate(INTERNAL_RANDO_WEAPON_TABLE_ROWS)
+        }
+        jobset = JobSet()
+
+        for i in range(INTERNAL_RANDO_CLASS_WEIGHTS_COUNT):
+            offs = (
+                INTERNAL_RANDO_CLASS_WEIGHTS_OFFS
+                + i * INTERNAL_RANDO_CLASS_WEIGHT_ENTRY_SIZE
+            )
+            for j in range(INTERNAL_RANDO_CLASS_WEIGHT_NUM_CLASSES):
+                job_id = self.rom[offs + j]
+                if not job_id or job_id >= 255:
+                    break
+                job = self.jobs_by_id[job_id]
+                if job.name == "Dracozombie":
+                    continue
+                unpromoted_pool, promoted_pool = (
+                    jobset.pools()
+                    # We _could_ repoint this and not need to check, but eh
+                    if len(jobset) >= INTERNAL_RANDO_WEAPONS_MAX_CLASSES
+                    else (self.unpromoted_jobs, self.promoted_jobs)
+                )
+                new_job = self.select_new_job(
+                    job,
+                    unpromoted_pool=unpromoted_pool,
+                    promoted_pool=promoted_pool,
+                    job_valid=job_valid_for_internal_rando,
+                )
+                self.rom[offs + j] = new_job.id
+                jobset.add(new_job)
+
+        # CR-someday cam: There is a lot of hardcoding going on here. It would
+        # be nice to move some of the special-casing here to the data files.
+        for i, job in enumerate(jobset.iter()):
+            offs = INTERNAL_RANDO_WEAPONS_OFFS + i * INTERNAL_RANDO_WEAPONS_ENTRY_SIZE
+            row1: Tuple[int, int, int, int, int]
+            row1weights: Tuple[int, int, int, int, int]
+            row1distrib: Tuple[int, int, int, int, int]
+            if "Claw" in job.tags:
+                pwr, distrib = {
+                    "Revenant": (0, 1),
+                    "Entombed": (1, 3),
+                    "Bael": (2, 26),
+                    "Elder Bael": (3, 27),
+                }[job.name]
+                idx = weapon_tables[("Claw", pwr)]
+                row1 = (idx, 0, 0, 0, 0)
+                row1weights = (100, 0, 0, 0, 0)
+                row1distrib = (distrib, 0, 0, 0, 0)
+            elif "Fang" in job.tags:
+                pwr = 1 if job.is_promoted else 0
+                idx = weapon_tables[("Fang", pwr)]
+                row1 = (idx, 0, 0, 0, 0)
+                row1weights = ((25, 75) if job.is_promoted else (75, 25)) + (0, 0, 0)
+                row1distrib = (13, 0, 0, 0, 0)
+            elif "MonsterDark" in job.tags:
+                match job.name:
+                    case "Mogall":
+                        idx = weapon_tables[("MonsterDark", 0)]
+                        distrib_idx = 45
+                    case "Arch Mogall":
+                        idx = weapon_tables[("MonsterDark", 1)]
+                        distrib_idx = 47
+                    case "Gorgon":
+                        idx = weapon_tables[("MonsterDark", 3)]
+                        distrib_idx = 49
+                    case other:
+                        raise ValueError(
+                            f"BUG: unhandled class {other} tagged as `MonsterDark`"
+                        )
+                row1 = (idx, 0, 0, 0, 0)
+                row1weights = (100, 0, 0, 0, 0)
+                row1distrib = (distrib_idx, 0, 0, 0, 0)
+            elif len(job.usable_weapons) > 1:
+                lo_pwr, mid_pwr, hi_pwr = (2, 3, 4) if job.is_promoted else (0, 1, 2)
+                lo_kind1, lo_kind2 = self.random.sample(list(job.usable_weapons), k=2)
+                lo_idx1 = weapon_tables[(lo_kind1, lo_pwr)]
+                lo_idx2 = weapon_tables[(lo_kind2, lo_pwr)]
+                hi_kind1, hi_kind2 = self.random.sample(list(job.usable_weapons), k=2)
+                hi_idx1 = weapon_tables[(hi_kind1, hi_pwr)]
+                hi_idx2 = weapon_tables[(hi_kind2, hi_pwr)]
+                mid_kind = self.random.choice((lo_kind1, lo_kind2, hi_kind1, hi_kind2))
+                mid_idx = weapon_tables[(mid_kind, mid_pwr)]
+                row1 = (lo_idx1, hi_idx1, mid_idx, lo_idx2, hi_idx2)
+                row1weights = (23, 15, 25, 22, 15)
+                # doens't typecheck
+                # row1distrib = tuple(
+                #    self.random.choice(self.valid_distribs_by_row[row]) for row in row1
+                # )
+                row1distrib = (
+                    self.random.choice(self.valid_distribs_by_row[row1[0]]),
+                    self.random.choice(self.valid_distribs_by_row[row1[1]]),
+                    self.random.choice(self.valid_distribs_by_row[row1[2]]),
+                    self.random.choice(self.valid_distribs_by_row[row1[3]]),
+                    self.random.choice(self.valid_distribs_by_row[row1[4]]),
+                )
+            else:
+                kind = list(job.usable_weapons)[0]
+                lo_pwr, mid_pwr, hi_pwr = (2, 3, 4) if job.is_promoted else (0, 1, 2)
+                lo_idx = weapon_tables[(kind, lo_pwr)]
+                mid_idx = weapon_tables[(kind, mid_pwr)]
+                hi_idx = weapon_tables[(kind, hi_pwr)]
+                row1 = (lo_idx, mid_idx, hi_idx, 0, 0)
+                row1weights = (30, 35, 35, 0, 0)
+                row1distrib = (
+                    self.random.choice(self.valid_distribs_by_row[row1[0]]),
+                    self.random.choice(self.valid_distribs_by_row[row1[1]]),
+                    self.random.choice(self.valid_distribs_by_row[row1[2]]),
+                    0,
+                    0,
+                )
+
+            self.rom[offs] = job.id
+            self.rom[offs + 1 : offs + 6] = bytes(row1)
+            self.rom[offs + 11 : offs + 16] = bytes(row1weights)
+            self.rom[offs + 21 : offs + 26] = bytes(row1distrib)
 
     def make_monsters_mounted(self) -> None:
         for job in MOUNTED_MONSTERS:

@@ -2,19 +2,17 @@
 Archipelago World definition for Fire Emblem: Sacred Stones
 """
 
+from typing import ClassVar, Optional, Callable, Set, Tuple, Any
 import os
-import logging
-import hashlib
-import pkgutil
-from typing import ClassVar, Optional, Callable, Set
+
+# import logging
 
 from worlds.AutoWorld import World, WebWorld
-from BaseClasses import Region, ItemClassification, CollectionState, Tutorial
+from BaseClasses import Region, ItemClassification, CollectionState, Tutorial, MultiWorld
 import settings
-from Utils import user_path
 
 from .client import FE8Client
-from .options import fe8_options
+from .options import FE8Options
 from .constants import (
     FE8_NAME,
     FE8_ID_PREFIX,
@@ -22,6 +20,7 @@ from .constants import (
     WEAPON_TYPES,
     NUM_WEAPON_LEVELS,
     HOLY_WEAPONS,
+    FILLER_ITEMS,
 )
 from .locations import FE8Location
 from .items import FE8Item
@@ -32,32 +31,6 @@ from .rom import FE8DeltaPatch, generate_output
 # We need to import FE8Client to register it properly, so we use it to disable
 # the unused import warning
 _ = FE8Client
-
-try:
-    connector_script_path = os.path.join(user_path("data", "lua"), "connector_fe8.lua")
-
-    if not os.path.exists(connector_script_path):
-        with open(connector_script_path, "wb") as connector_script_file:
-            connector = pkgutil.get_data(__name__, "data/connector_fe8.lua")
-            if connector is None:
-                raise IOError
-            connector_script_file.write(connector)
-    else:
-        with open(connector_script_path, "rb+") as connector_script_file:
-            expected_script = pkgutil.get_data(__name__, "data/connector_fe8.lua")
-            if expected_script is None:
-                raise IOError
-            expected_hash = hashlib.md5(expected_script).digest()
-            existing_hash = hashlib.md5(connector_script_file.read()).digest()
-
-            if existing_hash != expected_hash:
-                connector_script_file.seek(0)
-                connector_script_file.truncate()
-                connector_script_file.write(expected_script)
-except IOError:
-    logging.warning(
-        "Unable to copy connector_fe8.lua to /data/lua in your Archipelago install."
-    )
 
 
 class FE8WebWorld(WebWorld):
@@ -103,17 +76,37 @@ class FE8World(World):
 
     game = FE8_NAME
     base_id = FE8_ID_PREFIX
-    option_definitions = fe8_options
+    options_dataclass = FE8Options
     settings_key = "fe8_settings"
     settings: ClassVar[FE8Settings]
     topology_present = False
     web = FE8WebWorld()
     progression_holy_weapons: Set[str] = set()
+    options: FE8Options
 
     # TODO: populate for real
     item_name_to_id = {name: id + FE8_ID_PREFIX for name, id in items}
     location_name_to_id = {name: id + FE8_ID_PREFIX for name, id in locations}
     item_name_groups = {"holy weapons": set(HOLY_WEAPONS.keys())}
+
+    @classmethod
+    def stage_assert_generate(cls, multiworld: MultiWorld) -> None:
+        if not os.path.exists(cls.settings.rom_file):
+            raise FileNotFoundError(cls.settings.rom_file)
+
+    def total_locations(self) -> int:
+        tower_checks_enabled = self.options.tower_checks_enabled()
+        ruins_checks_enabled = self.options.ruins_checks_enabled()
+
+        def is_included(loc: Tuple[str, int]):
+            name = loc[0]
+            if "Valni" in name and not tower_checks_enabled:
+                return False
+            if "Lagdou" in name and not ruins_checks_enabled:
+                return False
+            return True
+
+        return len([loc for loc in locations if is_included(loc)])
 
     def create_item_with_classification(
         self, item: str, cls: ItemClassification
@@ -136,10 +129,10 @@ class FE8World(World):
         )
 
     def create_items(self) -> None:
-        smooth_level_caps = self.multiworld.smooth_level_caps[self.player]
-        min_endgame_level_cap = self.multiworld.min_endgame_level_cap[self.player]
-        exclude_latona = self.multiworld.exclude_latona[self.player]
-        required_holy_weapons = self.multiworld.required_holy_weapons[self.player]
+        smooth_level_caps = self.options.smooth_level_caps
+        min_endgame_level_cap = int(self.options.min_endgame_level_cap)
+        exclude_latona = self.options.exclude_latona
+        required_holy_weapons = self.options.required_holy_weapons
 
         smooth_levelcap_max = 25 if smooth_level_caps else 10
 
@@ -147,14 +140,22 @@ class FE8World(World):
             max(min_endgame_level_cap, smooth_levelcap_max) - 10
         ) // 5
 
+        progression_items: list[FE8Item] = []
+        other_items: list[FE8Item] = []
+
+        def register(name: str, cls: ItemClassification):
+            (
+                progression_items
+                if cls == ItemClassification.progression
+                else other_items
+            ).append(self.create_item_with_classification(name, cls))
+
         for i in range(NUM_LEVELCAPS):
-            self.multiworld.itempool.append(
-                self.create_item_with_classification(
-                    "Progressive Level Cap",
-                    ItemClassification.progression
-                    if i < needed_level_uncaps
-                    else ItemClassification.useful,
-                )
+            register(
+                "Progressive Level Cap",
+                ItemClassification.progression
+                if i < needed_level_uncaps
+                else ItemClassification.useful,
             )
 
         holy_weapon_pool = set(HOLY_WEAPONS.keys())
@@ -171,24 +172,40 @@ class FE8World(World):
 
         for wtype in WEAPON_TYPES:
             for _ in range(NUM_WEAPON_LEVELS):
-                self.multiworld.itempool.append(
-                    self.create_item_with_classification(
-                        "Progressive Weapon Level ({})".format(wtype),
-                        ItemClassification.progression
-                        if wtype in progression_weapon_types
-                        else ItemClassification.useful,
-                    )
+                register(
+                    "Progressive Weapon Level ({})".format(wtype),
+                    ItemClassification.progression
+                    if wtype in progression_weapon_types
+                    else ItemClassification.useful,
                 )
 
         for hw in HOLY_WEAPONS:
-            self.multiworld.itempool.append(
-                self.create_item_with_classification(
-                    hw,
-                    ItemClassification.progression
-                    if hw in progression_holy_weapons
-                    else ItemClassification.useful,
-                )
+            register(
+                hw,
+                ItemClassification.progression
+                if hw in progression_holy_weapons
+                else ItemClassification.useful,
             )
+
+        total_locations = self.total_locations()
+
+        if len(progression_items) > total_locations:
+            raise ValueError(
+                "Could not place all requested weapon levels and level uncaps. "
+                "Reduce the number of required Holy Weapons or disable smooth level caps."
+            )
+
+        for item in progression_items:
+            self.multiworld.itempool.append(item)
+
+        self.random.shuffle(other_items)
+        for _ in range(len(progression_items), total_locations):
+            if other_items:
+                self.multiworld.itempool.append(other_items.pop())
+            else:
+                self.multiworld.itempool.append(
+                    self.create_item(self.random.choice(FILLER_ITEMS))
+                )
 
     def add_location_to_region(self, name: str, addr: Optional[int], region: Region):
         if addr is None:
@@ -200,8 +217,8 @@ class FE8World(World):
         region.locations.append(FE8Location(self.player, name, address, region))
 
     def create_regions(self) -> None:
-        smooth_level_caps = self.multiworld.smooth_level_caps[self.player]
-        min_endgame_level_cap = self.multiworld.min_endgame_level_cap[self.player]
+        smooth_level_caps = self.options.smooth_level_caps
+        min_endgame_level_cap = int(self.options.min_endgame_level_cap)
 
         menu = Region("Menu", self.player, self.multiworld)
         finalboss = Region("FinalBoss", self.player, self.multiworld)
@@ -212,8 +229,9 @@ class FE8World(World):
         self.add_location_to_region("Defeat Formortiis", None, finalboss)
 
         def level_cap_at_least(n: int) -> Callable[[CollectionState], bool]:
+            player = self.player
             def wrapped(state: CollectionState) -> bool:
-                return 10 + state.count("Progressive Level Cap", self.player) * 5 >= n
+                return 10 + state.count("Progressive Level Cap", player) * 5 >= n
 
             return wrapped
 
@@ -311,5 +329,62 @@ class FE8World(World):
 
             self.multiworld.regions.append(campaign)
 
+        if self.options.tower_checks_enabled():
+            tower = Region("Tower of Valni", self.player, self.multiworld)
+            self.multiworld.regions.append(tower)
+
+            self.add_location_to_region("Complete Tower of Valni 1", None, tower)
+            self.add_location_to_region("Complete Tower of Valni 2", None, tower)
+            self.add_location_to_region("Complete Tower of Valni 3", None, tower)
+            self.add_location_to_region("Complete Tower of Valni 4", None, tower)
+            self.add_location_to_region("Complete Tower of Valni 5", None, tower)
+            self.add_location_to_region("Complete Tower of Valni 6", None, tower)
+            self.add_location_to_region("Complete Tower of Valni 7", None, tower)
+            self.add_location_to_region("Complete Tower of Valni 8", None, tower)
+
+            if smooth_level_caps:
+                route_split.add_exits(
+                    {"Tower of Valni": "Complete Chapter 15"},
+                    {"Tower of Valni": level_cap_at_least(20)},
+                )
+                tower.add_exits(
+                    {"Post-routesplit": "Complete Tower of Valni 8"},
+                    {"Post-routesplit": level_cap_at_least(25)},
+                )
+            else:
+                campaign.add_exits({"Tower of Valni": "Complete Chapter 15"})
+                tower.add_exits({"Campaign": "Complete Tower of Valni 8"})
+
+        if self.options.ruins_checks_enabled():
+            ruins = Region("Lagdou Ruins", self.player, self.multiworld)
+            self.multiworld.regions.append(ruins)
+
+            self.add_location_to_region("Complete Lagdou Ruins 1", None, ruins)
+            self.add_location_to_region("Complete Lagdou Ruins 2", None, ruins)
+            self.add_location_to_region("Complete Lagdou Ruins 3", None, ruins)
+            self.add_location_to_region("Complete Lagdou Ruins 4", None, ruins)
+            self.add_location_to_region("Complete Lagdou Ruins 5", None, ruins)
+            self.add_location_to_region("Complete Lagdou Ruins 6", None, ruins)
+            self.add_location_to_region("Complete Lagdou Ruins 7", None, ruins)
+            self.add_location_to_region("Complete Lagdou Ruins 8", None, ruins)
+            self.add_location_to_region("Complete Lagdou Ruins 9", None, ruins)
+            self.add_location_to_region("Complete Lagdou Ruins 10", None, ruins)
+
+            if smooth_level_caps:
+                lategame.add_exits(
+                    {"Lagdou Ruins": "Complete Chapter 19"},
+                    {"Lagdou Ruins": finalboss_rule},
+                )
+                ruins.add_exits({"Post-routesplit": "Complete Lagdou Ruins 10"})
+            else:
+                campaign.add_exits({"Lagdou Ruins": "Complete Chapter 19"})
+                tower.add_exits({"Campaign": "Complete Lagdou Ruins 10"})
+
+    def fill_slot_data(self) -> dict[str, Any]:
+        slot_data = self.options.as_dict("goal")
+        return slot_data
+
     def generate_output(self, output_directory: str) -> None:
-        generate_output(self.multiworld, self.player, output_directory, self.random)
+        generate_output(
+            self.multiworld, self.options, self.player, output_directory, self.random
+        )
