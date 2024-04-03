@@ -53,7 +53,7 @@ class FE8WebWorld(WebWorld):
 
 class FE8Settings(settings.Group):
     class FE8RomFile(settings.UserFilePath):
-        """File name of your Fire Emblem: The Sacred Stones (U) ROM"""
+        """File name of your Fire Emblem - The Sacred Stones (U) ROM"""
 
         description = "FE8 ROM file"
         copy_to = "Fire Emblem: The Sacred Stones (U).gba"
@@ -315,7 +315,7 @@ class FE8World(World):
                 {"FinalBoss": finalboss_rule},
             )
         else:
-            campaign = Region("MainCampaign", self.player, self.multiworld)
+            campaign = Region("Campaign", self.player, self.multiworld)
 
             for name, lid in locations:
                 if "Formortiis" not in name:
