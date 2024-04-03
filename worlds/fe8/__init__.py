@@ -53,10 +53,10 @@ class FE8WebWorld(WebWorld):
 
 class FE8Settings(settings.Group):
     class FE8RomFile(settings.UserFilePath):
-        """File name of your Fire Emblem - The Sacred Stones (U) ROM"""
+        """File name of your Fire Emblem: The Sacred Stones (U) ROM"""
 
         description = "FE8 ROM file"
-        copy_to = "Fire Emblem: The Sacred Stones (U).gba"
+        copy_to = "Fire Emblem The Sacred Stones (U).gba"
         md5s = [FE8DeltaPatch.hash]
 
     rom_file: FE8RomFile = FE8RomFile(FE8RomFile.copy_to)
