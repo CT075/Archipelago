@@ -318,8 +318,10 @@ class FE8World(World):
             campaign = Region("Campaign", self.player, self.multiworld)
 
             for name, lid in locations:
-                if "Formortiis" not in name:
-                    self.add_location_to_region(name, lid, campaign)
+                # TODO (cam): do this better
+                if any(item in name for item in ("Formortiis", "Valni", "Lagdou")):
+                    continue
+                self.add_location_to_region(name, lid, campaign)
 
             menu.connect(campaign, "Start Game")
             campaign.add_exits(
@@ -329,6 +331,7 @@ class FE8World(World):
 
             self.multiworld.regions.append(campaign)
 
+        # TODO (cam): These regions don't make much sense.
         if self.options.tower_checks_enabled():
             tower = Region("Tower of Valni", self.player, self.multiworld)
             self.multiworld.regions.append(tower)
@@ -378,7 +381,7 @@ class FE8World(World):
                 ruins.add_exits({"Post-routesplit": "Complete Lagdou Ruins 10"})
             else:
                 campaign.add_exits({"Lagdou Ruins": "Complete Chapter 19"})
-                tower.add_exits({"Campaign": "Complete Lagdou Ruins 10"})
+                ruins.add_exits({"Campaign": "Complete Lagdou Ruins 10"})
 
     def fill_slot_data(self) -> dict[str, Any]:
         slot_data = self.options.as_dict("goal")
