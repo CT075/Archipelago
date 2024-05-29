@@ -524,7 +524,7 @@ class FE8Randomizer:
         job: JobData,
         unpromoted_pool: Iterable[JobData],
         promoted_pool: Iterable[JobData],
-        job_valid: Callable[[JobData], [bool]],
+        job_valid: Callable[[JobData], bool],
     ) -> JobData:
         new_job_pool = promoted_pool if job.is_promoted else unpromoted_pool
         return self.random.choice([job for job in new_job_pool if job_valid(job)])
@@ -755,7 +755,7 @@ class FE8Randomizer:
                 pwr = 1 if job.is_promoted else 0
                 idx = weapon_tables[("Fang", pwr)]
                 row1 = (idx, 0, 0, 0, 0)
-                row1weights = ((25, 75) if job.is_promoted else (75, 25)) + (0, 0, 0)
+                row1weights = ((25, 75, 0, 0, 0) if job.is_promoted else (75, 25, 0, 0, 0))
                 row1distrib = (13, 0, 0, 0, 0)
             elif "MonsterDark" in job.tags:
                 match job.name:
