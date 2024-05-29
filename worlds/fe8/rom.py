@@ -3,17 +3,11 @@
 # `fe8py` makes semantic changes to the game itself (meaning the core
 # randomization, stat tweaks, etc).
 
-import pkgutil
-import bsdiff4  # type: ignore
-import os
 import json
 from random import Random
 from typing import TYPE_CHECKING
 
-from BaseClasses import MultiWorld
 from worlds.Files import (
-    APDeltaPatch,
-    APProcedurePatch,
     APTokenMixin,
     APTokenTypes,
     APProcedurePatch,
@@ -25,7 +19,6 @@ from .items import FE8Item
 from .locations import FE8Location
 from .constants import FE8_NAME, ROM_BASE_ADDRESS
 from .options import FE8Options
-from .util import write_short_le
 from .connector_config import (
     SLOT_NAME_ADDR,
     SUPER_DEMON_KING_OFFS,
@@ -57,13 +50,13 @@ class FE8PatchExtension(APPatchExtension):
         randomizer = FE8Randomizer(rom=mut_rom, random=random, config=config)
         randomizer.apply_base_changes()
 
-        if config['shuffle_skirmish_tables']:
+        if config["shuffle_skirmish_tables"]:
             randomizer.randomize_monster_gen()
 
-        if config['easier_5x']:
+        if config["easier_5x"]:
             randomizer.apply_5x_buffs()
 
-        if config['unbreakable_regalia']:
+        if config["unbreakable_regalia"]:
             randomizer.apply_infinite_holy_weapons()
 
         return bytes(mut_rom)

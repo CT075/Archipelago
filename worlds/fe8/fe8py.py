@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from enum import IntEnum
 import logging
 
-from typing import Any, Union, Optional, Callable, Iterable, Tuple, TYPE_CHECKING
+from typing import Any, Union, Optional, Callable, Iterable, Tuple
 
 from .util import fetch_json, write_short_le, read_short_le, read_word_le
 from .constants import (
@@ -335,7 +335,7 @@ class CharacterStore:
         return name in self.character_jobs
 
 
-# TODO: Eirika and Ephraim should be able to use their respective weapons if
+# CR cam: Eirika and Ephraim should be able to use their respective weapons if
 # they get randomized into the right class.
 def weapon_usable(weapon: WeaponData, job: JobData, logic: dict[str, Any]) -> bool:
     if weapon.kind not in job.usable_weapons:
@@ -354,7 +354,9 @@ def weapon_usable(weapon: WeaponData, job: JobData, logic: dict[str, Any]) -> bo
     return True
 
 
-# TODO: ensure that all the progression weapons are usable
+# CR cam: ensure that all the progression weapons are usable
+# CR-soon cam: This class does way too much. We should refactor this so things
+# like `apply_5x_buffs` can happen external to this class.
 class FE8Randomizer:
     unit_blocks: dict[str, list[UnitBlock]]
     weapons_by_id: dict[int, WeaponData]
