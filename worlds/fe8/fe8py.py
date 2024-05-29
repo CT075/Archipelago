@@ -62,7 +62,6 @@ from .constants import (
     INTERNAL_RANDO_WEAPON_TABLE_ROWS,
 )
 
-
 DEBUG = False
 
 
@@ -336,7 +335,7 @@ class CharacterStore:
         return name in self.character_jobs
 
 
-# TODO: Eirika and Ephraim should be able to use their respective weapons if
+# CR cam: Eirika and Ephraim should be able to use their respective weapons if
 # they get randomized into the right class.
 def weapon_usable(weapon: WeaponData, job: JobData, logic: dict[str, Any]) -> bool:
     if weapon.kind not in job.usable_weapons:
@@ -355,7 +354,9 @@ def weapon_usable(weapon: WeaponData, job: JobData, logic: dict[str, Any]) -> bo
     return True
 
 
-# TODO: ensure that all the progression weapons are usable
+# CR cam: ensure that all the progression weapons are usable
+# CR-soon cam: This class does way too much. We should refactor this so things
+# like `apply_5x_buffs` can happen external to this class.
 class FE8Randomizer:
     unit_blocks: dict[str, list[UnitBlock]]
     weapons_by_id: dict[int, WeaponData]
@@ -524,7 +525,7 @@ class FE8Randomizer:
         job: JobData,
         unpromoted_pool: Iterable[JobData],
         promoted_pool: Iterable[JobData],
-        job_valid: Callable[[JobData], [bool]],
+        job_valid: Callable[[JobData], bool],
     ) -> JobData:
         new_job_pool = promoted_pool if job.is_promoted else unpromoted_pool
         return self.random.choice([job for job in new_job_pool if job_valid(job)])
@@ -755,7 +756,7 @@ class FE8Randomizer:
                 pwr = 1 if job.is_promoted else 0
                 idx = weapon_tables[("Fang", pwr)]
                 row1 = (idx, 0, 0, 0, 0)
-                row1weights = ((25, 75) if job.is_promoted else (75, 25)) + (0, 0, 0)
+                row1weights = ((25, 75, 0, 0, 0) if job.is_promoted else (75, 25, 0, 0, 0))
                 row1distrib = (13, 0, 0, 0, 0)
             elif "MonsterDark" in job.tags:
                 match job.name:
