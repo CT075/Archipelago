@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from enum import IntEnum
 import logging
 
-from typing import Any, Union, Optional, Callable, Iterable, Tuple
+from typing import Any, Union, Optional, Callable, Iterable, Tuple, TYPE_CHECKING
 
 from .util import fetch_json, write_short_le, read_short_le, read_word_le
 from .constants import (
@@ -61,7 +61,6 @@ from .constants import (
     INTERNAL_RANDO_WEAPONS_MAX_CLASSES,
     INTERNAL_RANDO_WEAPON_TABLE_ROWS,
 )
-
 
 DEBUG = False
 
