@@ -144,6 +144,23 @@ class ShuffleSkirmishTables(Toggle):
     default = 1
 
 
+class LockpickUsability(Choice):
+    """
+    Allow units other than thieves to use lockpicks and the Rogue's Pick
+    command.
+
+    - Vanilla: Only Thieves, Assassins and Rogues can use lockpicks.
+    - Global Lockpicks: All characters can use lockpicks.
+    - Global Rogue pick: In addition to global lockpicks, all characters can use
+      the Rogue class's "Pick" command.
+    """
+
+    display_name = "Lockpick usability"
+    option_Vanilla = 0
+    option_GlobalLockpicks = 1
+    option_GlobalRoguePick = 2
+
+
 # CR-someday cam: think about how this interacts with chapter select mode
 class Goal(Choice):
     """
@@ -157,9 +174,6 @@ class Goal(Choice):
 
     Note that this option only change which check is considered the goal and
     does not affect progressing logic at all.
-
-    Supported values: traditional, inactive
-    Default value: traditional
     """
 
     display_name = "Goal"
@@ -184,6 +198,7 @@ class FE8Options(PerGameCommonOptions):
     tower_enabled: EnableTower
     ruins_enabled: EnableRuins
     shuffle_skirmish_tables: ShuffleSkirmishTables
+    lockpick_usability: LockpickUsability
     goal: Goal
 
     # Convenience methods for options that imply each other

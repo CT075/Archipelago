@@ -22,6 +22,7 @@ from .options import FE8Options
 from .connector_config import (
     SLOT_NAME_ADDR,
     SUPER_DEMON_KING_OFFS,
+    LOCKPICK_USABILITY_OFFS,
     LOCATION_INFO_OFFS,
     LOCATION_INFO_SIZE,
 )
@@ -135,5 +136,6 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
             patch.write_short_le(rom_loc, AP_ITEM_KIND)
 
     patch.write_byte(SUPER_DEMON_KING_OFFS, int(bool(options.super_demon_king)))
+    patch.write_byte(LOCKPICK_USABILITY_OFFS, int(options.lockpick_usability))
 
     patch.write_file("token_data.bin", patch.get_token_binary())
