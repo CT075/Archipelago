@@ -98,6 +98,7 @@ class ExcludeLatona(Toggle):
 
 # Cam: Should we make this a sliding scale?
 class Easier5x(Toggle):
+
     """
     Give Ephraim, Forde and Kyle extra base stats. This is recommended to make
     chapter 5x significantly less of a slog.
@@ -105,6 +106,20 @@ class Easier5x(Toggle):
 
     display_name = "Buff Ephraim's party for chapter 5x"
     default = 1
+
+   
+class SecureRoss(Toggle):
+    """
+    How the game makes sure you get Ross.
+    1. Force Vanessa to be a flier.
+    2. Change 2 tiles to be planes and not mountains.
+    3. Force any of Eirika->Vanessa to be a flier.
+    """
+
+    display_name = "Recruit Ross helper"
+    Vanessa = 0
+    Map = 1
+    Early = 2
 
 
 class UnbreakableRegalia(Toggle):
@@ -283,6 +298,7 @@ class FE8Options(PerGameCommonOptions):
     required_holy_weapons: MinimumUsableHolyWeapons
     exclude_latona: ExcludeLatona
     easier_5x: Easier5x
+    Sercure_Ross: SecureRoss
     unbreakable_regalia: UnbreakableRegalia
     tower_enabled: EnableTower
     ruins_enabled: EnableRuins
