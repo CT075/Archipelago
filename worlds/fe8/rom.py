@@ -50,6 +50,8 @@ class FE8PatchExtension(APPatchExtension):
         random = Random(config["seed"] + config["player"])
         mut_rom = bytearray(rom)
         randomizer = FE8Randomizer(rom=mut_rom, random=random, config=config)
+        randomizer.Secure_Ross()
+
         randomizer.apply_base_changes()
 
         if config["shuffle_skirmish_tables"]:
@@ -63,6 +65,8 @@ class FE8PatchExtension(APPatchExtension):
 
         if config["normalize_genders"]:
             randomizer.normalize_genders()
+        
+
 
         randomizer.randomize_growths(*config["growth_rando"])
         randomizer.randomize_music(config["music_rando"])
@@ -117,6 +121,7 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
         "player_rando": bool(options.player_unit_rando),
         "player_monster": bool(options.player_unit_monsters),
         "easier_5x": bool(options.easier_5x),
+        "Sercure_Ross": int(options.Sercure_Ross),
         "unbreakable_regalia": bool(options.unbreakable_regalia),
         "shuffle_skirmish_tables": bool(options.shuffle_skirmish_tables),
         "normalize_genders": bool(options.normalize_genders),
@@ -152,5 +157,6 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
     patch.write_byte(SUPER_DEMON_KING_OFFS, int(bool(options.super_demon_king)))
     patch.write_byte(LOCKPICK_USABILITY_OFFS, int(options.lockpick_usability))
     patch.write_byte(DEATH_LINK_KIND_OFFS, int(options.death_link))
+  
 
     patch.write_file("token_data.bin", patch.get_token_binary())
