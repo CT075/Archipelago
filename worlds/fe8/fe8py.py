@@ -68,6 +68,7 @@ from .constants import (
     INTERNAL_RANDO_WEAPONS_ENTRY_SIZE,
     INTERNAL_RANDO_WEAPONS_MAX_CLASSES,
     INTERNAL_RANDO_WEAPON_TABLE_ROWS,
+    ROSS_CH2_MAP_OFFSET,
     FEMALE_JOBS,
     SONG_TABLE_BASE,
     SONG_SIZE,
@@ -784,6 +785,23 @@ class FE8Randomizer:
                 continue
             self.randomize_chapter_unit(offset, logic)
 
+    #handles the say to save ross in chapter 2 by editing the map or by setting vanessa / early game units classes
+
+    def Secure_Ross(self) -> None:
+        if self.config["Sercure_Ross"]== 1: #map edit
+            list(self.unit_blocks.items())[2][1][0].logic.clear() #stop force vanessa flier
+            #make path to ross
+            self.rom[ROSS_CH2_MAP_OFFSET]=156
+            self.rom[ROSS_CH2_MAP_OFFSET + 1]=11
+            self.rom[ROSS_CH2_MAP_OFFSET + 2]=168
+            self.rom[ROSS_CH2_MAP_OFFSET + 3]=1
+            #make map look nicer
+            self.rom[ROSS_CH2_MAP_OFFSET +31]=196
+            
+        elif self.config["Sercure_Ross"]== 2: #early game unit only
+            list(self.unit_blocks.items())[2][1][0].logic.clear()
+
+
     # Randomize the classes and possible invtories for the game's internal
     # randomizer (used for skirmishes, tower/ruins, and the two random Wights
     # with Lyon for some reason).
@@ -1030,19 +1048,22 @@ class FE8Randomizer:
         # Eirika's Rapier is given in a cutscene at the start of the chapter,
         # rather than being in her inventory
         eirika_job = self.character_store["Eirika"]
-        if any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
-            new_rapier = self.select_new_item(
-                eirika_job, self.weapons_by_name["Steel Blade"].id, {}
-            )
-        else:
-            new_rapier = self.random.choice(
-                [
-                    self.weapons_by_name["Heal"],
-                    self.weapons_by_name["Mend"],
-                    self.weapons_by_name["Recover"],
-                ]
-            ).id
-        self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
+        if (eirika_job.id > 2):
+            if any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
+                new_rapier = self.select_new_item(
+                    eirika_job, self.weapons_by_name["Steel Blade"].id, {}
+                )
+            else:
+                new_rapier = self.random.choice(
+                    [
+                        self.weapons_by_name["Heal"],
+                        self.weapons_by_name["Mend"],
+                        self.weapons_by_name["Recover"],
+                    ]
+                ).id
+                self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
+        elif eirika_job.id == 1:
+            self.rom[EIRIKA_RAPIER_OFFSET]= self.weapons_by_name["Reginleif"].id
 
         # While we force Vanessa to fly to give Ross a fighting chance, it's
         # very possible that she won't be able to lift him. To make it more
@@ -1115,7 +1136,6 @@ class FE8Randomizer:
                 break
             i = self.random.choice(available_indices)
             result[i] += overflow
-            overflow = 0
             if result[i] > 255:
                 overflow = result[i] - 255
                 result[i] = 255
