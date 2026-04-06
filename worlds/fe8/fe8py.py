@@ -787,9 +787,9 @@ class FE8Randomizer:
 
     #handles the say to save ross in chapter 2 by editing the map or by setting vanessa / early game units classes
 
-    def Secure_Ross(self) -> None:
+    def secure_ross(self) -> None:
         if self.config["Sercure_Ross"]== 1: #map edit
-            list(self.unit_blocks.items())[2][1][0].logic.clear() #stop force vanessa flier
+            list(self.unit_blocks.items())[2][1][0].logic[0]["must_fly"] =False #stop force vanessa flier
             #make path to ross
             self.rom[ROSS_CH2_MAP_OFFSET]=156
             self.rom[ROSS_CH2_MAP_OFFSET + 1]=11
@@ -799,8 +799,10 @@ class FE8Randomizer:
             self.rom[ROSS_CH2_MAP_OFFSET +31]=196
             
         elif self.config["Sercure_Ross"]== 2: #early game unit only
-            list(self.unit_blocks.items())[2][1][0].logic.clear()
+            list(self.unit_blocks.items())[2][1][0].logic[0]["must_fly"] =False
 
+    def early_flyer(self) -> None:
+        list(self.unit_blocks.items())[2][1][0].logic[0]["must_fly"] =False
 
     # Randomize the classes and possible invtories for the game's internal
     # randomizer (used for skirmishes, tower/ruins, and the two random Wights
@@ -1048,7 +1050,7 @@ class FE8Randomizer:
         # Eirika's Rapier is given in a cutscene at the start of the chapter,
         # rather than being in her inventory
         eirika_job = self.character_store["Eirika"]
-        if (eirika_job.id > 2):
+        if (self.config["player_rando"]):
             if any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
                 new_rapier = self.select_new_item(
                     eirika_job, self.weapons_by_name["Steel Blade"].id, {}
@@ -1062,8 +1064,7 @@ class FE8Randomizer:
                     ]
                 ).id
                 self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
-        elif eirika_job.id == 1:
-            self.rom[EIRIKA_RAPIER_OFFSET]= self.weapons_by_name["Reginleif"].id
+
 
         # While we force Vanessa to fly to give Ross a fighting chance, it's
         # very possible that she won't be able to lift him. To make it more
