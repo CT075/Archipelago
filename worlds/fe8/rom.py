@@ -49,9 +49,12 @@ class FE8PatchExtension(APPatchExtension):
         random = Random(config["seed"] + config["player"])
         mut_rom = bytearray(rom)
         randomizer = FE8Randomizer(rom=mut_rom, random=random, config=config)
-        randomizer.Secure_Ross()
+        randomizer.secure_ross()
 
         randomizer.apply_base_changes()
+
+        if config["Sercure_Ross"]== 2:
+            randomizer.early_flyer()
 
         if config["shuffle_skirmish_tables"]:
             randomizer.randomize_monster_gen()
