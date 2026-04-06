@@ -108,7 +108,7 @@ class Easier5x(Toggle):
     default = 1
 
    
-class SecureRoss(Toggle):
+class SecureRoss(Choice):
     """
     How the game makes sure you get Ross.
     1. Force Vanessa to be a flier.
