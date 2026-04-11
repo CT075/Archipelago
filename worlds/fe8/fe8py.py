@@ -410,6 +410,7 @@ class CharacterStore:
         else:
             name = char
         return self.character_tags[name]
+    
 
     def __setitem__(self, char: Union[int, str], job: JobData) -> None:
         if isinstance(char, int):
@@ -423,6 +424,9 @@ class CharacterStore:
     def __getitem__(self, char: Union[int, str]):
         name = char if isinstance(char, str) else self.names_by_id[char]
         return self.character_jobs[name]
+    
+    def __delitem__(self, key):
+        pass
 
     def __contains__(self, char: Union[int, str]) -> bool:
         if isinstance(char, int):
@@ -1162,7 +1166,7 @@ class FE8Randomizer:
             ability_4_base = character_entry + CHAR_ABILITY_4_OFFSET
             self.rom[ability_4_base] |= lock_mask
 
-    def fix_cutscenes(self) -> None:
+    def fix_Eirika_Rapier(self) -> None:
         # Eirika's Rapier is given in a cutscene at the start of the chapter,
         # rather than being in her inventory
 
@@ -1187,7 +1191,7 @@ class FE8Randomizer:
         # likely will give you a extra turn to reach him.
         self.rom[ROSS_CH2_HP_OFFSET] = 15
 
-        # Eirika and Ephraim get automatic steels on rejoining in Ch15, which
+        # Ephraim get automatic steels on rejoining in Ch15, which
         # need to be adjusted.
         ch15_auto_steel_sword = self.select_new_item(
             eirika_job, self.weapons_by_name["Steel Sword"].id, {}

@@ -75,17 +75,12 @@ def open_patch():
             launch([*exe, file], component.cli)
 
 
-def generate_yamls(*args):
+def generate_yamls():
     from Options import generate_yaml_templates
-
-    parser = argparse.ArgumentParser(description="Generate Template Options", usage="[-h] [--skip_open_folder]")
-    parser.add_argument("--skip_open_folder", action="store_true")
-    args = parser.parse_args(args)
 
     target = Utils.user_path("Players", "Templates")
     generate_yaml_templates(target, False)
-    if not args.skip_open_folder:
-        open_folder(target)
+    open_folder(target)
 
 
 def browse_files():
@@ -458,7 +453,7 @@ def main(args: argparse.Namespace | dict | None = None):
     elif not args:
         args = {}
 
-    path = args.get("Patch|Game|Component|url", None)
+    path = './fire.apfe8'
     if path is not None:
         if path.startswith("archipelago://"):
             args["args"] = (path, *args.get("args", ()))
@@ -489,7 +484,7 @@ def main(args: argparse.Namespace | dict | None = None):
 
 if __name__ == '__main__':
     init_logging('Launcher')
-    multiprocessing.freeze_support()
+    multiprocessing.freeze_support() #Utils.freeze_support()
     multiprocessing.set_start_method("spawn")  # if launched process uses kivy, fork won't work
     parser = argparse.ArgumentParser(
         description='Archipelago Launcher',
