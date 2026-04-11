@@ -8,7 +8,7 @@
         },
         {"name": "ONeillGroup", "base": 9124944, "count": 3, "logic": {}},
         {
-            "name": "RenaisCastleGuards",
+            "name": "PlayerRenaisCastleGuards",
             "base": 9125144,
             "count": 8,
             "logic": {"3": {"no_store": true}, "4": {"no_store": true}}
@@ -22,7 +22,7 @@
         {"name": "label30", "base": 9125424, "count": 4, "logic": {}},
         {"name": "label31", "base": 9125524, "count": 6, "logic": {}},
         {
-            "name": "EirikaFranzSeth",
+            "name": "PlayerEirikaFranzSeth",
             "base": 9125736,
             "count": 3,
             "logic": {"0": {"must_fight": true}}
@@ -42,13 +42,13 @@
             "count": 7,
             "logic": {"0": {"must_fight": true}}
         },
-        {"name": "label35", "base": 9126268, "count": 2, "logic": {}},
+        {"name": "PlayerFranzGilliam", "base": 9126268, "count": 2, "logic": {}},
         {"name": "label32", "base": 9126408, "count": 2, "logic": {}},
         {"name": "EasternReinforcements", "base": 9126328, "count": 3, "logic": {}}
     ],
     "Ch2": [
         {
-            "name": "VanessaMoulder",
+            "name": "PlayerVanessaMoulder",
             "base": 9126864,
             "count": 2,
             "logic": {"0": {"must_fly": true}}
@@ -57,7 +57,7 @@
         {"name": "StartingEnemies", "base": 9126724, "count": 6, "logic": {}},
         {"name": "label28", "base": 9126924, "count": 1, "logic": {}},
         {
-            "name": "RossGarcia",
+            "name": "PlayerRossGarcia",
             "base": 9126964,
             "count": 2,
             "logic": {"1": {"must_fight": true}}

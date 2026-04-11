@@ -53,9 +53,9 @@ class FE8PatchExtension(APPatchExtension):
         randomizer.secure_ross()
 
         randomizer.apply_base_changes()
-
-        if config["Sercure_Ross"]== 2:
-            randomizer.early_flyer()
+        #if config["Sercure_Ross"]== 2:
+        randomizer.early_flyer()
+ 
 
         if config["shuffle_skirmish_tables"]:
             randomizer.randomize_monster_gen()
@@ -73,6 +73,7 @@ class FE8PatchExtension(APPatchExtension):
 
         randomizer.randomize_growths(*config["growth_rando"])
         randomizer.randomize_music(config["music_rando"])
+
 
         return bytes(mut_rom)
 

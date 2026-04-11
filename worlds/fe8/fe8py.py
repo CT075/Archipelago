@@ -336,6 +336,7 @@ class CharacterStore:
         else:
             name = char
         return self.character_tags[name]
+    
 
     def __setitem__(self, char: Union[int, str], job: JobData) -> None:
         if isinstance(char, int):
@@ -349,6 +350,9 @@ class CharacterStore:
     def __getitem__(self, char: Union[int, str]):
         name = char if isinstance(char, str) else self.names_by_id[char]
         return self.character_jobs[name]
+    
+    def __delitem__(self, key):
+        pass
 
     def __contains__(self, char: Union[int, str]) -> bool:
         if isinstance(char, int):
@@ -584,7 +588,7 @@ class FE8Randomizer:
             return job
         return self.random.choice(choices)
 
-    def randomize_chapter_unit(self, data_offset: int, logic: dict[str, Any]) -> None:
+    def randomize_chapter_unit(self, data_offset: int, logic: dict[str, Any], notForce:bool=True) -> None:
         # We *could* read the full struct, but we only need a few individual
         # bytes, so we may as well extract them ad-hoc.
         unit = self.rom[data_offset : data_offset + CHAPTER_UNIT_SIZE]
@@ -624,7 +628,7 @@ class FE8Randomizer:
         autolevel = unit[3] & 1
         inventory = unit[INVENTORY_INDEX : INVENTORY_INDEX + INVENTORY_SIZE]
 
-        if char in self.character_store:
+        if notForce and char in self.character_store:
             new_job = self.character_store[char]
         else:
             new_job = self.select_new_job(
@@ -708,7 +712,63 @@ class FE8Randomizer:
             list(self.unit_blocks.items())[2][1][0].logic[0]["must_fly"] =False
 
     def early_flyer(self) -> None:
+        flag = False
+        units = [9125736 + CHAPTER_UNIT_SIZE * 0, 9125736 + CHAPTER_UNIT_SIZE * 1, 9125736 + CHAPTER_UNIT_SIZE * 2, 9126864 + CHAPTER_UNIT_SIZE * 0, 9126864 + CHAPTER_UNIT_SIZE * 1, 9126268+ CHAPTER_UNIT_SIZE]
+        for u in units:
+            unit = self.rom[u : u + CHAPTER_UNIT_SIZE]
+            job= self.jobs_by_id[unit[1]]
+            if "flying" in job.tags:
+                flag = True
+        if flag == False:
+            fly = 5 #self.random.randint(0,5)
+            if fly ==0: #seth
+                logic = list(self.unit_blocks.items())[0][1][7].logic
+                slot =0
+            elif fly ==1: #eirika
+                logic =list(self.unit_blocks.items())[0][1][7].logic
+                slot=1
+            elif fly==2: #franze
+                logic =list(self.unit_blocks.items())[0][1][7].logic
+                slot=3
+            elif fly==3: #vanessa
+                logic =list(self.unit_blocks.items())[2][1][0].logic
+                slot =0
+            elif fly==4: #molder
+                logic =list(self.unit_blocks.items())[2][1][1].logic
+                slot=1
+            elif fly==5: #gilliam
+                logic =list(self.unit_blocks.items())[1][1][0].logic
+                slot=0
+            logic[slot]["must_fly"] =True
+            self.rerando_chapter_unit(units[fly], logic[slot])
+
+            
+            
+
+        unit = self.rom[9126268+ CHAPTER_UNIT_SIZE :9126268 + 2 * CHAPTER_UNIT_SIZE]
+        job_id= unit[1]
+        job= self.jobs_by_id[job_id]
+        if "flying" not in job.tags:
+            list(self.unit_blocks.items())[2][1][0].logic[0]["must_fly"] =False
+
         list(self.unit_blocks.items())[2][1][0].logic[0]["must_fly"] =False
+
+    def rerando_chapter_unit(self, data_offset: int, logic: dict[str, Any]) -> None:
+        char = self.rom[data_offset]
+        self.randomize_chapter_unit(data_offset,logic, False)
+        for chapter_name, chapter in self.unit_blocks.items():
+            for block in chapter:
+                if block.name.startswith("Player"):
+                    try:
+                        self.randomize_block(block)
+                    except (ValueError, IndexError) as e:
+                        logging.error("crash dump:")
+                        logging.error(f"  block_data: {chapter_name}, {block.name}")
+                        logging.error(f"  {e}")
+                        raise
+        if char==1:
+            self.fix_Eirika_Rapier()
+        
 
     # Randomize the classes and possible invtories for the game's internal
     # randomizer (used for skirmishes, tower/ruins, and the two random Wights
@@ -950,7 +1010,7 @@ class FE8Randomizer:
             ability_4_base = character_entry + CHAR_ABILITY_4_OFFSET
             self.rom[ability_4_base] |= lock_mask
 
-    def fix_cutscenes(self) -> None:
+    def fix_Eirika_Rapier(self) -> None:
         # Eirika's Rapier is given in a cutscene at the start of the chapter,
         # rather than being in her inventory
         eirika_job = self.character_store["Eirika"]
@@ -967,25 +1027,35 @@ class FE8Randomizer:
                         self.weapons_by_name["Recover"],
                     ]
                 ).id
-                self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
+            self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
 
+        # Eirika get automatic steels on rejoining in Ch15, which
+        # need to be adjusted.
+        #moved here incase rerando hits Eirika
+        ch15_auto_steel_sword = self.select_new_item(
+            eirika_job, self.weapons_by_name["Steel Sword"].id, {}
+        )
+        self.rom[CH15_AUTO_STEEL_SWORD] = ch15_auto_steel_sword
+        
+
+    def fix_cutscenes(self) -> None:
+    
+        self.fix_Eirika_Rapier()
 
         # While we force Vanessa to fly to give Ross a fighting chance, it's
         # very possible that she won't be able to lift him. To make it more
         # reasonable to save him, we _also_ set his starting HP.
+        # Aegis- I made it so Vaness isnt always forced but keeping this here for same logic
         self.rom[ROSS_CH2_HP_OFFSET] = 15
 
-        # Eirika and Ephraim get automatic steels on rejoining in Ch15, which
+        # Ephraim get automatic steels on rejoining in Ch15, which
         # need to be adjusted.
-        ch15_auto_steel_sword = self.select_new_item(
-            eirika_job, self.weapons_by_name["Steel Sword"].id, {}
-        )
         ephraim_job = self.character_store["Ephraim"]
         ch15_auto_steel_lance = self.select_new_item(
             ephraim_job, self.weapons_by_name["Steel Lance"].id, {}
         )
 
-        self.rom[CH15_AUTO_STEEL_SWORD] = ch15_auto_steel_sword
+        
         self.rom[CH15_AUTO_STEEL_LANCE] = ch15_auto_steel_lance
 
     # TODO: logic
