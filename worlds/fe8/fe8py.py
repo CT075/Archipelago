@@ -714,8 +714,6 @@ class FE8Randomizer:
         #then rerandomizes that unit
         #done this way so you dont have a higher chance at more fliers if the tag was on vanessa and gilliam is also one
         flag = False
-        list(self.unit_blocks.items())[2][1][0].logic[0]["must_fly"] =False
-
         units = [[0,1,7,0], #seth
                  [0,1,7,1], #franz
                  [0,1,7,2], #eirika
