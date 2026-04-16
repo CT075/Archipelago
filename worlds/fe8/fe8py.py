@@ -820,7 +820,7 @@ class FE8Randomizer:
             if "flying" in job.tags:
                 flag = True
         if flag == False:
-            fly = 5#self.random.randint(0,5)
+            fly = self.random.randint(0,5)
             list(self.unit_blocks.items())[units[fly][0]][units[fly][1]][units[fly][2]].logic[units[fly][3]]["must_fly"] =True
             self.rerando_chapter_unit(
                                     list(self.unit_blocks.items())[units[fly][0]][units[fly][1]][units[fly][2]].base + CHAPTER_UNIT_SIZE * units[fly][3], 
