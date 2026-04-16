@@ -385,9 +385,6 @@ class CharacterStore:
     def __getitem__(self, char: Union[int, str]):
         name = char if isinstance(char, str) else self.names_by_id[char]
         return self.character_jobs[name]
-    
-    def __delitem__(self, key):
-        pass
 
     def __contains__(self, char: Union[int, str]) -> bool:
         if isinstance(char, int):
