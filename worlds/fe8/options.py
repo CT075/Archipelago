@@ -110,16 +110,16 @@ class Easier5x(Toggle):
    
 class SecureRoss(Choice):
     """
-    How the game makes sure you get Ross.
+    How would you like to ensure being able to rescue Ross/Garcia?
     1. Force Vanessa to be a flier.
     2. Change 2 tiles to be planes and not mountains.
-    3. Force any of Eirika->Vanessa to be a flier.
+    3. Force any of Eirika-> Vanessa to be a flier.
     """
 
     display_name = "Recruit Ross helper"
-    Vanessa = 0
-    Map = 1
-    Early = 2
+    option_Vanessa = 0
+    option_Map = 1
+    option_Early = 2
 
 
 class UnbreakableRegalia(Toggle):
@@ -298,7 +298,7 @@ class FE8Options(PerGameCommonOptions):
     required_holy_weapons: MinimumUsableHolyWeapons
     exclude_latona: ExcludeLatona
     easier_5x: Easier5x
-    Sercure_Ross: SecureRoss
+    secure_Ross: SecureRoss
     unbreakable_regalia: UnbreakableRegalia
     tower_enabled: EnableTower
     ruins_enabled: EnableRuins
