@@ -51,7 +51,7 @@
             "name": "PlayerVanessaMoulder",
             "base": 9126864,
             "count": 2,
-            "logic": {"0": {"must_fly": true}}
+            "logic": {}
         },
         {"name": "PlayerDeployment", "base": 9126604, "count": 5, "logic": {}},
         {"name": "StartingEnemies", "base": 9126724, "count": 6, "logic": {}},
