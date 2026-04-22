@@ -106,23 +106,6 @@ class Easier5x(Toggle):
     display_name = "Buff Ephraim's party for chapter 5x"
     default = 1
 
-<<<<<<< Updated upstream
-=======
-   
-class SecureRoss(Choice):
-    """
-    How the game makes sure you get Ross.
-    1. Force Vanessa to be a flier.
-    2. Change 2 tiles to be planes and not mountains.
-    3. Force any of Eirika->Vanessa to be a flier.
-    """
-
-    display_name = "Recruit Ross helper"
-    option_Vanessa = 0
-    option_Map = 1
-    option_Early = 2
-
->>>>>>> Stashed changes
 
 class UnbreakableRegalia(Toggle):
     """
@@ -177,13 +160,13 @@ class LockpickUsability(Choice):
     option_GlobalLockpicks = 1
     option_GlobalRoguePick = 2
 
-class ForceTheif(Toggle):
+class ForceThief(Toggle):
     """
-    forces one of the early game units (up to colm) to be a theif
+    forces one of the early game units (up to colm) to be a thief
     So you still need to protect them to get chests
     if enabled colm will still come with a lock pick
     """
-    display_name = "Ensure a theif"
+    display_name = "Ensure a thief"
     default = 0
 
 class NormalizeGenders(Toggle):
@@ -313,7 +296,7 @@ class FE8Options(PerGameCommonOptions):
     ruins_enabled: EnableRuins
     shuffle_skirmish_tables: ShuffleSkirmishTables
     lockpick_usability: LockpickUsability
-    force_theif: ForceTheif
+    force_thief: ForceThief
     normalize_genders: NormalizeGenders
     death_link: DeathLink
     growth_rando: GrowthRando

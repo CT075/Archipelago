@@ -694,83 +694,41 @@ class FE8Randomizer:
                 continue
             self.randomize_chapter_unit(offset, logic)
 
-<<<<<<< Updated upstream
-=======
-    #handles the say to save ross in chapter 2 by editing the map or by setting vanessa / early game units classes
-
-    def secure_ross(self) -> None:
-        if self.config["Sercure_Ross"]== 1: #map edit
-            list(self.unit_blocks.items())[2][1][0].logic[0]["must_fly"] =False #stop force vanessa flier
-            #make path to ross
-            self.rom[ROSS_CH2_MAP_OFFSET]=156
-            self.rom[ROSS_CH2_MAP_OFFSET + 1]=11
-            self.rom[ROSS_CH2_MAP_OFFSET + 2]=168
-            self.rom[ROSS_CH2_MAP_OFFSET + 3]=1
-            #make map look nicer
-            self.rom[ROSS_CH2_MAP_OFFSET +31]=196
-            
-        elif self.config["Sercure_Ross"]== 2: #early game unit only
-            list(self.unit_blocks.items())[2][1][0].logic[0]["must_fly"] =False
-
-    def early_flyer(self) -> None:
-        #check to see if any of the early units (eirika -> vanessa) are fliers
-        #if there are none, selects one of them and forces the must fly tag on
-        #then rerandomizes that unit
-        #done this way so you dont have a higher chance at more fliers if the tag was on vanessa and gilliam is also one
+    
+    def force_thief(self) -> None:
+        # check to see if any of the early units (eirika -> colm) are fliers
+        # if there are none, selects one of them and forces the must lockpick tag on, and can't select any unit with the force fly tag on
+        # then rerandomizes that unit
+        # done this way so you dont have a higher chance at more theievs if the tag was on colm and gilliam randomizes into one
         flag = False
-        units = [[0,1,7,0], #seth
-                 [0,1,7,1], #franz
-                 [0,1,7,2], #eirika
-                 [2,1,0,0], #vanessa
-                 [2,1,0,1], #molder
-                 [1,1,2,1]] #gilliam
-        for u in units:
-            unit = self.rom[list(self.unit_blocks.items())[u[0]][u[1]][u[2]].base + CHAPTER_UNIT_SIZE * u[3] : list(self.unit_blocks.items())[u[0]][u[1]][u[2]].base + CHAPTER_UNIT_SIZE * u[3] + CHAPTER_UNIT_SIZE]
-            job= self.jobs_by_id[unit[1]]
-            if "flying" in job.tags:
-                flag = True
-        if flag == False:
-            
-            fly = self.random.randint(0,5)
-            list(self.unit_blocks.items())[units[fly][0]][units[fly][1]][units[fly][2]].logic[units[fly][3]]["must_fly"] =True
-            self.rerando_chapter_unit(
-                                    list(self.unit_blocks.items())[units[fly][0]][units[fly][1]][units[fly][2]].base + CHAPTER_UNIT_SIZE * units[fly][3], 
-                                    list(self.unit_blocks.items())[units[fly][0]][units[fly][1]][units[fly][2]].logic[units[fly][3]])
-
-    def force_theif(self) -> None:
-        #check to see if any of the early units (eirika -> colm) are fliers
-        #if there are none, selects one of them and forces the must lockpick tag on, and can't select any unit with the force fly tag on
-        #then rerandomizes that unit
-        #done this way so you dont have a higher chance at more theievs if the tag was on colm and gilliam randiomises into one
-        flag = False
-        units = [[0,1,7,0], #seth
-                 [0,1,7,1], #franz
-                 [0,1,7,2], #eirika
-                 [2,1,0,0], #vanessa
-                 [2,1,0,1], #molder
-                 [1,1,2,1], #gilliam
-                 [2,1,4,0], #ross
-                 [2,1,4,1], #garcia
-                 [3,1,2,0], #colm
-                 [3,1,0,6] #niemi
-                 ]       
+        units = [['Prologue',7,0], #seth
+                 ['Prologue',7,1], #franz
+                 ['Prologue',7,2], #eirika
+                 ['Ch2',0,0], #vanessa /
+                 ['Ch2',0,1], #molder
+                 ['Ch1',2,1], #gilliam
+                 ['Ch2',4,0], #ross
+                 ['Ch2',4,1], #garcia
+                 ['Ch3',2,0], #colm
+                 ['Ch3',0,6]] #niemi
+              
 
         
         for u in units:
-            unit = self.rom[list(self.unit_blocks.items())[u[0]][u[1]][u[2]].base + CHAPTER_UNIT_SIZE * u[3] : list(self.unit_blocks.items())[u[0]][u[1]][u[2]].base + CHAPTER_UNIT_SIZE * u[3] + CHAPTER_UNIT_SIZE]
+            unit = self.rom[self.unit_blocks[u[0]][u[1]].base + CHAPTER_UNIT_SIZE * u[2] : self.unit_blocks[u[0]][u[1]].base + CHAPTER_UNIT_SIZE * u[2] + CHAPTER_UNIT_SIZE]
             job= self.jobs_by_id[unit[1]]
             if "Lockpick" in job.tags:
                 flag = True
         if flag == False:
             while True: # need a do while loop
                 lock = self.random.randint(0,9)
-                test = list(self.unit_blocks.items())[units[lock][0]][units[lock][1]][units[lock][2]].logic[units[lock][3]]
+                test = self.unit_blocks[units[lock][0]][units[lock][1]].logic[units[lock][2]]
                 if not ("must_fly" in test and test["must_fly"]):
                     break
-            list(self.unit_blocks.items())[units[lock][0]][units[lock][1]][units[lock][2]].logic[units[lock][3]]["must_lockpick"] =True
+            self.unit_blocks[units[lock][0]][units[lock][1]].logic[units[lock][2]]["must_lockpick"] =True
             self.rerando_chapter_unit(
-                                    list(self.unit_blocks.items())[units[lock][0]][units[lock][1]][units[lock][2]].base + CHAPTER_UNIT_SIZE * units[lock][3], 
-                                    list(self.unit_blocks.items())[units[lock][0]][units[lock][1]][units[lock][2]].logic[units[lock][3]])
+                                    self.unit_blocks[units[lock][0]][units[lock][1]].base + CHAPTER_UNIT_SIZE * units[lock][2], 
+                                    self.unit_blocks[units[lock][0]][units[lock][1]].logic[units[lock][2]])
 
 
     def rerando_chapter_unit(self, data_offset: int, logic: dict[str, Any]) -> None:
@@ -795,7 +753,6 @@ class FE8Randomizer:
             self.fix_Eirika_Rapier()
         
 
->>>>>>> Stashed changes
     # Randomize the classes and possible invtories for the game's internal
     # randomizer (used for skirmishes, tower/ruins, and the two random Wights
     # with Lyon for some reason).

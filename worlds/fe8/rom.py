@@ -50,22 +50,13 @@ class FE8PatchExtension(APPatchExtension):
         random = Random(config["seed"] + config["player"])
         mut_rom = bytearray(rom)
         randomizer = FE8Randomizer(rom=mut_rom, random=random, config=config)
-<<<<<<< Updated upstream
-        randomizer.apply_base_changes()
-
-=======
-        randomizer.secure_ross()
 
         randomizer.apply_base_changes()
 
         
-        if config["Sercure_Ross"]== 2:
-            randomizer.early_flyer()
-        
-        if config["force_theif"]:
-            randomizer.force_theif()
+        if config["force_thief"]:
+            randomizer.force_thief()
  
->>>>>>> Stashed changes
         if config["shuffle_skirmish_tables"]:
             randomizer.randomize_monster_gen()
 
@@ -132,7 +123,7 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
         "player_monster": bool(options.player_unit_monsters),
         "easier_5x": bool(options.easier_5x),
         "unbreakable_regalia": bool(options.unbreakable_regalia),
-        "force_theif": bool(options.force_theif),
+        "force_thief": bool(options.force_thief),
         "shuffle_skirmish_tables": bool(options.shuffle_skirmish_tables),
         "normalize_genders": bool(options.normalize_genders),
         "growth_rando": (
