@@ -786,48 +786,48 @@ class FE8Randomizer:
                 continue
             self.randomize_chapter_unit(offset, logic)
 
-    #handles the say to save ross in chapter 2 by editing the map or by setting vanessa / early game units classes
+    # handles the say to save ross in chapter 2 by editing the map or by setting vanessa / early game units classes
 
     def secure_ross(self) -> None:
-        if self.config["Sercure_Ross"]== 1: #map edit
-            list(self.unit_blocks.items())[2][1][0].logic[0]["must_fly"] =False #stop force vanessa flier
-            #make path to ross
+        if self.config["Secure_Ross"]== 0: #Vanessa flier
+            self.unit_blocks['Ch2'][0].logic[0]["must_fly"] =True
+        elif self.config["Secure_Ross"]== 1: # map edit
+            # make path to ross
             self.rom[ROSS_CH2_MAP_OFFSET]=156
             self.rom[ROSS_CH2_MAP_OFFSET + 1]=11
             self.rom[ROSS_CH2_MAP_OFFSET + 2]=168
             self.rom[ROSS_CH2_MAP_OFFSET + 3]=1
-            #make map look nicer
+            # make map look nicer
             self.rom[ROSS_CH2_MAP_OFFSET +31]=196
             
-        elif self.config["Sercure_Ross"]== 2: #early game unit only
-            list(self.unit_blocks.items())[2][1][0].logic[0]["must_fly"] =False
 
-    def early_flyer(self) -> None:
-        #check to see if any of the early units (eirika -> vanessa) are fliers
-        #if there are none, selects one of them and forces the must fly tag on
-        #then rerandomizes that unit
-        #done this way so you dont have a higher chance at more fliers if the tag was on vanessa and gilliam is also one
+
+    def early_flier(self) -> None:
+        # check to see if any of the early units (eirika -> vanessa) are fliers
+        # if there are none, selects one of them and forces the must fly tag on
+        # then rerandomizes that unit
+        # done this way so you dont have a higher chance at more fliers if the tag was on vanessa and gilliam is also one
         flag = False
-        units = [[0,1,7,0], #seth
-                 [0,1,7,1], #franz
-                 [0,1,7,2], #eirika
-                 [2,1,0,0], #vanessa /
-                 [2,1,0,1], #molder
-                 [1,1,2,1]] #gilliam
+        units = [['Prologue',7,0], #seth
+                 ['Prologue',7,1], #franz
+                 ['Prologue',7,2], #eirika
+                 ['Ch2',0,0], #vanessa /
+                 ['Ch2',0,1], #molder
+                 ['Ch1',2,1]] #gilliam
         for u in units:
-            unit = self.rom[list(self.unit_blocks.items())[u[0]][u[1]][u[2]].base + CHAPTER_UNIT_SIZE * u[3] : list(self.unit_blocks.items())[u[0]][u[1]][u[2]].base + CHAPTER_UNIT_SIZE * u[3] + CHAPTER_UNIT_SIZE]
+            unit = self.rom[self.unit_blocks[u[0]][u[1]].base + CHAPTER_UNIT_SIZE * u[2] : self.unit_blocks[u[0]][u[1]].base + CHAPTER_UNIT_SIZE * u[2] + CHAPTER_UNIT_SIZE]
             job= self.jobs_by_id[unit[1]]
             if "flying" in job.tags:
-                flag = True
+                flag = False
         if flag == False:
             fly = self.random.randint(0,5)
-            list(self.unit_blocks.items())[units[fly][0]][units[fly][1]][units[fly][2]].logic[units[fly][3]]["must_fly"] =True
+            self.unit_blocks[units[fly][0]][units[fly][1]].logic[units[fly][2]]["must_fly"] =True
             self.rerando_chapter_unit(
-                                    list(self.unit_blocks.items())[units[fly][0]][units[fly][1]][units[fly][2]].base + CHAPTER_UNIT_SIZE * units[fly][3], 
-                                    list(self.unit_blocks.items())[units[fly][0]][units[fly][1]][units[fly][2]].logic[units[fly][3]])
+                                    self.unit_blocks[units[fly][0]][units[fly][1]].base + CHAPTER_UNIT_SIZE * units[fly][2], 
+                                    self.unit_blocks[units[fly][0]][units[fly][1]].logic[units[fly][2]])
 
     
-   def rerando_chapter_unit(self, data_offset: int, logic: dict[str, Any]) -> None:
+    def rerando_chapter_unit(self, data_offset: int, logic: dict[str, Any]) -> None:
         # just throws the unit back in with a flag to re do the character
         char = self.rom[data_offset]
         self.randomize_chapter_unit(data_offset,logic, False)
