@@ -332,6 +332,7 @@ class CharacterStore:
             # actually a list of strings
             self.character_tags[name] = set(data["tags"])
             self.ids_by_name[name] = data["ids"]
+  
 
         self.character_jobs = {}
 
@@ -339,6 +340,11 @@ class CharacterStore:
         if char_name not in self.ids_by_name:
             return None
         return self.ids_by_name[char_name]
+    
+    def lookup_jobs(self, char_name: str) -> Optional[list[int]]:
+        if char_name not in self.ids_by_name:
+            return None
+        return self.character_jobs[char_name]
 
     def lookup_name(self, char_id: int) -> Optional[str]:
         if char_id not in self.names_by_id:
@@ -793,8 +799,10 @@ class FE8Randomizer:
             self.unit_blocks['Ch2'][0].logic[0]["must_fly"] =True
         elif self.config["Secure_Ross"]== 1: # map edit
             # make path to ross
+            # tile  1
             self.rom[ROSS_CH2_MAP_OFFSET]=156
             self.rom[ROSS_CH2_MAP_OFFSET + 1]=11
+            # tile 2
             self.rom[ROSS_CH2_MAP_OFFSET + 2]=168
             self.rom[ROSS_CH2_MAP_OFFSET + 3]=1
             # make map look nicer
@@ -807,19 +815,18 @@ class FE8Randomizer:
         # if there are none, selects one of them and forces the must fly tag on
         # then rerandomizes that unit
         # done this way so you dont have a higher chance at more fliers if the tag was on vanessa and gilliam is also one
-        flag = False
+        flier = False
         units = [['Prologue',7,0], #seth
                  ['Prologue',7,1], #franz
                  ['Prologue',7,2], #eirika
                  ['Ch2',0,0], #vanessa /
                  ['Ch2',0,1], #molder
                  ['Ch1',2,1]] #gilliam
-        for u in units:
-            unit = self.rom[self.unit_blocks[u[0]][u[1]].base + CHAPTER_UNIT_SIZE * u[2] : self.unit_blocks[u[0]][u[1]].base + CHAPTER_UNIT_SIZE * u[2] + CHAPTER_UNIT_SIZE]
-            job= self.jobs_by_id[unit[1]]
+        for char in ["Eirika", "Seth", "Franz", "Gilliam", "Moulder", "Vanessa"]:
+            job = self.character_store.lookup_jobs(char)
             if "flying" in job.tags:
-                flag = False
-        if flag == False:
+                flier = True
+        if not flier:
             fly = self.random.randint(0,5)
             self.unit_blocks[units[fly][0]][units[fly][1]].logic[units[fly][2]]["must_fly"] =True
             self.rerando_chapter_unit(
@@ -845,8 +852,8 @@ class FE8Randomizer:
                         logging.error(f"  {e}")
                         raise
         # if erikia she needs a working weapon again
-        if char==1:
-            self.fix_Eirika_Rapier()
+        if char==EIRIKA:
+            self.fix_Eirika_Weapons()
         
 
     # Randomize the classes and possible invtories for the game's internal
@@ -1091,7 +1098,7 @@ class FE8Randomizer:
             ability_4_base = character_entry + CHAR_ABILITY_4_OFFSET
             self.rom[ability_4_base] |= lock_mask
 
-    def fix_Eirika_Rapier(self) -> None:
+    def fix_Eirika_Weapons(self) -> None:
         # Eirika's Rapier is given in a cutscene at the start of the chapter,
         # rather than being in her inventory
         eirika_job = self.character_store["Eirika"]
@@ -1112,7 +1119,6 @@ class FE8Randomizer:
 
         # Eirika get automatic steels on rejoining in Ch15, which
         # need to be adjusted.
-        #moved here incase rerando hits Eirika
         ch15_auto_steel_sword = self.select_new_item(
             eirika_job, self.weapons_by_name["Steel Sword"].id, {}
         )
@@ -1121,7 +1127,7 @@ class FE8Randomizer:
 
     def fix_cutscenes(self) -> None:
     
-        self.fix_Eirika_Rapier()
+        self.fix_Eirika_Weapons()
 
         # While we force Vanessa to fly to give Ross a fighting chance, it's
         # very possible that she won't be able to lift him. To make it more

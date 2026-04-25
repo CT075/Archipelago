@@ -54,7 +54,7 @@ class FE8PatchExtension(APPatchExtension):
 
         randomizer.apply_base_changes()
         
-        if config["Secure_Ross"]== 2:
+        if config["Secure_Ross"] == 2:
             randomizer.early_flier()
 
         if config["shuffle_skirmish_tables"]:
