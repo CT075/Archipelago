@@ -160,6 +160,8 @@ ITEM_SIZE = 36
 ITEM_ABILITY_1_INDEX = 8
 UNBREAKABLE_FLAG = 1 << 3
 
+WEAPON_POOL_07 = 0x8D21EB
+
 HOLY_WEAPON_IDS = [
     0x85,  # Sieglinde
     0x92,  # Siegmund

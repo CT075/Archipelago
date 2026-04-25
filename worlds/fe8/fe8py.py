@@ -68,6 +68,7 @@ from .constants import (
     INTERNAL_RANDO_WEAPONS_ENTRY_SIZE,
     INTERNAL_RANDO_WEAPONS_MAX_CLASSES,
     INTERNAL_RANDO_WEAPON_TABLE_ROWS,
+    WEAPON_POOL_07,
     FEMALE_JOBS,
     SONG_TABLE_BASE,
     SONG_SIZE,
@@ -367,6 +368,17 @@ def weapon_usable(weapon: WeaponData, job: JobData, logic: dict[str, Any]) -> bo
         return False
 
     if any(lock not in job.tags for lock in weapon.locks):
+        return False
+    
+    if ("player" not in logic or ("player" in logic and logic["player"]==False)) and weapon.name in [
+        "Restore",
+        "Warp",
+        "Rescue",
+        "Torch",
+        "Hammerne",
+        "Unlock",
+        "Barrier"
+    ]:
         return False
 
     if "must_fight" in logic and weapon.kind in [
@@ -880,6 +892,16 @@ class FE8Randomizer:
             entry = JOB_TABLE_BASE + job * JOB_SIZE
             self.rom[entry + JOB_ABILITY_1_INDEX] |= MOUNTED_AID_CANTO_MASK
 
+    def fix_tower_weapons(self) -> None:
+        """
+        Tower / ruins weapon pool 7 is grouped in with otther lance's and is
+        assigned to lance only classes, this weapon pool is orginally for 
+        bonewalkers that can use swords as well, and its just ranged weapons
+        this means that knights/ other lance locked classes can spawn with runesword
+        this swaps it out for a Brave lance
+        """
+        self.rom[WEAPON_POOL_07] = self.weapons_by_name["Brave Lance"].id
+
     def fix_movement_costs(self) -> None:
         """
         Units that spawn over water or mountains can get stuck, causing crashes
@@ -979,6 +1001,7 @@ class FE8Randomizer:
                     logging.error(f"  {e}")
                     raise
 
+        self.fix_tower_weapons()              
         self.fix_movement_costs()
         self.fix_cutscenes()
         self.tweak_lords()
