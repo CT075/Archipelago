@@ -4,6 +4,7 @@
 # randomization, stat tweaks, etc).
 
 import json
+import time
 from random import Random
 from typing import TYPE_CHECKING
 
@@ -46,6 +47,7 @@ class FE8PatchExtension(APPatchExtension):
 
     @staticmethod
     def apply_gameplay_changes(caller: APProcedurePatch, rom: bytes) -> bytes:
+        t0 = time.time()
         config = json.loads(caller.get_file("config.json").decode("UTF-8"))
         random = Random(config["seed"] + config["player"])
         mut_rom = bytearray(rom)
@@ -66,7 +68,10 @@ class FE8PatchExtension(APPatchExtension):
 
         randomizer.randomize_growths(*config["growth_rando"])
         randomizer.randomize_music(config["music_rando"])
-
+        t1 = time.time()
+        
+        with open('time.csv','a') as fd:
+            fd.write('\n'+str(t1-t0))
         return bytes(mut_rom)
 
 

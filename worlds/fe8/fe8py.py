@@ -363,9 +363,6 @@ class CharacterStore:
 # CR cam: Eirika and Ephraim should be able to use their respective weapons if
 # they get randomized into the right class.
 def weapon_usable(weapon: WeaponData, job: JobData, logic: dict[str, Any]) -> bool:
-    if weapon.kind not in job.usable_weapons:
-        return False
-
     if any(lock not in job.tags for lock in weapon.locks):
         return False
 
@@ -385,8 +382,8 @@ def weapon_usable(weapon: WeaponData, job: JobData, logic: dict[str, Any]) -> bo
 class FE8Randomizer:
     unit_blocks: dict[str, list[UnitBlock]]
     weapons_by_id: dict[int, WeaponData]
+    weapons_by_kind_rank: dict[WeaponKind, dict[WeaponRank, list[WeaponData]]]
     weapons_by_name: dict[str, WeaponData]
-    weapons_by_rank: dict[WeaponRank, list[WeaponData]]
     character_store: CharacterStore
     jobs_by_id: dict[int, JobData]
     valid_distribs_by_row: dict[int, list[int]]
@@ -439,24 +436,27 @@ class FE8Randomizer:
             if not job.is_promoted and "no_rando" not in job.tags
         ]
 
-        self.weapons_by_rank = defaultdict(list)
+        self.weapons_by_kind_rank = defaultdict(list)
+        for kind in WeaponKind:
+            self.weapons_by_kind_rank[kind] = defaultdict(list)
 
         for weap in self.weapons_by_id.values():
-            self.weapons_by_rank[weap.rank].append(weap)
+            self.weapons_by_kind_rank[weap.kind][weap.rank].append(weap)
 
         # Dark has no E-ranked weapons by default.
-        self.weapons_by_rank[WeaponRank.E].append(self.weapons_by_name["Flux"])
+        self.weapons_by_kind_rank[WeaponKind.DARK][WeaponRank.E].append(self.weapons_by_name["Flux"])
 
         # cam: Should we allow Lyon to become a monster?
 
-        self.weapons_by_rank[WeaponRank.D].append(self.weapons_by_name["Fiery Fang"])
-        self.weapons_by_rank[WeaponRank.C].append(self.weapons_by_name["Fiery Fang"])
-        self.weapons_by_rank[WeaponRank.A].append(self.weapons_by_name["Hellfang"])
-        self.weapons_by_rank[WeaponRank.S].append(self.weapons_by_name["Hellfang"])
 
-        self.weapons_by_rank[WeaponRank.A].append(self.weapons_by_name["Fetid Claw"])
-        self.weapons_by_rank[WeaponRank.S].append(self.weapons_by_name["Fetid Claw"])
+        self.weapons_by_kind_rank[WeaponKind.MONSTER_WEAPON][WeaponRank.D].append(self.weapons_by_name["Fiery Fang"])
+        self.weapons_by_kind_rank[WeaponKind.MONSTER_WEAPON][WeaponRank.C].append(self.weapons_by_name["Fiery Fang"])
+        self.weapons_by_kind_rank[WeaponKind.MONSTER_WEAPON][WeaponRank.A].append(self.weapons_by_name["Hellfang"])
+        self.weapons_by_kind_rank[WeaponKind.MONSTER_WEAPON][WeaponRank.S].append(self.weapons_by_name["Hellfang"])
 
+        self.weapons_by_kind_rank[WeaponKind.MONSTER_WEAPON][WeaponRank.A].append(self.weapons_by_name["Fetid Claw"])
+        self.weapons_by_kind_rank[WeaponKind.MONSTER_WEAPON][WeaponRank.S].append(self.weapons_by_name["Fetid Claw"])
+ 
         # CR-soon cam:
         # Darr: Dragon zombies experience the same problem. I've disabled them for now;
         # they only have one weapon and E-rank Wretched Air does not sound fun.
@@ -513,12 +513,16 @@ class FE8Randomizer:
             return item_id
         weapon_attrs = self.weapons_by_id[item_id]
 
+        useable=[]
+        for weapon_levels in job.usable_weapons: 
+            useable += self.weapons_by_kind_rank[weapon_levels][weapon_attrs.rank]
+
         choices = [
             weap
-            for weap in self.weapons_by_rank[weapon_attrs.rank]
+            for weap in useable
             if weapon_usable(weap, job, logic)
         ]
-
+ 
         if not choices:
             import json
 
@@ -527,9 +531,10 @@ class FE8Randomizer:
             logging.warning(f"  rank: {weapon_attrs.rank}")
             logging.warning(f"  logic: {json.dumps(logic, indent=2)}")
 
+            first_type = next(iter(job.usable_weapons))
             choices = [
                 weap
-                for weap in self.weapons_by_rank[WeaponRank.E]
+                for weap in self.weapons_by_kind_rank[WeaponRank.E][first_type]
                 if weapon_usable(weap, job, dict())
             ]
 
