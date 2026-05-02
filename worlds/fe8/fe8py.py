@@ -71,6 +71,8 @@ from .constants import (
     FEMALE_JOBS,
     SONG_TABLE_BASE,
     SONG_SIZE,
+    IS_PROMOTED,
+    NOT_PROMOTED
 )
 
 DEBUG = False
@@ -244,6 +246,17 @@ class WeaponRank(IntEnum):
             case "S":
                 return WeaponRank.S
         raise ValueError
+    
+class JobRace(IntEnum):
+    ALL = 0
+    HUMAN = 1
+    MONSTER = 2
+
+class JobType(IntEnum):
+    ANY = 0
+    RANGED = 1
+    FLIER = 2
+    LOCKPICK = 3
 
 
 @dataclass
@@ -387,10 +400,8 @@ class FE8Randomizer:
     character_store: CharacterStore
     jobs_by_id: dict[int, JobData]
     valid_distribs_by_row: dict[int, list[int]]
-    promoted_jobs: list[JobData]
-    unpromoted_jobs: list[JobData]
+    jobs_pools:dict[bool,dict[JobRace, dict[JobType, list[JobData]]]]
     songs: dict[str, dict[int, str]]
-
     random: Random
     rom: bytearray
     config: dict[str, Any]
@@ -427,19 +438,43 @@ class FE8Randomizer:
         self.weapons_by_name = {item.name: item for item in item_data}
         self.jobs_by_id = {job.id: job for job in job_data}
 
-        self.promoted_jobs = [
-            job for job in job_data if job.is_promoted and "no_rando" not in job.tags
-        ]
-        self.unpromoted_jobs = [
-            job
-            for job in job_data
-            if not job.is_promoted and "no_rando" not in job.tags
-        ]
+
+        self.jobs_pools = defaultdict(list)
+        for promo in [IS_PROMOTED,NOT_PROMOTED]:
+            self.jobs_pools[promo] = defaultdict(list)
+            for race in JobRace:
+                self.jobs_pools[promo][race] = defaultdict(list)
+
+        # sorting classes into the following class pools
+        # 1. if they are promoted or not
+        # 2. then, if they are a "human" or a "monster" class, as well as a "all" grouping
+        # 3. then by tags, so is the class flying, lockpick or ranged atm but more can be added in time
+        # This means there is a dedicated pool for promoted human fliers to make randomization faster
+        for job in job_data:
+            if "no_rando" not in job.tags:
+                if "monster" in job.tags:
+                    Race = JobRace.MONSTER
+                else:
+                    Race = JobRace.HUMAN
+                if "flying" in job.tags:
+                    self.jobs_pools[job.is_promoted][Race][JobType.FLIER].append(job)
+                    self.jobs_pools[job.is_promoted][JobRace.ALL][JobType.FLIER].append(job)
+                elif "Lockpick" in job.tags:
+                    self.jobs_pools[job.is_promoted][Race][JobType.LOCKPICK].append(job)
+                    self.jobs_pools[job.is_promoted][JobRace.ALL][JobType.LOCKPICK].append(job)
+                if "ranged" in job.tags:
+                    self.jobs_pools[job.is_promoted][Race][JobType.RANGED].append(job)
+                    self.jobs_pools[job.is_promoted][JobRace.ALL][JobType.RANGED].append(job)
+                self.jobs_pools[job.is_promoted][JobRace.ALL][JobType.ANY].append(job)
+
 
         self.weapons_by_kind_rank = defaultdict(list)
         for kind in WeaponKind:
             self.weapons_by_kind_rank[kind] = defaultdict(list)
 
+        # Weapons are given their own 2d dictionary so instead of just trying every weapon at a weapon level
+        # we instead only see if they can use weapons equipable at that weapon level
+        # just need to get what weapons they can equip first
         for weap in self.weapons_by_id.values():
             self.weapons_by_kind_rank[weap.kind][weap.rank].append(weap)
 
@@ -476,22 +511,12 @@ class FE8Randomizer:
         # the "no_" prefix adds the tag to the invalid tag list
         # "no_flying" makes any job with "flying" tag invalid
         notags = set()
-        # config option for disabling player unit monsters
-        if "player" in logic and logic["player"] and not self.config["player_monster"]:
-            notags.add("monster")
+
         for x in logic:
             if x.startswith("no_") and logic[x]:
                 notags.add(x.removeprefix("no_"))
         # job is invalid if it has any of the tags in notags
         if notags and notags & job.tags:
-            return False
-
-        # CR-soon cam: see above
-        if job.name in ("Dracozombie", "Revenant", "Entombed"):
-            return False
-
-        if "must_fly" in logic and logic["must_fly"] and "flying" not in job.tags:
-            # demand that valid job has the "flying" tag
             return False
 
         if "must_fight" in logic and logic["must_fight"]:
@@ -513,10 +538,11 @@ class FE8Randomizer:
             return item_id
         weapon_attrs = self.weapons_by_id[item_id]
 
+        # gets the weapon types equip able at and adds them to the pool for the current weapon being changed 
         useable=[]
         for weapon_levels in job.usable_weapons: 
             useable += self.weapons_by_kind_rank[weapon_levels][weapon_attrs.rank]
-
+        
         choices = [
             weap
             for weap in useable
@@ -531,6 +557,7 @@ class FE8Randomizer:
             logging.warning(f"  rank: {weapon_attrs.rank}")
             logging.warning(f"  logic: {json.dumps(logic, indent=2)}")
 
+            #gets the first type of equip able weapon
             first_type = next(iter(job.usable_weapons))
             choices = [
                 weap
@@ -576,12 +603,10 @@ class FE8Randomizer:
     def select_new_job(
         self,
         job: JobData,
-        unpromoted_pool: Iterable[JobData],
-        promoted_pool: Iterable[JobData],
+        job_pool: Iterable[JobData],
         job_valid: Callable[[JobData], bool],
     ) -> JobData:
-        new_job_pool = promoted_pool if job.is_promoted else unpromoted_pool
-        choices = [job for job in new_job_pool if job_valid(job)]
+        choices = [job for job in job_pool if job_valid(job)]
         if not choices:
             logging.warning("LOGIC ERROR: no valid jobs")
             logging.warning(f"  original job: {job.name}")
@@ -628,13 +653,28 @@ class FE8Randomizer:
         autolevel = unit[3] & 1
         inventory = unit[INVENTORY_INDEX : INVENTORY_INDEX + INVENTORY_SIZE]
 
+
+
         if char in self.character_store:
             new_job = self.character_store[char]
         else:
+            # Checks to see if monsters are in logic or if it should just use humans
+            if "player" in logic and logic["player"] and not self.config["player_monster"]:
+                Race = JobRace.HUMAN
+            else:
+                Race = JobRace.ALL
+            # Checks to see if we should use the respective flier pool of classes
+            # Add other checks here for other pools added in later :) as a else if
+            # could make pool intersections if you want to do like ranged fliers.... but shouldn't need that ever
+            # as only morgall and its promotion fit that definition 
+            if "must_fly" in logic and logic["must_fly"]:
+                Rules = JobType.FLIER
+            else:
+                Rules = JobType.ANY
+            
             new_job = self.select_new_job(
                 job,
-                unpromoted_pool=self.unpromoted_jobs,
-                promoted_pool=self.promoted_jobs,
+                job_pool=self.jobs_pools[job.is_promoted][Race][Rules],
                 job_valid=lambda job: self.job_valid(job, char, logic),
             )
 
@@ -781,12 +821,11 @@ class FE8Randomizer:
                     jobset.pools()
                     # We _could_ repoint this and not need to check, but eh
                     if len(jobset) >= INTERNAL_RANDO_WEAPONS_MAX_CLASSES
-                    else (self.unpromoted_jobs, self.promoted_jobs)
+                    else (self.jobs_pools[NOT_PROMOTED][JobRace.ALL][JobType.ANY], self.jobs_pools[IS_PROMOTED][JobRace.ALL][JobType.ANY])
                 )
                 new_job = self.select_new_job(
                     job,
-                    unpromoted_pool=unpromoted_pool,
-                    promoted_pool=promoted_pool,
+                    promoted_pool if job.is_promoted else unpromoted_pool,
                     job_valid=job_valid_for_internal_rando,
                 )
                 self.rom[offs + j] = new_job.id
