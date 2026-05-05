@@ -498,9 +498,9 @@ class FE8Randomizer:
         for kind in WeaponKind:
             self.weapons_by_kind_rank[kind] = defaultdict(list)
 
-        # Weapons are given their own 2d dictionary so instead of just trying every weapon at a weapon level
-        # we instead only see if they can use weapons equipable at that weapon level
-        # just need to get what weapons they can equip first
+        # Weapons are given their own 2d dictionary so we can get a small weapon pool
+        # Just find out what weapon levels the job has then what weapon rank you looking for
+
         for weap in self.weapons_by_id.values():
             self.weapons_by_kind_rank[weap.kind][weap.rank].append(weap)
 
@@ -577,7 +577,7 @@ class FE8Randomizer:
             return item_id
         weapon_attrs = self.weapons_by_id[item_id]
 
-        # gets the weapon types equip able at and adds them to the pool for the current weapon being changed
+        # gets the weapon types equipable and adds them to the pool for the current weapon being changed
         useable = []
         for weapon_levels in job.usable_weapons:
             useable += self.weapons_by_kind_rank[weapon_levels][weapon_attrs.rank]
@@ -592,7 +592,7 @@ class FE8Randomizer:
             logging.warning(f"  rank: {weapon_attrs.rank}")
             logging.warning(f"  logic: {json.dumps(logic, indent=2)}")
 
-            # gets the first type of equip able weapon
+            # gets the first type of equipable weapon
             first_type = next(iter(job.usable_weapons))
             choices = [
                 weap
@@ -690,10 +690,11 @@ class FE8Randomizer:
 
         if char in self.character_store:
             new_job = self.character_store[char]
-            # sets invintory from a earlier copy of yourself, if a invintory is stored
-            # as cutscene units usually have 0 items
-            # not saving new items as l'rachel and other route splits have different invintorys
-            # so this keeps that functionallity
+            # sets inventory from an earlier copy of yourself, if an inventory is stored
+            # as cutscene units usually have 0 items not all are stored
+            # not saving new items if you appeared in a cutscene 
+            # as L'Arachel and other route splits have different inventories
+            # so this keeps that functionality as well
             new_inventory = self.character_store.get_inventory(char)
             if new_inventory is None:
                 new_inventory = self.select_new_inventory(new_job, inventory, logic)
@@ -707,10 +708,10 @@ class FE8Randomizer:
                 Race = JobRace.HUMAN
             else:
                 Race = JobRace.ALL
-            # Checks to see if we should use the respective flier pool of classes
-            # Add other checks here for other pools added in later :) as a else if
-            # could make pool intersections if you want to do like ranged fliers.... but shouldn't need that ever
-            # as only morgall and its promotion fit that definition
+            # Checks to see what job pool to use
+            # Add other checks here for other pools added in later as a else if
+            # could make pool intersections if you want to do like ranged fliers
+            # but should never need to
             if "must_fly" in logic and logic["must_fly"]:
                 Rules = JobType.FLIER
             else:
@@ -724,8 +725,9 @@ class FE8Randomizer:
             new_inventory = self.select_new_inventory(new_job, inventory, logic)
             if not no_store:
                 # likely could combine these 2 functions but might be read / stored in other places
-                # only storing if you have 2 itmes as most units that appear in cutscenes have 0 BUT l'rachel and co have 1
+                # only storing if you have 2 items as most units that appear in cutscenes have 0 BUT L'Arachel and co have 1
                 # so only saves units that have 2 or more items
+
                 self.character_store[char] = new_job
                 if inventory[1] != 0:
                     self.character_store.set_inventory(char, new_inventory)
