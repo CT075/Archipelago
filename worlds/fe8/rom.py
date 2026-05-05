@@ -2,7 +2,6 @@
 # primarily concerned with interfacing the FE8 world with Archipelago, whereas
 # `fe8py` makes semantic changes to the game itself (meaning the core
 # randomization, stat tweaks, etc).
-
 import json
 from random import Random
 from typing import TYPE_CHECKING
@@ -66,7 +65,6 @@ class FE8PatchExtension(APPatchExtension):
 
         randomizer.randomize_growths(*config["growth_rando"])
         randomizer.randomize_music(config["music_rando"])
-
         return bytes(mut_rom)
 
 

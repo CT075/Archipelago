@@ -11,7 +11,7 @@
             "name": "RenaisCastleGuards",
             "base": 9125144,
             "count": 8,
-            "logic": {"3": {"no_store": true}, "4": {"no_store": true}}
+            "logic": {"3": {"no_store": true}, "4": {"no_store": true}, "5": {"no_store": true}}
         },
         {
             "name": "RenaisMessenger",

@@ -865,7 +865,8 @@
       "monster",
       "special",
       "generic",
-      "Claw"
+      "Claw",
+      "no_rando"
     ]
   },
   {
@@ -879,7 +880,8 @@
       "monster",
       "special",
       "generic",
-      "Claw"
+      "Claw",
+      "no_rando"
     ]
   },
   {
@@ -1101,7 +1103,8 @@
       "monster",
       "special",
       "flying",
-      "Breath"
+      "Breath",
+      "no_rando"
     ]
   },
   {
