@@ -72,7 +72,7 @@ from .constants import (
     SONG_TABLE_BASE,
     SONG_SIZE,
     IS_PROMOTED,
-    NOT_PROMOTED
+    NOT_PROMOTED,
 )
 
 DEBUG = False
@@ -246,11 +246,13 @@ class WeaponRank(IntEnum):
             case "S":
                 return WeaponRank.S
         raise ValueError
-    
+
+
 class JobRace(IntEnum):
     ALL = 0
     HUMAN = 1
     MONSTER = 2
+
 
 class JobType(IntEnum):
     ANY = 0
@@ -341,16 +343,16 @@ class CharacterStore:
         if char_id not in self.names_by_id:
             return None
         return self.names_by_id[char_id]
-    
+
     # these two could likely do the saftey checks faster / better but its still a improvement
     def set_inventory(self, char_id: int, invin: bytes) -> list[int]:
         if char_id not in self.names_by_id:
             return None
         name = self.names_by_id[char_id]
         if name not in self.character_inventory:
-            self.character_inventory[name]= invin
+            self.character_inventory[name] = invin
         return self.character_inventory[name]
-    
+
     def get_inventory(self, char_id: int):
         if char_id not in self.names_by_id:
             return None
@@ -420,7 +422,7 @@ class FE8Randomizer:
     character_store: CharacterStore
     jobs_by_id: dict[int, JobData]
     valid_distribs_by_row: dict[int, list[int]]
-    jobs_pools:dict[bool,dict[JobRace, dict[JobType, list[JobData]]]]
+    jobs_pools: dict[bool, dict[JobRace, dict[JobType, list[JobData]]]]
     songs: dict[str, dict[int, str]]
     random: Random
     rom: bytearray
@@ -458,9 +460,8 @@ class FE8Randomizer:
         self.weapons_by_name = {item.name: item for item in item_data}
         self.jobs_by_id = {job.id: job for job in job_data}
 
-
         self.jobs_pools = defaultdict(list)
-        for promo in [IS_PROMOTED,NOT_PROMOTED]:
+        for promo in [IS_PROMOTED, NOT_PROMOTED]:
             self.jobs_pools[promo] = defaultdict(list)
             for race in JobRace:
                 self.jobs_pools[promo][race] = defaultdict(list)
@@ -478,15 +479,20 @@ class FE8Randomizer:
                     Race = JobRace.HUMAN
                 if "flying" in job.tags:
                     self.jobs_pools[job.is_promoted][Race][JobType.FLIER].append(job)
-                    self.jobs_pools[job.is_promoted][JobRace.ALL][JobType.FLIER].append(job)
+                    self.jobs_pools[job.is_promoted][JobRace.ALL][JobType.FLIER].append(
+                        job
+                    )
                 elif "Lockpick" in job.tags:
                     self.jobs_pools[job.is_promoted][Race][JobType.LOCKPICK].append(job)
-                    self.jobs_pools[job.is_promoted][JobRace.ALL][JobType.LOCKPICK].append(job)
+                    self.jobs_pools[job.is_promoted][JobRace.ALL][
+                        JobType.LOCKPICK
+                    ].append(job)
                 if "ranged" in job.tags:
                     self.jobs_pools[job.is_promoted][Race][JobType.RANGED].append(job)
-                    self.jobs_pools[job.is_promoted][JobRace.ALL][JobType.RANGED].append(job)
+                    self.jobs_pools[job.is_promoted][JobRace.ALL][
+                        JobType.RANGED
+                    ].append(job)
                 self.jobs_pools[job.is_promoted][JobRace.ALL][JobType.ANY].append(job)
-
 
         self.weapons_by_kind_rank = defaultdict(list)
         for kind in WeaponKind:
@@ -499,19 +505,32 @@ class FE8Randomizer:
             self.weapons_by_kind_rank[weap.kind][weap.rank].append(weap)
 
         # Dark has no E-ranked weapons by default.
-        self.weapons_by_kind_rank[WeaponKind.DARK][WeaponRank.E].append(self.weapons_by_name["Flux"])
+        self.weapons_by_kind_rank[WeaponKind.DARK][WeaponRank.E].append(
+            self.weapons_by_name["Flux"]
+        )
 
         # cam: Should we allow Lyon to become a monster?
 
+        self.weapons_by_kind_rank[WeaponKind.MONSTER_WEAPON][WeaponRank.D].append(
+            self.weapons_by_name["Fiery Fang"]
+        )
+        self.weapons_by_kind_rank[WeaponKind.MONSTER_WEAPON][WeaponRank.C].append(
+            self.weapons_by_name["Fiery Fang"]
+        )
+        self.weapons_by_kind_rank[WeaponKind.MONSTER_WEAPON][WeaponRank.A].append(
+            self.weapons_by_name["Hellfang"]
+        )
+        self.weapons_by_kind_rank[WeaponKind.MONSTER_WEAPON][WeaponRank.S].append(
+            self.weapons_by_name["Hellfang"]
+        )
 
-        self.weapons_by_kind_rank[WeaponKind.MONSTER_WEAPON][WeaponRank.D].append(self.weapons_by_name["Fiery Fang"])
-        self.weapons_by_kind_rank[WeaponKind.MONSTER_WEAPON][WeaponRank.C].append(self.weapons_by_name["Fiery Fang"])
-        self.weapons_by_kind_rank[WeaponKind.MONSTER_WEAPON][WeaponRank.A].append(self.weapons_by_name["Hellfang"])
-        self.weapons_by_kind_rank[WeaponKind.MONSTER_WEAPON][WeaponRank.S].append(self.weapons_by_name["Hellfang"])
+        self.weapons_by_kind_rank[WeaponKind.MONSTER_WEAPON][WeaponRank.A].append(
+            self.weapons_by_name["Fetid Claw"]
+        )
+        self.weapons_by_kind_rank[WeaponKind.MONSTER_WEAPON][WeaponRank.S].append(
+            self.weapons_by_name["Fetid Claw"]
+        )
 
-        self.weapons_by_kind_rank[WeaponKind.MONSTER_WEAPON][WeaponRank.A].append(self.weapons_by_name["Fetid Claw"])
-        self.weapons_by_kind_rank[WeaponKind.MONSTER_WEAPON][WeaponRank.S].append(self.weapons_by_name["Fetid Claw"])
- 
         # CR-soon cam:
         # Darr: Dragon zombies experience the same problem. I've disabled them for now;
         # they only have one weapon and E-rank Wretched Air does not sound fun.
@@ -558,17 +577,13 @@ class FE8Randomizer:
             return item_id
         weapon_attrs = self.weapons_by_id[item_id]
 
-        # gets the weapon types equip able at and adds them to the pool for the current weapon being changed 
-        useable=[]
-        for weapon_levels in job.usable_weapons: 
+        # gets the weapon types equip able at and adds them to the pool for the current weapon being changed
+        useable = []
+        for weapon_levels in job.usable_weapons:
             useable += self.weapons_by_kind_rank[weapon_levels][weapon_attrs.rank]
-        
-        choices = [
-            weap
-            for weap in useable
-            if weapon_usable(weap, job, logic)
-        ]
- 
+
+        choices = [weap for weap in useable if weapon_usable(weap, job, logic)]
+
         if not choices:
             import json
 
@@ -577,7 +592,7 @@ class FE8Randomizer:
             logging.warning(f"  rank: {weapon_attrs.rank}")
             logging.warning(f"  logic: {json.dumps(logic, indent=2)}")
 
-            #gets the first type of equip able weapon
+            # gets the first type of equip able weapon
             first_type = next(iter(job.usable_weapons))
             choices = [
                 weap
@@ -673,32 +688,34 @@ class FE8Randomizer:
         autolevel = unit[3] & 1
         inventory = unit[INVENTORY_INDEX : INVENTORY_INDEX + INVENTORY_SIZE]
 
-
-       
         if char in self.character_store:
             new_job = self.character_store[char]
             # sets invintory from a earlier copy of yourself, if a invintory is stored
-            # as cutscene units usually have 0 items 
+            # as cutscene units usually have 0 items
             # not saving new items as l'rachel and other route splits have different invintorys
-            # so this keeps that functionallity 
+            # so this keeps that functionallity
             new_inventory = self.character_store.get_inventory(char)
             if new_inventory is None:
                 new_inventory = self.select_new_inventory(new_job, inventory, logic)
         else:
             # Checks to see if monsters are in logic or if it should just use humans
-            if "player" in logic and logic["player"] and not self.config["player_monster"]:
+            if (
+                "player" in logic
+                and logic["player"]
+                and not self.config["player_monster"]
+            ):
                 Race = JobRace.HUMAN
             else:
                 Race = JobRace.ALL
             # Checks to see if we should use the respective flier pool of classes
             # Add other checks here for other pools added in later :) as a else if
             # could make pool intersections if you want to do like ranged fliers.... but shouldn't need that ever
-            # as only morgall and its promotion fit that definition 
+            # as only morgall and its promotion fit that definition
             if "must_fly" in logic and logic["must_fly"]:
                 Rules = JobType.FLIER
             else:
                 Rules = JobType.ANY
-            
+
             new_job = self.select_new_job(
                 job,
                 job_pool=self.jobs_pools[job.is_promoted][Race][Rules],
@@ -710,10 +727,8 @@ class FE8Randomizer:
                 # only storing if you have 2 itmes as most units that appear in cutscenes have 0 BUT l'rachel and co have 1
                 # so only saves units that have 2 or more items
                 self.character_store[char] = new_job
-                if inventory[1] !=0:
+                if inventory[1] != 0:
                     self.character_store.set_inventory(char, new_inventory)
-
-        
 
         self.rom[data_offset + 1] = new_job.id
         for i, item_id in enumerate(new_inventory):
@@ -853,7 +868,10 @@ class FE8Randomizer:
                     jobset.pools()
                     # We _could_ repoint this and not need to check, but eh
                     if len(jobset) >= INTERNAL_RANDO_WEAPONS_MAX_CLASSES
-                    else (self.jobs_pools[NOT_PROMOTED][JobRace.ALL][JobType.ANY], self.jobs_pools[IS_PROMOTED][JobRace.ALL][JobType.ANY])
+                    else (
+                        self.jobs_pools[NOT_PROMOTED][JobRace.ALL][JobType.ANY],
+                        self.jobs_pools[IS_PROMOTED][JobRace.ALL][JobType.ANY],
+                    )
                 )
                 new_job = self.select_new_job(
                     job,
@@ -1082,11 +1100,11 @@ class FE8Randomizer:
         cuts = sorted(self.random.sample(range(1, total), STATS_COUNT))
         result = []
         overflow = 0
-        for st, end in zip([0]+cuts, cuts+[total]):
-            growth = end-st
+        for st, end in zip([0] + cuts, cuts + [total]):
+            growth = end - st
             if growth > 255:
                 result.append(255)
-                overflow += growth-255
+                overflow += growth - 255
             else:
                 result.append(growth)
         while overflow > 0:
@@ -1097,7 +1115,7 @@ class FE8Randomizer:
             result[i] += overflow
             overflow = 0
             if result[i] > 255:
-                overflow = result[i]-255
+                overflow = result[i] - 255
                 result[i] = 255
         return result
 
