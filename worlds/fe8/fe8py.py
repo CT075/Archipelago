@@ -312,11 +312,13 @@ class CharacterStore:
     ids_by_name: dict[str, list[int]]
     character_jobs: dict[str, JobData]
     character_tags: dict[str, set[str]]
+    character_inventory: dict[str, list[int]]
 
     def __init__(self, char_data: dict[str, dict[str, Any]]):
         self.names_by_id = {}
         self.character_tags = dict()
         self.ids_by_name = dict()
+        self.character_inventory = dict()
 
         for name, data in char_data.items():
             for i in data["ids"]:
@@ -339,6 +341,24 @@ class CharacterStore:
         if char_id not in self.names_by_id:
             return None
         return self.names_by_id[char_id]
+    
+    # these two could likely do the saftey checks faster / better but its still a improvement
+    def set_inventory(self, char_id: int, invin: bytes) -> list[int]:
+        if char_id not in self.names_by_id:
+            return None
+        name = self.names_by_id[char_id]
+        if name not in self.character_inventory:
+            self.character_inventory[name]= invin
+        return self.character_inventory[name]
+    
+    def get_inventory(self, char_id: int):
+        if char_id not in self.names_by_id:
+            return None
+        name = self.names_by_id[char_id]
+        if name not in self.character_inventory:
+            return None
+        else:
+            return self.character_inventory[name]
 
     def tags(self, char: Union[int, str]) -> Optional[set[str]]:
         if isinstance(char, int):
@@ -654,9 +674,16 @@ class FE8Randomizer:
         inventory = unit[INVENTORY_INDEX : INVENTORY_INDEX + INVENTORY_SIZE]
 
 
-
+       
         if char in self.character_store:
             new_job = self.character_store[char]
+            # sets invintory from a earlier copy of yourself, if a invintory is stored
+            # as cutscene units usually have 0 items 
+            # not saving new items as l'rachel and other route splits have different invintorys
+            # so this keeps that functionallity 
+            new_inventory = self.character_store.get_inventory(char)
+            if new_inventory is None:
+                new_inventory = self.select_new_inventory(new_job, inventory, logic)
         else:
             # Checks to see if monsters are in logic or if it should just use humans
             if "player" in logic and logic["player"] and not self.config["player_monster"]:
@@ -677,11 +704,16 @@ class FE8Randomizer:
                 job_pool=self.jobs_pools[job.is_promoted][Race][Rules],
                 job_valid=lambda job: self.job_valid(job, char, logic),
             )
-
+            new_inventory = self.select_new_inventory(new_job, inventory, logic)
             if not no_store:
+                # likely could combine these 2 functions but might be read / stored in other places
+                # only storing if you have 2 itmes as most units that appear in cutscenes have 0 BUT l'rachel and co have 1
+                # so only saves units that have 2 or more items
                 self.character_store[char] = new_job
+                if inventory[1] !=0:
+                    self.character_store.set_inventory(char, new_inventory)
 
-        new_inventory = self.select_new_inventory(new_job, inventory, logic)
+        
 
         self.rom[data_offset + 1] = new_job.id
         for i, item_id in enumerate(new_inventory):
