@@ -54,7 +54,7 @@ class FE8PatchExtension(APPatchExtension):
 
         randomizer.apply_base_changes()
         
-        if config["Secure_Ross"] == 2:
+        if config["secure_ross"] == 2:
             randomizer.early_flier()
 
         if config["shuffle_skirmish_tables"]:
@@ -125,7 +125,7 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
         "player_rando": bool(options.player_unit_rando),
         "player_monster": bool(options.player_unit_monsters),
         "easier_5x": bool(options.easier_5x),
-        "Secure_Ross": int(options.secure_Ross),
+        "secure_ross": int(options.secure_Ross),
         "unbreakable_regalia": bool(options.unbreakable_regalia),
         "shuffle_skirmish_tables": bool(options.shuffle_skirmish_tables),
         "normalize_genders": bool(options.normalize_genders),

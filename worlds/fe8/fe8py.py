@@ -656,7 +656,7 @@ class FE8Randomizer:
             return job
         return self.random.choice(choices)
 
-    def randomize_chapter_unit(self, data_offset: int, logic: dict[str, Any], notForce:bool=True) -> None:
+    def randomize_chapter_unit(self, data_offset: int, logic: dict[str, Any], not_force:bool=True) -> None:
         # We *could* read the full struct, but we only need a few individual
         # bytes, so we may as well extract them ad-hoc.
         unit = self.rom[data_offset : data_offset + CHAPTER_UNIT_SIZE]
@@ -696,7 +696,7 @@ class FE8Randomizer:
         autolevel = unit[3] & 1
         inventory = unit[INVENTORY_INDEX : INVENTORY_INDEX + INVENTORY_SIZE]
 
-        if notForce and char in self.character_store:
+        if  char in self.character_store and not_force:
             new_job = self.character_store[char]
             # sets inventory from an earlier copy of yourself, if an inventory is stored
             # as cutscene units usually have 0 items not all are stored
@@ -792,12 +792,20 @@ class FE8Randomizer:
                 continue
             self.randomize_chapter_unit(offset, logic)
 
-    # handles the say to save ross in chapter 2 by editing the map or by setting vanessa / early game units classes
+    
 
     def secure_ross(self) -> None:
-        if self.config["Secure_Ross"]== 0: #Vanessa flier
+        # Setting to ensure the player always has a way to get to ross and garcia
+        # three different options
+        # 1. Vanessa is always a flier like in base game
+        # 2. open a path in mountain for any unit to reach them
+        # 3. any of the first units are a flier (eirika -> vanessa)
+
+        # Vanessa flier
+        if self.config["Secure_Ross"]== 0: 
             self.unit_blocks['Ch2'][0].logic[0]["must_fly"] =True
-        elif self.config["Secure_Ross"]== 1: # map edit
+        # map edit
+        elif self.config["Secure_Ross"]== 1: 
             # make path to ross
             # tile  1
             self.rom[ROSS_CH2_MAP_OFFSET]=156
@@ -813,8 +821,8 @@ class FE8Randomizer:
     def early_flier(self) -> None:
         # check to see if any of the early units (eirika -> vanessa) are fliers
         # if there are none, selects one of them and forces the must fly tag on
-        # then rerandomizes that unit
-        # done this way so you dont have a higher chance at more fliers if the tag was on vanessa and gilliam is also one
+        # then rerandomizes that unit and makes all cutscenes with them consistant 
+        # done this way so you dont have a higher chance at more fliers
         flier = False
         units = [['Prologue',7,0], #seth
                  ['Prologue',7,1], #franz
@@ -851,7 +859,7 @@ class FE8Randomizer:
                         logging.error(f"  block_data: {chapter_name}, {block.name}")
                         logging.error(f"  {e}")
                         raise
-        # if erikia she needs a working weapon again
+        # if Eirika she needs a working weapon again
         if char==EIRIKA:
             self.fix_Eirika_Weapons()
         
@@ -1129,10 +1137,9 @@ class FE8Randomizer:
     
         self.fix_Eirika_Weapons()
 
-        # While we force Vanessa to fly to give Ross a fighting chance, it's
-        # very possible that she won't be able to lift him. To make it more
-        # reasonable to save him, we _also_ set his starting HP.
-        # Aegis- I made it so Vaness isnt always forced but keeping this here for same logic
+        # While there are 3 ways to get to Ross.
+        # We might not be able to rescue him so setting HP to 15 
+        # likely will give you a extra turn to reach him.
         self.rom[ROSS_CH2_HP_OFFSET] = 15
 
         # Ephraim get automatic steels on rejoining in Ch15, which
