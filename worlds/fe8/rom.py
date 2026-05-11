@@ -50,12 +50,15 @@ class FE8PatchExtension(APPatchExtension):
         mut_rom = bytearray(rom)
         randomizer = FE8Randomizer(rom=mut_rom, random=random, config=config)
         
-        randomizer.secure_ross()
+        randomizer.allies_logic_changes()
+
+        randomizer.randomize_allies()
+
+        randomizer.allies_logic_checks()
+
+        randomizer.randomize_units()
 
         randomizer.apply_base_changes()
-        
-        if config["secure_ross"] == 2:
-            randomizer.early_flier()
 
         if config["shuffle_skirmish_tables"]:
             randomizer.randomize_monster_gen()
