@@ -73,9 +73,12 @@ class FE8PatchExtension(APPatchExtension):
             randomizer.normalize_genders()
         
 
+        
+
 
         randomizer.randomize_growths(*config["growth_rando"])
         randomizer.randomize_music(config["music_rando"])
+
 
 
         return bytes(mut_rom)
@@ -129,6 +132,7 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
         "player_monster": bool(options.player_unit_monsters),
         "easier_5x": bool(options.easier_5x),
         "secure_ross": int(options.secure_Ross),
+        "secure_ross": int(options.secure_Ross),
         "unbreakable_regalia": bool(options.unbreakable_regalia),
         "shuffle_skirmish_tables": bool(options.shuffle_skirmish_tables),
         "normalize_genders": bool(options.normalize_genders),
@@ -164,6 +168,7 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
     patch.write_byte(SUPER_DEMON_KING_OFFS, int(bool(options.super_demon_king)))
     patch.write_byte(LOCKPICK_USABILITY_OFFS, int(options.lockpick_usability))
     patch.write_byte(DEATH_LINK_KIND_OFFS, int(options.death_link))
+  
   
 
     patch.write_file("token_data.bin", patch.get_token_binary())

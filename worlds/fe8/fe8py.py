@@ -374,6 +374,11 @@ class CharacterStore:
             return None
         return self.character_jobs[char_name]
 
+    def lookup_jobs(self, char_name: str) -> Optional[list[int]]:
+        if char_name not in self.ids_by_name:
+            return None
+        return self.character_jobs[char_name]
+
     def lookup_jobs_by_id(self, char_id: int) -> Optional[list[int]]:
         if char_id not in self.names_by_id:
             return None
@@ -729,7 +734,7 @@ class FE8Randomizer:
             return
 
         # dancer and manakete
-        if job_id == 59 or job_id == 77:
+        if job_id == 60 or job_id == 77:
             self.character_store[char] = job
             return
 
@@ -777,7 +782,7 @@ class FE8Randomizer:
             if not no_store:
                 # likely could combine these 2 functions but might be read / stored in other places
                 # only storing if you have 2 items as all ally units appear in cutscenes have 0 somewhere in the game
-                # but Valter in prologue is his first apperance and only has 1 item then. 
+                # but Valter in prologue is his first apperance and only has 1 item then.
                 # so only saves units that have 2 or more items
                 self.character_store[char] = new_job
                 if inventory[1] != 0:
@@ -864,8 +869,7 @@ class FE8Randomizer:
                 # if no flier gives the tag and re rolls them with it
                 self.force_tag(6, "must_fly")
 
-            # TODO: logic
-
+    # TODO: logic
     #   - Flying Duessel vs enemy archers in Ephraim 10 may be unbeatable
 
     def ally_check(self, amount: int, needed_tag: str, given_logic: str) -> None:
@@ -1192,13 +1196,13 @@ class FE8Randomizer:
         ch15_auto_steel_sword = self.select_new_item(
             eirika_job, self.weapons_by_name["Steel Sword"].id, {}
         )
-        self.rom[CH15_AUTO_STEEL_SWORD] = ch15_auto_steel_sword
 
         ephraim_job = self.character_store["Ephraim"]
         ch15_auto_steel_lance = self.select_new_item(
             ephraim_job, self.weapons_by_name["Steel Lance"].id, {}
         )
 
+        self.rom[CH15_AUTO_STEEL_SWORD] = ch15_auto_steel_sword
         self.rom[CH15_AUTO_STEEL_LANCE] = ch15_auto_steel_lance
 
     def randomize_units(self) -> None:
