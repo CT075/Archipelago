@@ -744,7 +744,7 @@ class FE8Randomizer:
         return self.random.choice(choices)
 
     def randomize_chapter_unit(
-        self, data_offset: int, logic: dict[str, Any], not_force: bool = True
+        self, data_offset: int, logic: dict[str, Any], Race: JobRace 
     ) -> None:
         # We *could* read the full struct, but we only need a few individual
         # bytes, so we may as well extract them ad-hoc.
@@ -790,7 +790,7 @@ class FE8Randomizer:
         autolevel = unit[3] & 1
         inventory = unit[INVENTORY_INDEX : INVENTORY_INDEX + INVENTORY_SIZE]
 
-        if char in self.character_store and not_force and not no_store:
+        if char in self.character_store and not no_store:
             new_job = self.character_store[char]
             # sets inventory from an earlier copy of yourself, if an inventory is stored
             # as cutscene units usually have 0 items not all are stored
@@ -801,15 +801,6 @@ class FE8Randomizer:
             if new_inventory is None:
                 new_inventory = self.select_new_inventory(new_job, inventory, logic)
         else:
-            # Checks to see if monsters are in logic or if it should just use humans
-            if (
-                "player" in logic
-                and logic["player"]
-                and not self.config["player_monster"]
-            ):
-                Race = JobRace.HUMAN
-            else:
-                Race = JobRace.ALL
             # Checks to see what job pool to use
             # Add other checks here for other pools added in later as a else if
             # could make pool intersections if you want to do like ranged fliers
@@ -899,7 +890,7 @@ class FE8Randomizer:
                 rank = self.rom[boss_wrank_offs]
                 self.rom[boss_wrank_offs] = max(rank, weapon.rank)
 
-    def randomize_block(self, block: UnitBlock):
+    def randomize_block(self, block: UnitBlock, Race: JobRace):
 
         for i in range(block.count):
             offset = block.base + i * CHAPTER_UNIT_SIZE
@@ -913,7 +904,7 @@ class FE8Randomizer:
             # the in-game randomizer, meaning we don't have to touch it.
             if "monster" in logic and logic["monster"]:
                 continue
-            self.randomize_chapter_unit(offset, logic)
+            self.randomize_chapter_unit(offset, logic, Race)
 
     def allies_logic_changes(self) -> None:
         # For options that change logic of allies before randomization
@@ -1265,10 +1256,13 @@ class FE8Randomizer:
     def apply_base_changes(self) -> None:
         self.clear_weapon_ranks()
     def randomize_units(self) -> None:
+        # TO DO
+        # add no monster enemy mode
+        Race = JobRace.ALL
         for chapter_name, chapter in self.unit_blocks.items():
             for block in chapter:
                 try:
-                    self.randomize_block(block)
+                    self.randomize_block(block, Race)
                 except (ValueError, IndexError) as e:
                     logging.error("crash dump:")
                     logging.error(f"  block_data: {chapter_name}, {block.name}")
@@ -1276,10 +1270,15 @@ class FE8Randomizer:
                     raise
 
     def randomize_allies(self) -> None:
+        # Checks to see if monsters are in logic or if it should just use humans
+        if not self.config["player_monster"]:
+            Race = JobRace.HUMAN
+        else:
+            Race = JobRace.ALL
         for chapter_name, chapter in self.ally_blocks.items():
             for block in chapter:
                 try:
-                    self.randomize_block(block)
+                    self.randomize_block(block, Race)
                 except (ValueError, IndexError) as e:
                     logging.error("crash dump:")
                     logging.error(f"  block_data: {chapter_name}, {block.name}")
