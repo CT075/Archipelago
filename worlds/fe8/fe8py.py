@@ -841,6 +841,8 @@ class FE8Randomizer:
             # make map look nicer
             self.rom[ROSS_CH2_MAP_OFFSET + 31] = 196
 
+
+
         # making sure that ch5x has at least 3 useable units to make it fun
         ephraim_group = [14, 15, 16, 33]
         for x in range(3):
@@ -855,6 +857,8 @@ class FE8Randomizer:
             self.ally_blocks["Units"][chosen].logic[0]["must_fight"] = True
             LArachel_group.remove(chosen)
 
+
+
     def allies_logic_checks(self) -> None:
         # to check if certain outputs were made and forcing things
         # before they are propagated to every copy of the unit
@@ -866,8 +870,7 @@ class FE8Randomizer:
                 self.force_tag(6, "must_fly")
 
             # TODO: logic
-
-    #   - Flying Duessel vs enemy archers in Ephraim 10 may be unbeatable
+            #   - Flying Duessel vs enemy archers in Ephraim 10 may be unbeatable
 
     def ally_check(self, amount: int, needed_tag: str, given_logic: str) -> None:
         # Checks to see if the needed tag is in the first amount of units
@@ -1163,7 +1166,7 @@ class FE8Randomizer:
             ability_4_base = character_entry + CHAR_ABILITY_4_OFFSET
             self.rom[ability_4_base] |= lock_mask
 
-    def fix_Eirika_Rapier(self) -> None:
+    def fix_cutscenes(self) -> None:
         # Eirika's Rapier is given in a cutscene at the start of the chapter,
         # rather than being in her inventory
 
@@ -1193,6 +1196,7 @@ class FE8Randomizer:
         ch15_auto_steel_sword = self.select_new_item(
             eirika_job, self.weapons_by_name["Steel Sword"].id, {}
         )
+        
         self.rom[CH15_AUTO_STEEL_SWORD] = ch15_auto_steel_sword
 
         ephraim_job = self.character_store["Ephraim"]

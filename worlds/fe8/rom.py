@@ -60,9 +60,6 @@ class FE8PatchExtension(APPatchExtension):
 
         randomizer.apply_base_changes()
         
-        if config["Sercure_Ross"]== 2:
-           randomizer.early_flyer()
-
         if config["shuffle_skirmish_tables"]:
             randomizer.randomize_monster_gen()
 
