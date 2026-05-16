@@ -51,8 +51,17 @@ class FE8PatchExtension(APPatchExtension):
         random = Random(config["seed"] + config["player"])
         mut_rom = bytearray(rom)
         randomizer = FE8Randomizer(rom=mut_rom, random=random, config=config)
-        randomizer.apply_base_changes()
+        
+        randomizer.allies_logic_changes()
 
+        randomizer.randomize_allies()
+
+        randomizer.allies_logic_checks()
+
+        randomizer.randomize_units()
+
+        randomizer.apply_base_changes()
+        
         if config["shuffle_skirmish_tables"]:
             randomizer.randomize_monster_gen()
 
@@ -64,9 +73,13 @@ class FE8PatchExtension(APPatchExtension):
 
         if config["normalize_genders"]:
             randomizer.normalize_genders()
+        
+
 
         randomizer.randomize_growths(*config["growth_rando"])
         randomizer.randomize_music(config["music_rando"])
+
+
         return bytes(mut_rom)
 
 
@@ -157,5 +170,6 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
     patch.write_byte(
         WEAPON_LEVEL_CAPS_OFFS, int(bool(options.enable_weapon_level_caps))
     )
+  
 
     patch.write_file("token_data.bin", patch.get_token_binary())

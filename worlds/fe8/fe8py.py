@@ -68,6 +68,7 @@ from .constants import (
     INTERNAL_RANDO_WEAPONS_ENTRY_SIZE,
     INTERNAL_RANDO_WEAPONS_MAX_CLASSES,
     INTERNAL_RANDO_WEAPON_TABLE_ROWS,
+    ROSS_CH2_MAP_OFFSET,
     FEMALE_JOBS,
     SONG_TABLE_BASE,
     SONG_SIZE,
@@ -86,6 +87,7 @@ SONG_DATA = "data/songdata.json"
 CHARACTERS = "data/characters.json"
 CHARACTER_WRANKS = "data/character_wranks.json"
 CHAPTER_UNIT_BLOCKS = "data/chapter_unit_blocks.json"
+ALLY_UNIT_BLOCKS = "data/ally_unit_blocks.json"
 INTERNAL_RANDO_VALID_DISTRIBS = "data/internal_rando_distribs.json"
 
 
@@ -116,6 +118,34 @@ class UnitBlock:
         self.name = name
         self.base = base
         self.count = count
+        self.logic = defaultdict(
+            dict, {int_if_possible(k): v for k, v in logic.items()}
+        )
+
+
+class AllyBlock:
+    name: str
+    base: int
+    count: int
+    ids: set[int]
+
+    # Currently, the names of blocks in `chapter_unit_blocks.json` are mostly
+    # automatically generated from chapter event disassembly and are tagged
+    # with any relevant information about the block.
+    logic: defaultdict[Union[int, str], dict[str, Any]]
+
+    def __init__(
+        self,
+        name: str,
+        base: int,
+        count: int,
+        ids: set[int],
+        logic: dict[str, dict[str, Any]],
+    ):
+        self.name = name
+        self.base = base
+        self.count = count
+        self.ids = ids
         self.logic = defaultdict(
             dict, {int_if_possible(k): v for k, v in logic.items()}
         )
@@ -340,6 +370,16 @@ class CharacterStore:
             return None
         return self.ids_by_name[char_name]
 
+    def lookup_jobs(self, char_name: str) -> Optional[list[int]]:
+        if char_name not in self.ids_by_name:
+            return None
+        return self.character_jobs[char_name]
+
+    def lookup_jobs_by_id(self, char_id: int) -> Optional[list[int]]:
+        if char_id not in self.names_by_id:
+            return None
+        return self.lookup_jobs(self.names_by_id[char_id])
+
     def lookup_name(self, char_id: int) -> Optional[str]:
         if char_id not in self.names_by_id:
             return None
@@ -371,6 +411,7 @@ class CharacterStore:
         else:
             name = char
         return self.character_tags[name]
+    
 
     def __setitem__(self, char: Union[int, str], job: JobData) -> None:
         if isinstance(char, int):
@@ -417,6 +458,7 @@ def weapon_usable(weapon: WeaponData, job: JobData, logic: dict[str, Any]) -> bo
 # like `apply_5x_buffs` can happen external to this class.
 class FE8Randomizer:
     unit_blocks: dict[str, list[UnitBlock]]
+    ally_blocks: dict[str, list[AllyBlock]]
     weapons_by_id: dict[int, WeaponData]
     weapons_by_kind_rank: dict[WeaponKind, dict[WeaponRank, list[WeaponData]]]
     weapons_by_name: dict[str, WeaponData]
@@ -433,6 +475,7 @@ class FE8Randomizer:
         self.random = random
         self.rom = rom
         unit_blocks = fetch_json(CHAPTER_UNIT_BLOCKS)
+        ally_blocks = fetch_json(ALLY_UNIT_BLOCKS)
         self.config = config
 
         self.character_wranks: dict[int, list[int]] = {
@@ -442,6 +485,11 @@ class FE8Randomizer:
         self.unit_blocks = {
             name: [UnitBlock(**block) for block in blocks]
             for name, blocks in unit_blocks.items()
+        }
+
+        self.ally_blocks = {
+            name: [AllyBlock(**block) for block in blocks]
+            for name, blocks in ally_blocks.items()
         }
 
         valid_distribs_by_row = fetch_json(INTERNAL_RANDO_VALID_DISTRIBS)
@@ -455,9 +503,6 @@ class FE8Randomizer:
             JOB_DATA,
             object_hook=JobData.of_object,
         )
-
-        # TODO: handle these properly
-        job_data = [job for job in job_data if job.usable_weapons]
 
         self.character_store = CharacterStore(fetch_json(CHARACTERS))
 
@@ -477,7 +522,7 @@ class FE8Randomizer:
         # 3. then by tags, so is the class flying, lockpick or ranged atm but more can be added in time
         # This means there is a dedicated pool for promoted human fliers to make randomization faster
         for job in job_data:
-            if "no_rando" not in job.tags:
+            if "no_rando" not in job.tags and job.usable_weapons:
                 if "monster" in job.tags:
                     Race = JobRace.MONSTER
                 else:
@@ -698,7 +743,9 @@ class FE8Randomizer:
             return job
         return self.random.choice(choices)
 
-    def randomize_chapter_unit(self, data_offset: int, logic: dict[str, Any]) -> None:
+    def randomize_chapter_unit(
+        self, data_offset: int, logic: dict[str, Any], not_force: bool = True
+    ) -> None:
         # We *could* read the full struct, but we only need a few individual
         # bytes, so we may as well extract them ad-hoc.
         unit = self.rom[data_offset : data_offset + CHAPTER_UNIT_SIZE]
@@ -732,17 +779,22 @@ class FE8Randomizer:
                 self.character_store[char] = job
             return
 
+        # dancer and manakete
+        if job_id == 59 or job_id == 77:
+            self.character_store[char] = job
+            return
+
         # Affiliation = bits 1,2; unit is player if they're unset
         is_player = not bool(unit[3] & 0b0110)
         # Autolevel is LSB
         autolevel = unit[3] & 1
         inventory = unit[INVENTORY_INDEX : INVENTORY_INDEX + INVENTORY_SIZE]
 
-        if char in self.character_store:
+        if char in self.character_store and not_force and not no_store:
             new_job = self.character_store[char]
             # sets inventory from an earlier copy of yourself, if an inventory is stored
             # as cutscene units usually have 0 items not all are stored
-            # not saving new items if you appeared in a cutscene 
+            # not saving inventorys when you do get picked
             # as L'Arachel and other route splits have different inventories
             # so this keeps that functionality as well
             new_inventory = self.character_store.get_inventory(char)
@@ -775,9 +827,9 @@ class FE8Randomizer:
             new_inventory = self.select_new_inventory(new_job, inventory, logic)
             if not no_store:
                 # likely could combine these 2 functions but might be read / stored in other places
-                # only storing if you have 2 items as most units that appear in cutscenes have 0 BUT L'Arachel and co have 1
+                # only storing if you have 2 items as all ally units appear in cutscenes have 0 somewhere in the game
+                # but Valter in prologue is his first apperance and only has 1 item then. 
                 # so only saves units that have 2 or more items
-
                 self.character_store[char] = new_job
                 if inventory[1] != 0:
                     self.character_store.set_inventory(char, new_inventory)
@@ -848,19 +900,6 @@ class FE8Randomizer:
                 self.rom[boss_wrank_offs] = max(rank, weapon.rank)
 
     def randomize_block(self, block: UnitBlock):
-        for k, v in list(block.logic.items()):
-            if isinstance(k, int):
-                continue
-
-            assert isinstance(k, str)
-
-            if isinstance(v, dict) and "at_least" in v:
-                affected = self.random.sample(range(block.count), v["at_least"])
-            else:
-                affected = list(range(block.count))
-
-            for i in affected:
-                block.logic[i][k] = v
 
         for i in range(block.count):
             offset = block.base + i * CHAPTER_UNIT_SIZE
@@ -876,7 +915,37 @@ class FE8Randomizer:
                 continue
             self.randomize_chapter_unit(offset, logic)
 
-    # Randomize the classes and possible invtories for the game's internal
+    def allies_logic_changes(self) -> None:
+        # For options that change logic of allies before randomization
+        
+        # making sure that ch5x has at least 3 useable units to make it fun
+        ephraim_group = [14, 15, 16, 33]
+        for x in range(3):
+            chosen = self.random.choice(ephraim_group)
+            self.ally_blocks["Units"][chosen].logic[0]["must_fight"] = True
+            ephraim_group.remove(chosen)
+
+        # l'arachel's group gets the same thing but its mainly so Dozla can protect her
+        LArachel_group = [23, 24, 28]
+        for x in range(2):
+            chosen = self.random.choice(LArachel_group)
+            self.ally_blocks["Units"][chosen].logic[0]["must_fight"] = True
+            LArachel_group.remove(chosen)
+
+
+
+    def allies_logic_checks(self) -> None:
+        # to check if certain outputs were made and forcing things
+        # before they are propagated to every copy of the unit
+
+        #line just here so python doesnt complain will have logic in next PR
+        holder =True
+
+            # TODO: logic
+            #   - Flying Duessel vs enemy archers in Ephraim 10 may be unbeatable
+
+
+    # Randomize the classes and possible inventories for the game's internal
     # randomizer (used for skirmishes, tower/ruins, and the two random Wights
     # with Lyon for some reason).
     def randomize_monster_gen(self) -> None:
@@ -1121,7 +1190,22 @@ class FE8Randomizer:
     def fix_cutscenes(self) -> None:
         # Eirika's Rapier is given in a cutscene at the start of the chapter,
         # rather than being in her inventory
+
         eirika_job = self.character_store["Eirika"]
+        if self.config["player_rando"]:
+            if any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
+                new_rapier = self.select_new_item(
+                    eirika_job, self.weapons_by_name["Steel Blade"].id, {}
+                )
+            else:
+                new_rapier = self.random.choice(
+                    [
+                        self.weapons_by_name["Heal"],
+                        self.weapons_by_name["Mend"],
+                        self.weapons_by_name["Recover"],
+                    ]
+                ).id
+            self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
         if eirika_job.id == EIRIKA_LORD:
             new_rapier = self.weapons_by_name["Rapier"].id
         else:
@@ -1149,22 +1233,24 @@ class FE8Randomizer:
                 new_rapier = self.random.choice(healing).id
         self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
 
-        # While we force Vanessa to fly to give Ross a fighting chance, it's
-        # very possible that she won't be able to lift him. To make it more
-        # reasonable to save him, we _also_ set his starting HP.
+        # While there are 3 ways to get to Ross.
+        # We might not be able to rescue him so setting HP to 15
+        # likely will give you a extra turn to reach him.
         self.rom[ROSS_CH2_HP_OFFSET] = 15
 
-        # Eirika and Ephraim get automatic steels on rejoining in Ch15, which
+        # Ephraim get automatic steels on rejoining in Ch15, which
         # need to be adjusted.
         ch15_auto_steel_sword = self.select_new_item(
             eirika_job, self.weapons_by_name["Steel Sword"].id, {}
         )
+        
+        self.rom[CH15_AUTO_STEEL_SWORD] = ch15_auto_steel_sword
+
         ephraim_job = self.character_store["Ephraim"]
         ch15_auto_steel_lance = self.select_new_item(
             ephraim_job, self.weapons_by_name["Steel Lance"].id, {}
         )
 
-        self.rom[CH15_AUTO_STEEL_SWORD] = ch15_auto_steel_sword
         self.rom[CH15_AUTO_STEEL_LANCE] = ch15_auto_steel_lance
 
     # TODO: logic
@@ -1178,6 +1264,7 @@ class FE8Randomizer:
 
     def apply_base_changes(self) -> None:
         self.clear_weapon_ranks()
+    def randomize_units(self) -> None:
         for chapter_name, chapter in self.unit_blocks.items():
             for block in chapter:
                 try:
@@ -1188,6 +1275,18 @@ class FE8Randomizer:
                     logging.error(f"  {e}")
                     raise
 
+    def randomize_allies(self) -> None:
+        for chapter_name, chapter in self.ally_blocks.items():
+            for block in chapter:
+                try:
+                    self.randomize_block(block)
+                except (ValueError, IndexError) as e:
+                    logging.error("crash dump:")
+                    logging.error(f"  block_data: {chapter_name}, {block.name}")
+                    logging.error(f"  {e}")
+                    raise
+
+    def apply_base_changes(self) -> None:
         self.fix_movement_costs()
         self.fix_cutscenes()
         self.tweak_lords()
@@ -1228,7 +1327,6 @@ class FE8Randomizer:
                 break
             i = self.random.choice(available_indices)
             result[i] += overflow
-            overflow = 0
             if result[i] > 255:
                 overflow = result[i] - 255
                 result[i] = 255

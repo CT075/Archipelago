@@ -42,7 +42,7 @@
             "count": 7,
             "logic": {"0": {"must_fight": true}}
         },
-        {"name": "label35", "base": 9126268, "count": 2, "logic": {}},
+        {"name": "FranzGilliam", "base": 9126268, "count": 2, "logic": {}},
         {"name": "label32", "base": 9126408, "count": 2, "logic": {}},
         {"name": "EasternReinforcements", "base": 9126328, "count": 3, "logic": {}}
     ],
@@ -82,7 +82,7 @@
             "name": "LArachelGroup",
             "base": 9129176,
             "count": 3,
-            "logic": {"must_fight": {"at_least": 2}}
+            "logic": {}
         },
         {"name": "label40", "base": 9129256, "count": 2, "logic": {}},
         {"name": "label41", "base": 9129316, "count": 3, "logic": {}},
@@ -103,7 +103,7 @@
             "name": "label44",
             "base": 9140284,
             "count": 2,
-            "logic": {"1": {"no_store": true}}
+            "logic": {}
         },
         {"name": "label45", "base": 9140364, "count": 1, "logic": {}},
         {"name": "Turn2Brigands", "base": 9132128, "count": 2, "logic": {}},
@@ -115,7 +115,7 @@
             "name": "PlayerDeployment",
             "base": 9132644,
             "count": 4,
-            "logic": {"must_fight": {"at_least": 3}}
+            "logic": {}
         },
         {"name": "label22", "base": 9132744, "count": 31, "logic": {}},
         {"name": "label23", "base": 9133384, "count": 3, "logic": {}},
