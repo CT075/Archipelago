@@ -64,11 +64,12 @@ from .constants import (
     INTERNAL_RANDO_CLASS_WEIGHT_ENTRY_SIZE,
     INTERNAL_RANDO_CLASS_WEIGHTS_COUNT,
     INTERNAL_RANDO_CLASS_WEIGHT_NUM_CLASSES,
-    INTERNAL_RANDO_WEAPONS_OFFS,
-    INTERNAL_RANDO_WEAPONS_ENTRY_SIZE,
-    INTERNAL_RANDO_WEAPONS_MAX_CLASSES,
+    INTERNAL_RANDO_CLASS_OFFS,
+    INTERNAL_RANDO_CLASS_ENTRY_SIZE,
+    INTERNAL_RANDO_CLASS_MAX_CLASSES,
     INTERNAL_RANDO_WEAPON_TABLE_ROWS,
-    WEAPON_POOL_07,
+    INTERNAL_RANDO_WEAPON_OFFS,
+    INTERNAL_RANDO_WEAPON_ENTRY_SIZE,
     FEMALE_JOBS,
     SONG_TABLE_BASE,
     SONG_SIZE,
@@ -369,15 +370,18 @@ def weapon_usable(weapon: WeaponData, job: JobData, logic: dict[str, Any]) -> bo
 
     if any(lock not in job.tags for lock in weapon.locks):
         return False
-    
-    if ("player" not in logic or ("player" in logic and logic["player"]==False)) and weapon.name in [
+
+    # removes weapons the AI can not use
+    if (
+        "player" not in logic or ("player" in logic and logic["player"] == False)
+    ) and weapon.name in [
         "Restore",
         "Warp",
         "Rescue",
         "Torch",
         "Hammerne",
         "Unlock",
-        "Barrier"
+        "Barrier",
     ]:
         return False
 
@@ -556,7 +560,30 @@ class FE8Randomizer:
     def select_new_inventory(
         self, job: JobData, items: bytes, logic: dict[str, Any]
     ) -> list[int]:
-        return [self.select_new_item(job, item_id, logic) for item_id in items]
+        inventory = [self.select_new_item(job, item_id, logic) for item_id in items]
+
+        # adds a basic tome to units with just staffs if they are promoted
+        if (
+            job.is_promoted
+            and inventory[0] != 0
+            and any(wkind == WeaponKind.STAFF for wkind in job.usable_weapons)
+        ):
+            only_staff = True
+            empty = 0
+            for item_id in inventory:
+                if item_id == 0:
+                    break
+                empty += 1
+                if item_id not in self.weapons_by_id:
+                    continue
+                weapon_attrs = self.weapons_by_id[item_id]
+                if WeaponKind.STAFF != weapon_attrs.kind:
+                    only_staff = False
+            if only_staff:
+                inventory[empty] = self.select_new_item(
+                    job, self.weapons_by_name["Iron Sword"].id, {"must_fight": True}
+                )
+        return inventory
 
     def rewrite_coords(self, offset: int, x: int, y: int):
         old_coords = read_short_le(self.rom, offset)
@@ -612,7 +639,7 @@ class FE8Randomizer:
 
         job = self.jobs_by_id[job_id]
         char = unit[0]
-
+ 
         # add character tags to logic
         ctags = self.character_store.tags(char)
         if not ctags:
@@ -623,20 +650,27 @@ class FE8Randomizer:
 
         no_store = "no_store" in logic and logic["no_store"]
 
-        # config option for disabling player unit randomization
-        if not self.config["player_rando"] and "player" in logic and logic["player"]:
-            if char not in self.character_store and not no_store:
-                self.character_store[char] = job
-            return
-
         # Affiliation = bits 1,2; unit is player if they're unset
         is_player = not bool(unit[3] & 0b0110)
         # Autolevel is LSB
         autolevel = unit[3] & 1
         inventory = unit[INVENTORY_INDEX : INVENTORY_INDEX + INVENTORY_SIZE]
 
+        # config option for disabling player unit randomization
+        if not self.config["player_rando"] and "player" in logic and logic["player"]:
+            if char not in self.character_store and not no_store:
+                self.character_store[char] = job
+
+                # Weapon level fix for green / red "allys" so they can use weapons when not blue
+                # effects joshua dozla, orson ETC
+            if not is_player and not autolevel:
+                    self.add_weapon_rank(inventory, char)    
+            return
+
         if char in self.character_store:
             new_job = self.character_store[char]
+            if char == 109:
+                self.add_weapon_rank(inventory, char)
         else:
             new_job = self.select_new_job(
                 job,
@@ -664,14 +698,18 @@ class FE8Randomizer:
         # some kind, so we should force its weapon levels in the character
         # table.
         if not is_player and not autolevel and char in self.character_store:
-            for item_id in new_inventory:
-                if item_id not in self.weapons_by_id:
-                    continue
-                boss_data_offs = CHARACTER_TABLE_BASE + char * CHARACTER_SIZE
-                weapon = self.weapons_by_id[item_id]
-                boss_wrank_offs = boss_data_offs + CHARACTER_WRANK_OFFSET + weapon.kind
-                rank = self.rom[boss_wrank_offs]
-                self.rom[boss_wrank_offs] = max(rank, weapon.rank)
+            self.add_weapon_rank(new_inventory, char)
+
+
+    def add_weapon_rank(self, inventory: bytes, char: int):
+        for item_id in inventory:
+            if item_id not in self.weapons_by_id:
+                continue
+            boss_data_offs = CHARACTER_TABLE_BASE + char * CHARACTER_SIZE
+            weapon = self.weapons_by_id[item_id]
+            boss_wrank_offs = boss_data_offs + CHARACTER_WRANK_OFFSET + weapon.kind
+            rank = self.rom[boss_wrank_offs]
+            self.rom[boss_wrank_offs] = max(rank, weapon.rank)
 
     def randomize_block(self, block: UnitBlock):
         for k, v in list(block.logic.items()):
@@ -738,11 +776,8 @@ class FE8Randomizer:
                 map(
                     job.name.startswith,
                     (
-                        # catches both regular Mages and "Mage Knight"
-                        "Mage",
-                        "Sage",
+
                         "Shaman",
-                        "Druid",
                         "Priest",
                         "Cleric",
                         "Monk",
@@ -751,10 +786,13 @@ class FE8Randomizer:
                         "Valkyrie",
                         "Summoner",
                         "Necromancer",
-                        "Pupil",
-                        "Journeyman",
-                        "Recruit",
+                        "Pupil (1)",
+                        "Journeyman (1)",
+                        "Recruit (1)",
                         "Dracozombie",
+                        "Dancer",
+                        "Manakete",
+                        "Bard",
                     ),
                 )
             ):
@@ -787,7 +825,7 @@ class FE8Randomizer:
                 unpromoted_pool, promoted_pool = (
                     jobset.pools()
                     # We _could_ repoint this and not need to check, but eh
-                    if len(jobset) >= INTERNAL_RANDO_WEAPONS_MAX_CLASSES
+                    if len(jobset) >= INTERNAL_RANDO_CLASS_MAX_CLASSES
                     else (self.unpromoted_jobs, self.promoted_jobs)
                 )
                 new_job = self.select_new_job(
@@ -799,10 +837,40 @@ class FE8Randomizer:
                 self.rom[offs + j] = new_job.id
                 jobset.add(new_job)
 
+        # removes the sword in lance tables
+        offset = (
+            INTERNAL_RANDO_WEAPON_OFFS
+            + weapon_tables[(WeaponKind.LANCE, 1)] * INTERNAL_RANDO_WEAPON_ENTRY_SIZE
+        )
+        for i in range(4):
+            self.rom[offset + i] = self.rom[offset + i + 1]
+
+        # turns 2 blank tables and a unused axe table into ANIMA tables
+        offset = (
+            INTERNAL_RANDO_WEAPON_OFFS
+            + weapon_tables[(WeaponKind.ANIMA, 0)] * INTERNAL_RANDO_WEAPON_ENTRY_SIZE
+        )
+        self.rom[offset] = self.weapons_by_name["Fire"].id
+        self.rom[offset + 1] = self.weapons_by_name["Thunder"].id
+
+        offset = (
+            INTERNAL_RANDO_WEAPON_OFFS
+            + weapon_tables[(WeaponKind.ANIMA, 1)] * INTERNAL_RANDO_WEAPON_ENTRY_SIZE
+        )
+        self.rom[offset] = self.weapons_by_name["Elfire"].id
+        self.rom[offset + 1] = self.weapons_by_name["Thunder"].id
+
+        offset = (
+            INTERNAL_RANDO_WEAPON_OFFS
+            + weapon_tables[(WeaponKind.ANIMA, 2)] * INTERNAL_RANDO_WEAPON_ENTRY_SIZE
+        )
+        self.rom[offset] = self.weapons_by_name["Elfire"].id
+        self.rom[offset + 1] = self.weapons_by_name["Fimbulvetr"].id
+
         # CR-someday cam: There is a lot of hardcoding going on here. It would
         # be nice to move some of the special-casing here to the data files.
         for i, job in enumerate(jobset.iter()):
-            offs = INTERNAL_RANDO_WEAPONS_OFFS + i * INTERNAL_RANDO_WEAPONS_ENTRY_SIZE
+            offs = INTERNAL_RANDO_CLASS_OFFS + i * INTERNAL_RANDO_CLASS_ENTRY_SIZE
             row1: Tuple[int, int, int, int, int]
             row1weights: Tuple[int, int, int, int, int]
             row1distrib: Tuple[int, int, int, int, int]
@@ -843,6 +911,20 @@ class FE8Randomizer:
                 row1 = (idx, 0, 0, 0, 0)
                 row1weights = (100, 0, 0, 0, 0)
                 row1distrib = (distrib_idx, 0, 0, 0, 0)
+            elif WeaponKind.ANIMA in job.usable_weapons:
+                kind = WeaponKind.ANIMA
+                lo_pwr, hi_pwr = (1, 2) if job.is_promoted else (0, 1)
+                lo_idx = weapon_tables[(kind, lo_pwr)]
+                hi_idx = weapon_tables[(kind, hi_pwr)]
+                row1 = (lo_idx, hi_idx, 0, 0, 0)
+                row1weights = (45, 55, 0, 0, 0)
+                row1distrib = (
+                    self.random.choice(self.valid_distribs_by_row[row1[0]]),
+                    self.random.choice(self.valid_distribs_by_row[row1[1]]),
+                    0,
+                    0,
+                    0,
+                )
             elif len(job.usable_weapons) > 1:
                 lo_pwr, mid_pwr, hi_pwr = (2, 3, 4) if job.is_promoted else (0, 1, 2)
                 lo_kind1, lo_kind2 = self.random.sample(list(job.usable_weapons), k=2)
@@ -891,16 +973,6 @@ class FE8Randomizer:
         for job in MOUNTED_MONSTERS:
             entry = JOB_TABLE_BASE + job * JOB_SIZE
             self.rom[entry + JOB_ABILITY_1_INDEX] |= MOUNTED_AID_CANTO_MASK
-
-    def fix_tower_weapons(self) -> None:
-        """
-        Tower / ruins weapon pool 7 is grouped in with otther lance's and is
-        assigned to lance only classes, this weapon pool is orginally for 
-        bonewalkers that can use swords as well, and its just ranged weapons
-        this means that knights/ other lance locked classes can spawn with runesword
-        this swaps it out for a Brave lance
-        """
-        self.rom[WEAPON_POOL_07] = self.weapons_by_name["Brave Lance"].id
 
     def fix_movement_costs(self) -> None:
         """
@@ -1001,7 +1073,6 @@ class FE8Randomizer:
                     logging.error(f"  {e}")
                     raise
 
-        self.fix_tower_weapons()              
         self.fix_movement_costs()
         self.fix_cutscenes()
         self.tweak_lords()
@@ -1029,11 +1100,11 @@ class FE8Randomizer:
         cuts = sorted(self.random.sample(range(1, total), STATS_COUNT))
         result = []
         overflow = 0
-        for st, end in zip([0]+cuts, cuts+[total]):
-            growth = end-st
+        for st, end in zip([0] + cuts, cuts + [total]):
+            growth = end - st
             if growth > 255:
                 result.append(255)
-                overflow += growth-255
+                overflow += growth - 255
             else:
                 result.append(growth)
         while overflow > 0:
@@ -1044,7 +1115,7 @@ class FE8Randomizer:
             result[i] += overflow
             overflow = 0
             if result[i] > 255:
-                overflow = result[i]-255
+                overflow = result[i] - 255
                 result[i] = 255
         return result
 
