@@ -669,8 +669,6 @@ class FE8Randomizer:
 
         if char in self.character_store:
             new_job = self.character_store[char]
-            if char == 109:
-                self.add_weapon_rank(inventory, char)
         else:
             new_job = self.select_new_job(
                 job,
