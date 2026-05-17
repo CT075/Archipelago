@@ -852,6 +852,9 @@ class FE8Randomizer:
         )
         self.rom[offset] = self.weapons_by_name["Fire"].id
         self.rom[offset + 1] = self.weapons_by_name["Thunder"].id
+        self.rom[offset + 2] = 0
+        self.rom[offset + 3] = 0
+        self.rom[offset + 4] = 0
 
         offset = (
             INTERNAL_RANDO_WEAPON_OFFS
