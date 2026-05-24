@@ -862,15 +862,13 @@ class FE8Randomizer:
                     yield j
 
         def job_valid_for_internal_rando(job: JobData) -> bool:
-            # We disable mages because there aren't any entries for them in the
-            # base weapon tables. Eventually we'll add them back in, but for
-            # now we can just disable them.
-            # CR-soon cam: Add these back in
+            # only Light and normal Dark magic are not in tables
+            # Here are the jobs that only use Light Dark and staffs
+            # While also being in the job pools for randomization 
             if any(
                 map(
                     job.name.startswith,
                     (
-
                         "Shaman",
                         "Priest",
                         "Cleric",
@@ -879,20 +877,55 @@ class FE8Randomizer:
                         "Troubadour",
                         "Valkyrie",
                         "Summoner",
-                        "Necromancer",
-                        "Pupil (1)",
-                        "Journeyman (1)",
-                        "Recruit (1)",
-                        "Dracozombie",
-                        "Dancer",
-                        "Manakete",
-                        "Bard",
+                        "Necromancer"
                     ),
                 )
             ):
                 return False
 
             return True
+        
+
+        def weapon_updates():
+            # function for any and all changes to internal rando weapons 
+
+            # removes the sword in lance tables
+            offset = (
+                INTERNAL_RANDO_WEAPON_OFFS
+                + weapon_tables[(WeaponKind.LANCE, 1)] * INTERNAL_RANDO_WEAPON_ENTRY_SIZE
+            )
+            for i in range(4):
+                self.rom[offset + i] = self.rom[offset + i + 1]
+
+            # turns 2 blank tables and a unused axe table into ANIMA tables
+            # (unsed by us ) axe table 5 -> low level anima
+            offset = (
+                INTERNAL_RANDO_WEAPON_OFFS
+                + weapon_tables[(WeaponKind.ANIMA, 0)] * INTERNAL_RANDO_WEAPON_ENTRY_SIZE
+            )
+            self.rom[offset] = self.weapons_by_name["Fire"].id
+            self.rom[offset + 1] = self.weapons_by_name["Thunder"].id
+            self.rom[offset + 2] = 0
+            self.rom[offset + 3] = 0
+            self.rom[offset + 4] = 0
+
+            # blank table 1 -> mid level anima
+            offset = (
+                INTERNAL_RANDO_WEAPON_OFFS
+                + weapon_tables[(WeaponKind.ANIMA, 1)] * INTERNAL_RANDO_WEAPON_ENTRY_SIZE
+            )
+            self.rom[offset] = self.weapons_by_name["Elfire"].id
+            self.rom[offset + 1] = self.weapons_by_name["Thunder"].id
+
+            # blank table 2 -> high level anima
+            offset = (
+                INTERNAL_RANDO_WEAPON_OFFS
+                + weapon_tables[(WeaponKind.ANIMA, 2)] * INTERNAL_RANDO_WEAPON_ENTRY_SIZE
+            )
+            self.rom[offset] = self.weapons_by_name["Elfire"].id
+            self.rom[offset + 1] = self.weapons_by_name["Fimbulvetr"].id
+
+
 
         # CR-soon cam: do this better
         weapon_tables = {
@@ -930,38 +963,7 @@ class FE8Randomizer:
                 self.rom[offs + j] = new_job.id
                 jobset.add(new_job)
 
-        # removes the sword in lance tables
-        offset = (
-            INTERNAL_RANDO_WEAPON_OFFS
-            + weapon_tables[(WeaponKind.LANCE, 1)] * INTERNAL_RANDO_WEAPON_ENTRY_SIZE
-        )
-        for i in range(4):
-            self.rom[offset + i] = self.rom[offset + i + 1]
-
-        # turns 2 blank tables and a unused axe table into ANIMA tables
-        offset = (
-            INTERNAL_RANDO_WEAPON_OFFS
-            + weapon_tables[(WeaponKind.ANIMA, 0)] * INTERNAL_RANDO_WEAPON_ENTRY_SIZE
-        )
-        self.rom[offset] = self.weapons_by_name["Fire"].id
-        self.rom[offset + 1] = self.weapons_by_name["Thunder"].id
-        self.rom[offset + 2] = 0
-        self.rom[offset + 3] = 0
-        self.rom[offset + 4] = 0
-
-        offset = (
-            INTERNAL_RANDO_WEAPON_OFFS
-            + weapon_tables[(WeaponKind.ANIMA, 1)] * INTERNAL_RANDO_WEAPON_ENTRY_SIZE
-        )
-        self.rom[offset] = self.weapons_by_name["Elfire"].id
-        self.rom[offset + 1] = self.weapons_by_name["Thunder"].id
-
-        offset = (
-            INTERNAL_RANDO_WEAPON_OFFS
-            + weapon_tables[(WeaponKind.ANIMA, 2)] * INTERNAL_RANDO_WEAPON_ENTRY_SIZE
-        )
-        self.rom[offset] = self.weapons_by_name["Elfire"].id
-        self.rom[offset + 1] = self.weapons_by_name["Fimbulvetr"].id
+        weapon_updates
 
         # CR-someday cam: There is a lot of hardcoding going on here. It would
         # be nice to move some of the special-casing here to the data files.
