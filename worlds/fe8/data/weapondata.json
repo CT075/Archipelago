@@ -447,7 +447,8 @@
     "id":80,
     "name":"Restore",
     "rank":"C",
-    "kind":"Staff"
+    "kind":"Staff",
+    "team":"Player_only"
   },
   {
     "id":81,
@@ -471,37 +472,43 @@
     "id":84,
     "name":"Warp",
     "rank":"A",
-    "kind":"Staff"
+    "kind":"Staff",
+    "team":"Player_only"
   },
   {
     "id":85,
     "name":"Rescue",
     "rank":"B",
-    "kind":"Staff"
+    "kind":"Staff",
+    "team":"Player_only"
   },
   {
     "id":86,
     "name":"Torch",
     "rank":"D",
-    "kind":"Staff"
+    "kind":"Staff",
+    "team":"Player_only"
   },
   {
     "id":87,
     "name":"Hammerne",
     "rank":"C",
-    "kind":"Staff"
+    "kind":"Staff",
+    "team":"Player_only"
   },
   {
     "id":88,
     "name":"Unlock",
     "rank":"D",
-    "kind":"Staff"
+    "kind":"Staff",
+    "team":"Player_only"
   },
   {
     "id":89,
     "name":"Barrier",
     "rank":"C",
-    "kind":"Staff"
+    "kind":"Staff",
+    "team":"Player_only"
   },
   {
     "id":90,

@@ -270,6 +270,7 @@ class WeaponData:
     rank: WeaponRank
     kind: WeaponKind
     locks: set[str]
+    team: set[str]
 
     @classmethod
     def of_object(cls, obj: dict[str, Any]):
@@ -279,6 +280,7 @@ class WeaponData:
             rank=WeaponRank.of_str(obj["rank"]),
             kind=WeaponKind.of_str(obj["kind"]),
             locks=obj.get("locks", set()),
+            team=obj.get("team", set()),
         )
 
 
@@ -406,15 +408,7 @@ def weapon_usable(weapon: WeaponData, job: JobData, logic: dict[str, Any]) -> bo
     # removes weapons the AI can not use
     if (
         "player" not in logic or ("player" in logic and logic["player"] == False)
-    ) and weapon.name in [
-        "Restore",
-        "Warp",
-        "Rescue",
-        "Torch",
-        "Hammerne",
-        "Unlock",
-        "Barrier",
-    ]:
+    ) and weapon.team == "Player":
         return False
 
     if "must_fight" in logic and weapon.kind in [
