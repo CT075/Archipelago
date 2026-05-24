@@ -574,7 +574,8 @@
     "id":140,
     "name":"Latona",
     "rank":"S",
-    "kind":"Staff"
+    "kind":"Staff",
+    "team":"Player_only"
   },
   {
     "id":141,

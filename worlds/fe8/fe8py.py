@@ -408,7 +408,7 @@ def weapon_usable(weapon: WeaponData, job: JobData, logic: dict[str, Any]) -> bo
     # removes weapons the AI can not use
     if (
         "player" not in logic or ("player" in logic and logic["player"] == False)
-    ) and weapon.team == "Player":
+    ) and weapon.team == "Player_only":
         return False
 
     if "must_fight" in logic and weapon.kind in [
@@ -579,12 +579,12 @@ class FE8Randomizer:
     def select_new_item(self, job: JobData, item_id: int, logic: dict[str, Any]) -> int:
         if item_id == LOCKPICK:
             if "Lockpick" in job.tags:
-                return LOCKPICK
+                return LOCKPICK, WeaponKind.ITEM
             else:
-                return CHEST_KEY_5
+                return CHEST_KEY_5, WeaponKind.ITEM
 
         if item_id not in self.weapons_by_id:
-            return item_id
+            return item_id, WeaponKind.ITEM
         weapon_attrs = self.weapons_by_id[item_id]
 
         # gets the weapon types equipable and adds them to the pool for the current weapon being changed
@@ -616,35 +616,40 @@ class FE8Randomizer:
                 )
                 choices = [self.weapons_by_name["Iron Sword"]]
 
-        return self.random.choice(choices).id
+        chosen = self.random.choice(choices).id
+
+        return chosen, self.weapons_by_id[chosen].kind
 
     def select_new_inventory(
         self, job: JobData, items: bytes, logic: dict[str, Any]
     ) -> list[int]:
-        inventory = [self.select_new_item(job, item_id, logic) for item_id in items]
+        # selects items, and checks to see if they can deal damage
+        # if you are promoted and no damaging weapons (staffs)
+        # adds a E rank tome to  invintory
+         
+         
+        new_inventory=[]
+        can_fight = False
 
-        # adds a basic tome to units with just staffs if they are promoted
-        if (
-            job.is_promoted
-            and inventory[0] != 0
-            and any(wkind == WeaponKind.STAFF for wkind in job.usable_weapons)
-        ):
-            only_staff = True
-            empty = 0
-            for item_id in inventory:
-                if item_id == 0:
-                    break
-                empty += 1
-                if item_id not in self.weapons_by_id:
-                    continue
-                weapon_attrs = self.weapons_by_id[item_id]
-                if WeaponKind.STAFF != weapon_attrs.kind:
-                    only_staff = False
-            if only_staff:
-                inventory[empty] = self.select_new_item(
+        for item_id in items:
+            if item_id == 0:
+                break
+            new_item, type = self.select_new_item(job, item_id, logic)
+            if type.damaging():
+                can_fight=True
+            new_inventory.append(new_item)
+        
+        if job.is_promoted and not can_fight:
+            new_item, type = self.select_new_item(
                     job, self.weapons_by_name["Iron Sword"].id, {"must_fight": True}
                 )
-        return inventory
+            new_inventory.append(new_item)
+        
+        new_inventory = new_inventory + [0] * (4 - len(new_inventory))
+
+        return new_inventory
+        
+
 
     def rewrite_coords(self, offset: int, x: int, y: int):
         old_coords = read_short_le(self.rom, offset)
@@ -720,8 +725,8 @@ class FE8Randomizer:
             if char not in self.character_store and not no_store:
                 self.character_store[char] = job
 
-                # Weapon level fix for green / red "allys" so they can use weapons when not blue
-                # effects joshua dozla, orson ETC
+            # Weapon level fix for green / red "allys" so they can use weapons when not blue
+            # effects joshua, dozla, orson ETC
             if not is_player and not autolevel:
                     self.add_weapon_rank(inventory, char)    
             return
@@ -1121,7 +1126,7 @@ class FE8Randomizer:
         # rather than being in her inventory
         eirika_job = self.character_store["Eirika"]
         if any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
-            new_rapier = self.select_new_item(
+            new_rapier, kind = self.select_new_item(
                 eirika_job, self.weapons_by_name["Steel Blade"].id, {}
             )
         else:
@@ -1141,11 +1146,11 @@ class FE8Randomizer:
 
         # Eirika and Ephraim get automatic steels on rejoining in Ch15, which
         # need to be adjusted.
-        ch15_auto_steel_sword = self.select_new_item(
+        ch15_auto_steel_sword, kind = self.select_new_item(
             eirika_job, self.weapons_by_name["Steel Sword"].id, {}
         )
         ephraim_job = self.character_store["Ephraim"]
-        ch15_auto_steel_lance = self.select_new_item(
+        ch15_auto_steel_lance, kind = self.select_new_item(
             ephraim_job, self.weapons_by_name["Steel Lance"].id, {}
         )
 
