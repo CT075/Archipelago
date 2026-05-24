@@ -758,6 +758,8 @@ class FE8Randomizer:
             # but should never need to
             if "must_fly" in logic and logic["must_fly"]:
                 Rules = JobType.FLIER
+            elif "must_ranged" in logic and logic["must_ranged"]:
+                Rules = JobType.RANGED
             else:
                 Rules = JobType.ANY
 
@@ -918,7 +920,7 @@ class FE8Randomizer:
                     jobset.pools()
                     # We _could_ repoint this and not need to check, but eh
                     if len(jobset) >= INTERNAL_RANDO_CLASS_MAX_CLASSES
-                    else (self.unpromoted_jobs, self.promoted_jobs)
+                    else (self.jobs_pools[NOT_PROMOTED][JobRace.ALL][JobType.ANY], self.jobs_pools[IS_PROMOTED][JobRace.ALL][JobType.ANY])
                 )
                 new_job = self.select_new_job(
                     job,

@@ -620,7 +620,10 @@
     ],
     "Ch14Eir": [
         {"name": "PlayerDeployment", "base": 9157544, "count": 12, "logic": {}},
-        {"name": "StartingEnemies", "base": 9157804, "count": 42, "logic": {}},
+        {"name": "StartingEnemies", "base": 9157804, "count": 42, "logic": 
+        {"20": {"must_ranged": true},
+        "21": {"must_ranged": true},
+        "22": {"must_ranged": true}}},
         {"name": "label35", "base": 9158924, "count": 1, "logic": {}},
         {"name": "label38", "base": 9158964, "count": 2, "logic": {}},
         {"name": "ThroneGroup", "base": 9159024, "count": 6, "logic": {}},
@@ -636,7 +639,9 @@
             "logic": {"must_fight": true}
         },
         {"name": "label49", "base": 9159892, "count": 5, "logic": {}},
-        {"name": "StairsArcher", "base": 9158664, "count": 1, "logic": {}},
+        {"name": "StairsArcher", "base": 9158664, "count": 1, "logic": {
+            "0": {"must_ranged": true}
+        }},
         {"name": "SoutheasternCavaliers", "base": 9158844, "count": 3, "logic": {}},
         {"name": "StairsShamans", "base": 9158784, "count": 2, "logic": {}},
         {"name": "SouthwesternArmours", "base": 9158704, "count": 3, "logic": {}}

@@ -284,7 +284,8 @@
     ],
     "is_promoted":false,
     "tags":[
-      "bow_only"
+      "bow_only",
+      "ranged"
     ]
   },
   {
@@ -295,7 +296,8 @@
     ],
     "is_promoted":false,
     "tags":[
-      "bow_only"
+      "bow_only",
+      "ranged"
     ]
   },
   {
@@ -306,7 +308,8 @@
     ],
     "is_promoted":true,
     "tags":[
-      "bow_only"
+      "bow_only",
+      "ranged"
     ]
   },
   {
@@ -317,7 +320,8 @@
     ],
     "is_promoted":true,
     "tags":[
-      "bow_only"
+      "bow_only",
+      "ranged"
     ]
   },
   {
@@ -420,7 +424,7 @@
     ],
     "is_promoted":false,
     "tags":[
-      
+      "ranged"
     ]
   },
   {
@@ -431,7 +435,7 @@
     ],
     "is_promoted":false,
     "tags":[
-      
+      "ranged"
     ]
   },
   {
@@ -444,7 +448,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "ranged"
     ]
   },
   {
@@ -457,7 +461,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "ranged"
     ]
   },
   {
@@ -469,7 +473,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "ranged"
     ]
   },
   {
@@ -481,7 +485,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "ranged"
     ]
   },
   {
@@ -493,7 +497,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "ranged"
     ]
   },
   {
@@ -505,7 +509,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "ranged"
     ]
   },
   {
@@ -516,7 +520,7 @@
     ],
     "is_promoted":false,
     "tags":[
-      
+      "ranged"
     ]
   },
   {
@@ -527,7 +531,7 @@
     ],
     "is_promoted":false,
     "tags":[
-      
+      "ranged"
     ]
   },
   {
@@ -540,7 +544,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "ranged"
     ]
   },
   {
@@ -553,7 +557,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "ranged"
     ]
   },
   {
@@ -565,7 +569,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "ranged"
     ]
   },
   {
@@ -577,7 +581,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "ranged"
     ]
   },
   {
@@ -660,7 +664,8 @@
     ],
     "is_promoted":false,
     "tags":[
-      "trainee"
+      "trainee",
+      "ranged"
     ]
   },
   {
@@ -727,7 +732,7 @@
     ],
     "is_promoted":false,
     "tags":[
-      
+      "ranged"
     ]
   },
   {
@@ -817,7 +822,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "ranged"
     ]
   },
   {
@@ -851,7 +856,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "ranged"
     ]
   },
   {
@@ -907,7 +912,8 @@
     "tags":[
       "monster",
       "special",
-      "bow_only"
+      "bow_only",
+      "ranged"
     ]
   },
   {
@@ -933,7 +939,8 @@
     "tags":[
       "monster",
       "special",
-      "bow_only"
+      "bow_only",
+      "ranged"
     ]
   },
   {
@@ -1036,7 +1043,8 @@
       "monster",
       "special",
       "flying",
-      "MonsterDark"
+      "MonsterDark",
+      "ranged"
     ]
   },
   {
@@ -1050,7 +1058,8 @@
       "monster",
       "special",
       "flying",
-      "MonsterDark"
+      "MonsterDark",
+      "ranged"
     ]
   },
   {
@@ -1063,7 +1072,8 @@
     "tags":[
       "monster",
       "special",
-      "MonsterDark"
+      "MonsterDark",
+      "ranged"
     ]
   },
   {
@@ -1165,7 +1175,8 @@
     "is_promoted":false,
     "tags":[
       "trainee",
-      "no_rando"
+      "no_rando",
+      "ranged"
     ]
   }
 ]
