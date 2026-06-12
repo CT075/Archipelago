@@ -933,18 +933,6 @@ class FE8Randomizer:
 
 
 
-
-    def allies_logic_checks(self) -> None:
-        # to check if certain outputs were made and forcing things
-        # before they are propagated to every copy of the unit
-
-        #line just here so python doesnt complain will have logic in next PR
-        pass
-
-            # TODO: logic
-            #   - Flying Duessel vs enemy archers in Ephraim 10 may be unbeatable
-
-
     # Randomize the classes and possible inventories for the game's internal
     # randomizer (used for skirmishes, tower/ruins, and the two random Wights
     # with Lyon for some reason).

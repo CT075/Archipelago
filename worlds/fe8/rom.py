@@ -56,8 +56,6 @@ class FE8PatchExtension(APPatchExtension):
 
         randomizer.randomize_allies()
 
-        randomizer.allies_logic_checks()
-
         randomizer.randomize_units()
 
         randomizer.apply_base_changes()
