@@ -73,6 +73,9 @@ from .constants import (
     SONG_SIZE,
     IS_PROMOTED,
     NOT_PROMOTED,
+    DANCER_ID,
+    MANAKETE_ID,
+    DRACO_ZOMBIE_ID,
 )
 
 DEBUG = False
@@ -383,7 +386,7 @@ class CharacterStore:
         if char_id not in self.names_by_id:
             return None
         return self.names_by_id[char_id]
-
+    
     # these two could likely do the saftey checks faster / better but its still a improvement
     def set_inventory(self, char_id: int, invin: bytes) -> list[int]:
         if char_id not in self.names_by_id:
@@ -465,6 +468,7 @@ class FE8Randomizer:
     jobs_by_id: dict[int, JobData]
     valid_distribs_by_row: dict[int, list[int]]
     jobs_pools: dict[bool, dict[JobRace, dict[JobType, list[JobData]]]]
+    jobs_not_randomized: [int]
     songs: dict[str, dict[int, str]]
     random: Random
     rom: bytearray
@@ -755,10 +759,6 @@ class FE8Randomizer:
         if job_id not in self.jobs_by_id:
             return
 
-        # CR cam: this is dracozombie. prevents randomizing existing dracozombies.
-        if job_id == 101:
-            return
-
         job = self.jobs_by_id[job_id]
         char = unit[0]
 
@@ -778,10 +778,13 @@ class FE8Randomizer:
                 self.character_store[char] = job
             return
 
-        # dancer and manakete
-        if job_id == 59 or job_id == 77:
-            self.character_store[char] = job
+        # stops any unit in jobs we dont want to be randomized
+        # and saves them if they are a player unit
+        if job_id in self.jobs_not_randomized:
+            if "player" in logic and logic["player"]:
+                self.character_store[char] = job
             return
+
 
         # Affiliation = bits 1,2; unit is player if they're unset
         is_player = not bool(unit[3] & 0b0110)
@@ -792,10 +795,11 @@ class FE8Randomizer:
         if char in self.character_store and not no_store:
             new_job = self.character_store[char]
             # sets inventory from an earlier copy of yourself, if an inventory is stored
-            # as cutscene units usually have 0 items not all are stored
-            # not saving inventorys when you do get picked
+            # as cutscene units usually have 0 items not all are inventory's are stored
             # as L'Arachel and other route splits have different inventories
-            # so this keeps that functionality as well
+            # so this keeps each route with their own inventory's
+            # marisa is only exception as there is no 0 inventory marisa so used ephraim route
+            # so in Eirika route she gets a elixer instead of vulnerary  
             new_inventory = self.character_store.get_inventory(char)
             if new_inventory is None:
                 new_inventory = self.select_new_inventory(new_job, inventory, logic)
@@ -922,6 +926,12 @@ class FE8Randomizer:
             self.ally_blocks["Units"][chosen].logic[0]["must_fight"] = True
             LArachel_group.remove(chosen)
 
+        # adding tethys and myrrh to not be randomized
+        self.jobs_not_randomized.append (MANAKETE_ID)
+        self.jobs_not_randomized.append (DANCER_ID)
+        self.jobs_not_randomized.append (DRACO_ZOMBIE_ID)
+
+
 
 
     def allies_logic_checks(self) -> None:
@@ -929,7 +939,7 @@ class FE8Randomizer:
         # before they are propagated to every copy of the unit
 
         #line just here so python doesnt complain will have logic in next PR
-        holder =True
+        pass
 
             # TODO: logic
             #   - Flying Duessel vs enemy archers in Ephraim 10 may be unbeatable
@@ -1228,7 +1238,7 @@ class FE8Randomizer:
         # likely will give you a extra turn to reach him.
         self.rom[ROSS_CH2_HP_OFFSET] = 15
 
-        # Ephraim get automatic steels on rejoining in Ch15, which
+        # Eirika and Ephraim get automatic steels on rejoining in Ch15, which
         # need to be adjusted.
         ch15_auto_steel_sword = self.select_new_item(
             eirika_job, self.weapons_by_name["Steel Sword"].id, {}
@@ -1325,6 +1335,7 @@ class FE8Randomizer:
                 break
             i = self.random.choice(available_indices)
             result[i] += overflow
+            overflow = 0
             if result[i] > 255:
                 overflow = result[i] - 255
                 result[i] = 255
