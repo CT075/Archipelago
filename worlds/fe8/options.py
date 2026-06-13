@@ -141,6 +141,20 @@ class ProgressiveSethDeployment(Toggle):
     default = 0
 
 
+class EnablePromotionUnlocks(Toggle):
+    """
+    Gate class promotion behind Archipelago items. Adds one "... Promotion"
+    item per promoted class (Great Lord is always available); units cannot
+    promote into a class until its item has been received. Also makes the
+    super trainee path available from the start of the game.
+
+    When disabled, promotion behaves as in the vanilla game.
+    """
+
+    display_name = "Enable promotion unlocks"
+    default = 0
+
+
 class SmoothDeployments(Toggle):
     """
     Gate chapter progression on the size of your deployable army.
@@ -327,6 +341,7 @@ class FE8Options(PerGameCommonOptions):
     recruit_checks_enabled: EnableRecruitChecks
     progressive_seth_deployment: ProgressiveSethDeployment
     smooth_deployments: SmoothDeployments
+    promotion_unlocks: EnablePromotionUnlocks
     tower_enabled: EnableTower
     ruins_enabled: EnableRuins
     shuffle_skirmish_tables: ShuffleSkirmishTables
