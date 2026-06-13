@@ -75,6 +75,7 @@ TOTAL_NUM_PROCS = 0x40
 # These are literal addresses including the ROM offset because we compare
 # against them, rather than reading or writing.
 WM_PROC_ADDRESS = 0x08A3EE74
+PREP_SCREEN_PROC_ADDRESS = 0x0859DBBC
 E_PLAYERPHASE_PROC_ADDRESS = 0x0859AAD8
 
 LOCKPICK = 0x6B
@@ -227,3 +228,42 @@ INTERNAL_RANDO_WEAPON_TABLE_ROWS = [
     ("Fang", 1),
     ("MonsterDark", 3),
 ]
+
+DEPLOY_EARLY_UNITS = frozenset(
+    {
+        "Seth",
+        "Franz",
+        "Gilliam",
+        "Vanessa",
+        "Moulder",
+        "Ross",
+        "Garcia",
+        "Neimi",
+        "Colm",
+        "Artur",
+        "Lute",
+        "Natasha",
+        "Joshua",
+    }
+)
+DEPLOY_MID_UNITS = frozenset(
+    {
+        "Forde",
+        "Kyle",
+        "Tana",
+        "Amelia",
+        "Innes",
+        "Gerik",
+        "Tethys",
+        "Marisa",
+        "L'Arachel",
+        "Dozla",
+        "Saleh",
+        "Ewan",
+        "Cormag",
+        "Rennac",
+        "Duessel",
+        "Knoll",
+    }
+)
+# late tier: Myrrh, Syrene

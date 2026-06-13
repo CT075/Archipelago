@@ -56,6 +56,37 @@ locations = [
   ("Audhulma Received", 49),
   ("Ivaldi Received", 50),
   ("Latona Received", 51),
+  ("Seth Recruited", 52),
+  ("Franz Recruited", 53),
+  ("Gilliam Recruited", 54),
+  ("Vanessa Recruited", 55),
+  ("Moulder Recruited", 56),
+  ("Ross Recruited", 57),
+  ("Garcia Recruited", 58),
+  ("Neimi Recruited", 59),
+  ("Colm Recruited", 60),
+  ("Artur Recruited", 61),
+  ("Lute Recruited", 62),
+  ("Natasha Recruited", 63),
+  ("Joshua Recruited", 64),
+  ("Forde Recruited", 65),
+  ("Kyle Recruited", 66),
+  ("Tana Recruited", 67),
+  ("Amelia Recruited", 68),
+  ("Innes Recruited", 69),
+  ("Gerik Recruited", 70),
+  ("Tethys Recruited", 71),
+  ("Marisa Recruited", 72),
+  ("L'Arachel Recruited", 73),
+  ("Dozla Recruited", 74),
+  ("Saleh Recruited", 75),
+  ("Ewan Recruited", 76),
+  ("Cormag Recruited", 77),
+  ("Rennac Recruited", 78),
+  ("Duessel Recruited", 79),
+  ("Knoll Recruited", 80),
+  ("Myrrh Recruited", 81),
+  ("Syrene Recruited", 82),
 ]
 
 items = [
@@ -94,19 +125,51 @@ items = [
   ("ElysianWhip", 32),
   ("OceanSeal", 33),
   ("MasterSeal", 34),
+  ("Deploy Seth", 35),
+  ("Deploy Franz", 36),
+  ("Deploy Gilliam", 37),
+  ("Deploy Vanessa", 38),
+  ("Deploy Moulder", 39),
+  ("Deploy Ross", 40),
+  ("Deploy Garcia", 41),
+  ("Deploy Neimi", 42),
+  ("Deploy Colm", 43),
+  ("Deploy Artur", 44),
+  ("Deploy Lute", 45),
+  ("Deploy Natasha", 46),
+  ("Deploy Joshua", 47),
+  ("Deploy Forde", 48),
+  ("Deploy Kyle", 49),
+  ("Deploy Tana", 50),
+  ("Deploy Amelia", 51),
+  ("Deploy Innes", 52),
+  ("Deploy Gerik", 53),
+  ("Deploy Tethys", 54),
+  ("Deploy Marisa", 55),
+  ("Deploy L'Arachel", 56),
+  ("Deploy Dozla", 57),
+  ("Deploy Saleh", 58),
+  ("Deploy Ewan", 59),
+  ("Deploy Cormag", 60),
+  ("Deploy Rennac", 61),
+  ("Deploy Duessel", 62),
+  ("Deploy Knoll", 63),
+  ("Deploy Myrrh", 64),
+  ("Deploy Syrene", 65),
+  ("Progressive Seth Deployment", 66),
 ]
-SLOT_NAME_ADDR = 0x8EFD5C4
-SUPER_DEMON_KING_OFFS = 0xEFD604
-LOCKPICK_USABILITY_OFFS = 0xEFD604+1
-DEATH_LINK_KIND_OFFS = 0xEFD604+2
-LOCATION_INFO_OFFS = 0xEFD608
+SLOT_NAME_ADDR = 0x8EFDBD0
+SUPER_DEMON_KING_OFFS = 0xEFDC10
+LOCKPICK_USABILITY_OFFS = 0xEFDC10+1
+DEATH_LINK_KIND_OFFS = 0xEFDC10+2
+LOCATION_INFO_OFFS = 0xEFDD0C
 LOCATION_INFO_SIZE = 4
-ARCHIPELAGO_RECEIVED_ITEM_ADDR = 0x2026E38
-ARCHIPELAGO_NUM_RECEIVED_ITEMS_ADDR = 0x2026E3C
-ARCHIPELAGO_DEATHLINK_IN = 0x2027064
-ARCHIPELAGO_DEATHLINK_OUT = 0x2027065
-ARCHIPELAGO_DEATHLINK_READY = 0x2027066
+ARCHIPELAGO_RECEIVED_ITEM_ADDR = 0x2026E3C
+ARCHIPELAGO_NUM_RECEIVED_ITEMS_ADDR = 0x2026E40
+ARCHIPELAGO_DEATHLINK_IN = 0x2027068
+ARCHIPELAGO_DEATHLINK_OUT = 0x2027069
+ARCHIPELAGO_DEATHLINK_READY = 0x202706A
 FLAGS_ADDR = 0x2026E30
-FLAGS_SIZE = 8
+FLAGS_SIZE = 12
 
-EXPECTED_ROM_NAME = "FE8AP120DC35431F"
+EXPECTED_ROM_NAME = "FE8APB4C9ECEC192"

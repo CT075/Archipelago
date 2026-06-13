@@ -116,6 +116,46 @@ class UnbreakableRegalia(Toggle):
     default = 0
 
 
+class EnableRecruitChecks(Toggle):
+    """
+    Make each character recruitment a check. Adds 31 locations (one per
+    recruitable unit) and adds deploy permit items to the item pool, so
+    units must be unlocked before they can be deployed on the prep screen.
+    """
+
+    display_name = "Enable recruit checks"
+    default = 1
+
+
+class ProgressiveSethDeployment(Toggle):
+    """
+    Requires Enable recruit checks.
+
+    When enabled, Seth's deploy permit is replaced by 4 progressive items
+    (denoted by the letters S, E, T, and H). Each received item reveals a hint and the
+    fourth grants Seth's deploy permit. When disabled, a single Deploy Seth
+    item is used instead.
+    """
+
+    display_name = "Progressive Seth deployment"
+    default = 0
+
+
+class SmoothDeployments(Toggle):
+    """
+    Gate chapter progression on the size of your deployable army.
+    Requires Enable recruit checks.
+
+    Deploy permits become progression items and can be placed anywhere in the
+    multiworld. Logic expects 8 deploy permits for early units (recruited by
+    Chapter 7) before advancing past Chapter 8, and 11 deploy permits for
+    early/mid units before advancing past Chapter 15.
+    """
+
+    display_name = "Smooth deployments"
+    default = 1
+
+
 class EnableTower(Toggle):
     """
     Make each floor of the Tower of Valni a check. This can help balance the
@@ -284,6 +324,9 @@ class FE8Options(PerGameCommonOptions):
     exclude_latona: ExcludeLatona
     easier_5x: Easier5x
     unbreakable_regalia: UnbreakableRegalia
+    recruit_checks_enabled: EnableRecruitChecks
+    progressive_seth_deployment: ProgressiveSethDeployment
+    smooth_deployments: SmoothDeployments
     tower_enabled: EnableTower
     ruins_enabled: EnableRuins
     shuffle_skirmish_tables: ShuffleSkirmishTables

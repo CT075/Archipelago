@@ -1064,7 +1064,15 @@ class FE8Randomizer:
 
     # TODO: logic
     #   - Flying Duessel vs enemy archers in Ephraim 10 may be unbeatable
+    def clear_weapon_ranks(self) -> None:
+        for ids in self.character_store.ids_by_name.values():
+            for char_id in ids:
+                wrank_base = CHARACTER_TABLE_BASE + CHARACTER_SIZE * char_id + CHARACTER_WRANK_OFFSET
+                for i in range(8):
+                    self.rom[wrank_base + i] = 0
+
     def apply_base_changes(self) -> None:
+        self.clear_weapon_ranks()
         for chapter_name, chapter in self.unit_blocks.items():
             for block in chapter:
                 try:

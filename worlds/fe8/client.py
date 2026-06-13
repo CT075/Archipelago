@@ -34,6 +34,7 @@ from .constants import (
     TOTAL_NUM_PROCS,
     # TODO: world map item receiving
     # WM_PROC_ADDRESS,
+    PREP_SCREEN_PROC_ADDRESS,
     E_PLAYERPHASE_PROC_ADDRESS,
 )
 
@@ -159,7 +160,10 @@ class FE8Client(BizHawkClient):
             )
         ]
 
-        if any(proc in (E_PLAYERPHASE_PROC_ADDRESS,) for proc in active_procs):
+        if any(
+            proc in (E_PLAYERPHASE_PROC_ADDRESS, PREP_SCREEN_PROC_ADDRESS)
+            for proc in active_procs
+        ):
             self.game_state_safe = True
         else:
             self.game_state_safe = False
@@ -174,7 +178,6 @@ class FE8Client(BizHawkClient):
                 # GameOver, it won't be able to receive it anyway.
                 if "DeathLink" in args["tags"] and self.deathlink_kind:
                     self.pending_deathlink = True
-
 
     async def handle_pending_deathlink(self, ctx: BizHawkClientContext):
         self.pending_deathlink = False
