@@ -19,7 +19,7 @@ from BaseClasses import (
 import settings
 
 from .client import FE8Client
-from .options import FE8Options
+from .options import FE8Options, Goal
 from .constants import (
     FE8_NAME,
     FE8_ID_PREFIX,
@@ -58,7 +58,7 @@ class FE8WebWorld(WebWorld):
         ["CT075"],
     )
 
-    tutorials = []
+    tutorials = [setup_en]
 
 
 class FE8Settings(settings.Group):
@@ -557,6 +557,19 @@ class FE8World(World):
                 ruins.add_exits({"Campaign": "Complete Lagdou Ruins 10"})
 
     def set_rules(self) -> None:
+        # The goal option only changes which check counts as victory; it does
+        # not affect progression logic. Mirror the client's goal->flag mapping
+        # (see client.py) so the generator requires reaching that same check.
+        goal_location = {
+            Goal.option_DefeatFormortiis: "Defeat Formortiis",
+            Goal.option_ClearValni: "Complete Tower of Valni 8",
+            Goal.option_DefeatTirado: "Complete Chapter 8",
+            Goal.option_ClearLagdou: "Complete Lagdou Ruins 10",
+        }[self.options.goal.value]
+        self.multiworld.completion_condition[self.player] = (
+            lambda state: state.can_reach_location(goal_location, self.player)
+        )
+
         if not self.options.recruit_checks_enabled:
             return
         smooth_deployments = bool(self.options.smooth_deployments)
