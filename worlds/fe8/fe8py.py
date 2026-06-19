@@ -84,6 +84,7 @@ WEAPON_DATA = "data/weapondata.json"
 JOB_DATA = "data/jobdata.json"
 SONG_DATA = "data/songdata.json"
 CHARACTERS = "data/characters.json"
+CHARACTER_WRANKS = "data/character_wranks.json"
 CHAPTER_UNIT_BLOCKS = "data/chapter_unit_blocks.json"
 INTERNAL_RANDO_VALID_DISTRIBS = "data/internal_rando_distribs.json"
 
@@ -434,7 +435,9 @@ class FE8Randomizer:
         unit_blocks = fetch_json(CHAPTER_UNIT_BLOCKS)
         self.config = config
 
-        self.player_base_highest: dict[int, int] = {}
+        self.character_wranks: dict[int, list[int]] = {
+            int(k): v for k, v in fetch_json(CHARACTER_WRANKS).items()
+        }
 
         self.unit_blocks = {
             name: [UnitBlock(**block) for block in blocks]
@@ -569,6 +572,17 @@ class FE8Randomizer:
 
         return True
 
+    def vanilla_highest_rank(self, char: int) -> int:
+        """The highest weapon rank `char` had in the vanilla game, floored to E.
+
+        The base patch zeroes the in-ROM character weapon-rank table, so these
+        can't be read back from `self.rom`; they come from `character_wranks.json`
+        (see `CHARACTER_WRANKS`). Characters with no entry (e.g. generic units)
+        fall back to E.
+        """
+        row = self.character_wranks.get(char)
+        return max(max(row) if row else 0, int(WeaponRank.E))
+
     def select_new_item(self, job: JobData, item_id: int, logic: dict[str, Any]) -> int:
         if item_id == LOCKPICK:
             if "Lockpick" in job.tags:
@@ -581,12 +595,7 @@ class FE8Randomizer:
             if self.config["enable_weapon_level_caps"]:
                 max_rank = int(WeaponRank.C)
             else:
-                wrank_base = (
-                    CHARACTER_TABLE_BASE
-                    + EPHRAIM * CHARACTER_SIZE
-                    + CHARACTER_WRANK_OFFSET
-                )
-                max_rank = max(self.rom[wrank_base + i] for i in range(8))
+                max_rank = self.vanilla_highest_rank(EPHRAIM)
             return self.select_starting_weapon(job, max_rank)
 
         if item_id not in self.weapons_by_id:
@@ -793,12 +802,7 @@ class FE8Randomizer:
             wrank_base = (
                 CHARACTER_TABLE_BASE + char * CHARACTER_SIZE + CHARACTER_WRANK_OFFSET
             )
-            if char not in self.player_base_highest:
-                self.player_base_highest[char] = max(
-                    max(self.rom[wrank_base + i] for i in range(8)),
-                    int(WeaponRank.E),
-                )
-            highest = self.player_base_highest[char]
+            highest = self.vanilla_highest_rank(char)
             usable_kinds = {int(kind) for kind in new_job.usable_weapons}
             for i in range(8):
                 if i not in usable_kinds:
@@ -1113,12 +1117,7 @@ class FE8Randomizer:
             if self.config["enable_weapon_level_caps"]:
                 max_rank = int(WeaponRank.C)
             else:
-                wrank_base = (
-                    CHARACTER_TABLE_BASE
-                    + EIRIKA * CHARACTER_SIZE
-                    + CHARACTER_WRANK_OFFSET
-                )
-                max_rank = max(self.rom[wrank_base + i] for i in range(8))
+                max_rank = self.vanilla_highest_rank(EIRIKA)
 
             if any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
                 new_rapier = self.select_starting_weapon(eirika_job, max_rank)
