@@ -68,8 +68,8 @@ class EnableWeaponLevelCaps(Toggle):
     If enabled, your party's weapon ranks start low and are raised by
     "Progressive Weapon Level" items shuffled into the item pool.
 
-    If disabled, those items are left out of the pool and your party has maximum
-    weapon ranks from the start.
+    If disabled, those items are left out of the pool and weapon levels
+    work like the base game
     """
 
     display_name = "Enable Weapon Level Caps"
