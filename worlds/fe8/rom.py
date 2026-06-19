@@ -23,6 +23,8 @@ from .connector_config import (
     SUPER_DEMON_KING_OFFS,
     LOCKPICK_USABILITY_OFFS,
     DEATH_LINK_KIND_OFFS,
+    LEVEL_CAPS_OFFS,
+    WEAPON_LEVEL_CAPS_OFFS,
     LOCATION_INFO_OFFS,
     LOCATION_INFO_SIZE,
 )
@@ -114,6 +116,7 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
     config_dict = {
         "player_rando": bool(options.player_unit_rando),
         "player_monster": bool(options.player_unit_monsters),
+        "enable_weapon_level_caps": bool(options.enable_weapon_level_caps),
         "easier_5x": bool(options.easier_5x),
         "unbreakable_regalia": bool(options.unbreakable_regalia),
         "shuffle_skirmish_tables": bool(options.shuffle_skirmish_tables),
@@ -150,5 +153,9 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
     patch.write_byte(SUPER_DEMON_KING_OFFS, int(bool(options.super_demon_king)))
     patch.write_byte(LOCKPICK_USABILITY_OFFS, int(options.lockpick_usability))
     patch.write_byte(DEATH_LINK_KIND_OFFS, int(options.death_link))
+    patch.write_byte(LEVEL_CAPS_OFFS, int(bool(options.enable_level_caps)))
+    patch.write_byte(
+        WEAPON_LEVEL_CAPS_OFFS, int(bool(options.enable_weapon_level_caps))
+    )
 
     patch.write_file("token_data.bin", patch.get_token_binary())

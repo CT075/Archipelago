@@ -434,6 +434,8 @@ class FE8Randomizer:
         unit_blocks = fetch_json(CHAPTER_UNIT_BLOCKS)
         self.config = config
 
+        self.player_base_highest: dict[int, int] = {}
+
         self.unit_blocks = {
             name: [UnitBlock(**block) for block in blocks]
             for name, blocks in unit_blocks.items()
@@ -493,6 +495,7 @@ class FE8Randomizer:
                         JobType.RANGED
                     ].append(job)
                 self.jobs_pools[job.is_promoted][JobRace.ALL][JobType.ANY].append(job)
+                self.jobs_pools[job.is_promoted][Race][JobType.ANY].append(job)
 
         self.weapons_by_kind_rank = defaultdict(list)
         for kind in WeaponKind:
@@ -573,6 +576,19 @@ class FE8Randomizer:
             else:
                 return CHEST_KEY_5
 
+        if item_id == self.weapons_by_name["Reginleif"].id:
+            # Ensure Ephraim gets a usable weapon to replace reginleif
+            if self.config["enable_weapon_level_caps"]:
+                max_rank = int(WeaponRank.C)
+            else:
+                wrank_base = (
+                    CHARACTER_TABLE_BASE
+                    + EPHRAIM * CHARACTER_SIZE
+                    + CHARACTER_WRANK_OFFSET
+                )
+                max_rank = max(self.rom[wrank_base + i] for i in range(8))
+            return self.select_starting_weapon(job, max_rank)
+
         if item_id not in self.weapons_by_id:
             return item_id
         weapon_attrs = self.weapons_by_id[item_id]
@@ -612,6 +628,31 @@ class FE8Randomizer:
         self, job: JobData, items: bytes, logic: dict[str, Any]
     ) -> list[int]:
         return [self.select_new_item(job, item_id, logic) for item_id in items]
+
+    def select_starting_weapon(self, job: JobData, max_rank: int) -> int:
+        """Pick a weapon `job` can actually use at the start, given a starting
+        weapon rank of `max_rank` (a weapon-exp threshold). Used for starting
+        equipment so a unit isn't handed a weapon its rank can't use.
+        """
+        candidates = [
+            weap
+            for weap in self.weapons_by_id.values()
+            if weap.kind in job.usable_weapons and weapon_usable(weap, job, {})
+        ]
+        if not candidates:
+            return self.weapons_by_name["Iron Sword"].id
+
+        def usable(weap: WeaponData) -> bool:
+            return weap.kind == WeaponKind.MONSTER_WEAPON or int(weap.rank) <= max_rank
+
+        usable_weaps = [weap for weap in candidates if usable(weap)]
+        if usable_weaps:
+            best_rank = max(int(weap.rank) for weap in usable_weaps)
+            pool = [weap for weap in usable_weaps if int(weap.rank) == best_rank]
+        else:
+            worst_rank = min(int(weap.rank) for weap in candidates)
+            pool = [weap for weap in candidates if int(weap.rank) == worst_rank]
+        return self.random.choice(pool).id
 
     def rewrite_coords(self, offset: int, x: int, y: int):
         old_coords = read_short_le(self.rom, offset)
@@ -735,6 +776,38 @@ class FE8Randomizer:
         self.rom[data_offset + 1] = new_job.id
         for i, item_id in enumerate(new_inventory):
             self.rom[data_offset + INVENTORY_INDEX + i] = item_id
+
+        # When weapon level caps are disabled, weapon ranks fall back to each
+        # unit's own (vanilla) ranks. A player unit whose class was randomized
+        # would otherwise keep ranks for its base class's weapon types, which may
+        # not match its new class. We rewrite the unit's rank table to match its
+        # new class: every weapon type the new class can use is set to the unit's
+        # highest vanilla rank so it can wield that type, and every type the new
+        # class can't use is zeroed out so the unit has no rank in weapons it
+        # can't equip.
+        if (
+            is_player
+            and self.config["player_rando"]
+            and not self.config["enable_weapon_level_caps"]
+        ):
+            wrank_base = (
+                CHARACTER_TABLE_BASE + char * CHARACTER_SIZE + CHARACTER_WRANK_OFFSET
+            )
+            if char not in self.player_base_highest:
+                self.player_base_highest[char] = max(
+                    max(self.rom[wrank_base + i] for i in range(8)),
+                    int(WeaponRank.E),
+                )
+            highest = self.player_base_highest[char]
+            usable_kinds = {int(kind) for kind in new_job.usable_weapons}
+            for i in range(8):
+                if i not in usable_kinds:
+                    self.rom[wrank_base + i] = 0
+                elif i == WeaponKind.DARK:
+                    # Dark has no E-rank weapon, so an E dark rank is unusable
+                    self.rom[wrank_base + i] = max(highest, int(WeaponRank.D))
+                else:
+                    self.rom[wrank_base + i] = highest
 
         if (
             "ai1_mod" in logic
@@ -1030,18 +1103,36 @@ class FE8Randomizer:
         # Eirika's Rapier is given in a cutscene at the start of the chapter,
         # rather than being in her inventory
         eirika_job = self.character_store["Eirika"]
-        if any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
-            new_rapier = self.select_new_item(
-                eirika_job, self.weapons_by_name["Steel Blade"].id, {}
-            )
+        if eirika_job.id == EIRIKA_LORD:
+            new_rapier = self.weapons_by_name["Rapier"].id
         else:
-            new_rapier = self.random.choice(
-                [
-                    self.weapons_by_name["Heal"],
-                    self.weapons_by_name["Mend"],
-                    self.weapons_by_name["Recover"],
-                ]
-            ).id
+            # Cap the starting weapon's rank to what she can actually use: 
+            # party weapon ranks start at C when weapon level caps are enabled; 
+            # otherwise her starting rank is her highest base-class rank 
+            # (written into the character table during randomization).
+            if self.config["enable_weapon_level_caps"]:
+                max_rank = int(WeaponRank.C)
+            else:
+                wrank_base = (
+                    CHARACTER_TABLE_BASE
+                    + EIRIKA * CHARACTER_SIZE
+                    + CHARACTER_WRANK_OFFSET
+                )
+                max_rank = max(self.rom[wrank_base + i] for i in range(8))
+
+            if any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
+                new_rapier = self.select_starting_weapon(eirika_job, max_rank)
+            else:
+                healing = [
+                    weap
+                    for weap in (
+                        self.weapons_by_name["Heal"],
+                        self.weapons_by_name["Mend"],
+                        self.weapons_by_name["Recover"],
+                    )
+                    if int(weap.rank) <= max_rank
+                ] or [self.weapons_by_name["Heal"]]
+                new_rapier = self.random.choice(healing).id
         self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
 
         # While we force Vanessa to fly to give Ross a fighting chance, it's
