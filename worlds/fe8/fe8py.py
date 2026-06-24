@@ -788,12 +788,7 @@ class FE8Randomizer:
 
         # When weapon level caps are disabled, weapon ranks fall back to each
         # unit's own (vanilla) ranks. A player unit whose class was randomized
-        # would otherwise keep ranks for its base class's weapon types, which may
-        # not match its new class. We rewrite the unit's rank table to match its
-        # new class: every weapon type the new class can use is set to the unit's
-        # highest vanilla rank so it can wield that type, and every type the new
-        # class can't use is zeroed out so the unit has no rank in weapons it
-        # can't equip.
+        # would otherwise keep ranks for its base class's weapon types
         if (
             is_player
             and self.config["player_rando"]
@@ -802,16 +797,36 @@ class FE8Randomizer:
             wrank_base = (
                 CHARACTER_TABLE_BASE + char * CHARACTER_SIZE + CHARACTER_WRANK_OFFSET
             )
-            highest = self.vanilla_highest_rank(char)
-            usable_kinds = {int(kind) for kind in new_job.usable_weapons}
+            # Build the unit's pool of actual vanilla ranks (nonzero, highest
+            # first, keeping duplicates so the pool is distribution-weighted).
+            row = self.character_wranks.get(char)
+            pool = sorted((r for r in row if r > 0), reverse=True) if row else []
+            if not pool:
+                pool = [int(WeaponRank.E)]
+
+            usable_kinds = sorted(int(kind) for kind in new_job.usable_weapons)
+            n = len(usable_kinds)
+
+            # Take the highest ranks first; once the whole pool is used, fill the
+            # remaining slots by sampling from the pool at random (with replacement).
+            if n <= len(pool):
+                ranks = pool[:n]
+            else:
+                ranks = pool + [self.random.choice(pool) for _ in range(n - len(pool))]
+
+            # Random rank -> weapon-type pairing.
+            self.random.shuffle(ranks)
+
+            usable_set = set(usable_kinds)
             for i in range(8):
-                if i not in usable_kinds:
+                # Set unusuable weapon types to 0
+                if i not in usable_set:
                     self.rom[wrank_base + i] = 0
-                elif i == WeaponKind.DARK:
-                    # Dark has no E-rank weapon, so an E dark rank is unusable
-                    self.rom[wrank_base + i] = max(highest, int(WeaponRank.D))
-                else:
-                    self.rom[wrank_base + i] = highest
+            for kind, rank in zip(usable_kinds, ranks):
+                # Dark has no E-rank weapon, so an E dark rank is unusable.
+                if kind == WeaponKind.DARK:
+                    rank = max(rank, int(WeaponRank.D))
+                self.rom[wrank_base + kind] = rank
 
         if (
             "ai1_mod" in logic
