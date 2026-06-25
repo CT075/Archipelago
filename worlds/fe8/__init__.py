@@ -19,7 +19,7 @@ from BaseClasses import (
 import settings
 
 from .client import FE8Client
-from .options import FE8Options
+from .options import FE8Options, Goal
 from .constants import (
     FE8_NAME,
     FE8_ID_PREFIX,
@@ -58,7 +58,7 @@ class FE8WebWorld(WebWorld):
         ["CT075"],
     )
 
-    tutorials = []
+    tutorials = [setup_en]
 
 
 class FE8Settings(settings.Group):
@@ -557,6 +557,16 @@ class FE8World(World):
 
                 campaign.add_exits({"Lagdou Ruins": "Complete Chapter 19"})
                 ruins.add_exits({"Campaign": "Complete Lagdou Ruins 10"})
+
+        goal_location = {
+            Goal.option_DefeatFormortiis: "Defeat Formortiis",
+            Goal.option_ClearValni: "Complete Tower of Valni 8",
+            Goal.option_DefeatTirado: "Complete Chapter 8",
+            Goal.option_ClearLagdou: "Complete Lagdou Ruins 10",
+        }[self.options.goal.value]
+        self.multiworld.completion_condition[self.player] = (
+            lambda state: state.can_reach_location(goal_location, self.player)
+        )
 
     def set_rules(self) -> None:
         if not self.options.recruit_checks_enabled:
