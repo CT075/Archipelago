@@ -3,10 +3,11 @@ Archipelago World definition for Fire Emblem: Sacred Stones
 """
 
 from typing import ClassVar, Optional, Callable, Set, Tuple, Any
+from collections import Counter
 import os
 import pkgutil
 
-# import logging
+import logging
 
 from Options import OptionError
 from worlds.AutoWorld import World, WebWorld
@@ -272,6 +273,20 @@ class FE8World(World):
                 self.multiworld.itempool.append(
                     self.create_item(self.random.choice(FILLER_ITEMS))
                 )
+
+        if other_items:
+            dropped = Counter(item.name for item in other_items)
+            summary = ", ".join(
+                f"{count}x {name}" for name, count in dropped.items()
+            )
+            logging.warning(
+                f"[{self.player_name}] Not enough locations to place all "
+                f"useful items; {len(other_items)} item(s) were left out of "
+                f"the pool: {summary}. Enable Tower of Valni or Lagdou Ruins "
+                f"checks to add more locations, or reduce item counts "
+                f"(level caps, weapon level caps, promo items, "
+                f"or progressive seth deployment)."
+            )
 
     def add_location_to_region(self, name: str, addr: Optional[int], region: Region):
         if addr is None:
