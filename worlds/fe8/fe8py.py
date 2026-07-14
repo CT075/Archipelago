@@ -84,6 +84,7 @@ WEAPON_DATA = "data/weapondata.json"
 JOB_DATA = "data/jobdata.json"
 SONG_DATA = "data/songdata.json"
 CHARACTERS = "data/characters.json"
+CHARACTER_WRANKS = "data/character_wranks.json"
 CHAPTER_UNIT_BLOCKS = "data/chapter_unit_blocks.json"
 INTERNAL_RANDO_VALID_DISTRIBS = "data/internal_rando_distribs.json"
 
@@ -434,6 +435,10 @@ class FE8Randomizer:
         unit_blocks = fetch_json(CHAPTER_UNIT_BLOCKS)
         self.config = config
 
+        self.character_wranks: dict[int, list[int]] = {
+            int(k): v for k, v in fetch_json(CHARACTER_WRANKS).items()
+        }
+
         self.unit_blocks = {
             name: [UnitBlock(**block) for block in blocks]
             for name, blocks in unit_blocks.items()
@@ -493,6 +498,7 @@ class FE8Randomizer:
                         JobType.RANGED
                     ].append(job)
                 self.jobs_pools[job.is_promoted][JobRace.ALL][JobType.ANY].append(job)
+                self.jobs_pools[job.is_promoted][Race][JobType.ANY].append(job)
 
         self.weapons_by_kind_rank = defaultdict(list)
         for kind in WeaponKind:
@@ -566,12 +572,31 @@ class FE8Randomizer:
 
         return True
 
+    def vanilla_highest_rank(self, char: int) -> int:
+        """The highest weapon rank `char` had in the vanilla game, floored to E.
+
+        The base patch zeroes the in-ROM character weapon-rank table, so these
+        can't be read back from `self.rom`; they come from `character_wranks.json`
+        (see `CHARACTER_WRANKS`). Characters with no entry (e.g. generic units)
+        fall back to E.
+        """
+        row = self.character_wranks.get(char)
+        return max(max(row) if row else 0, int(WeaponRank.E))
+
     def select_new_item(self, job: JobData, item_id: int, logic: dict[str, Any]) -> int:
         if item_id == LOCKPICK:
             if "Lockpick" in job.tags:
                 return LOCKPICK
             else:
                 return CHEST_KEY_5
+
+        if item_id == self.weapons_by_name["Reginleif"].id:
+            # Ensure Ephraim gets a usable weapon to replace reginleif
+            if self.config["enable_weapon_level_caps"]:
+                max_rank = int(WeaponRank.C)
+            else:
+                max_rank = self.vanilla_highest_rank(EPHRAIM)
+            return self.select_starting_weapon(job, max_rank)
 
         if item_id not in self.weapons_by_id:
             return item_id
@@ -612,6 +637,31 @@ class FE8Randomizer:
         self, job: JobData, items: bytes, logic: dict[str, Any]
     ) -> list[int]:
         return [self.select_new_item(job, item_id, logic) for item_id in items]
+
+    def select_starting_weapon(self, job: JobData, max_rank: int) -> int:
+        """Pick a weapon `job` can actually use at the start, given a starting
+        weapon rank of `max_rank` (a weapon-exp threshold). Used for starting
+        equipment so a unit isn't handed a weapon its rank can't use.
+        """
+        candidates = [
+            weap
+            for weap in self.weapons_by_id.values()
+            if weap.kind in job.usable_weapons and weapon_usable(weap, job, {})
+        ]
+        if not candidates:
+            return self.weapons_by_name["Iron Sword"].id
+
+        def usable(weap: WeaponData) -> bool:
+            return weap.kind == WeaponKind.MONSTER_WEAPON or int(weap.rank) <= max_rank
+
+        usable_weaps = [weap for weap in candidates if usable(weap)]
+        if usable_weaps:
+            best_rank = max(int(weap.rank) for weap in usable_weaps)
+            pool = [weap for weap in usable_weaps if int(weap.rank) == best_rank]
+        else:
+            worst_rank = min(int(weap.rank) for weap in candidates)
+            pool = [weap for weap in candidates if int(weap.rank) == worst_rank]
+        return self.random.choice(pool).id
 
     def rewrite_coords(self, offset: int, x: int, y: int):
         old_coords = read_short_le(self.rom, offset)
@@ -735,6 +785,48 @@ class FE8Randomizer:
         self.rom[data_offset + 1] = new_job.id
         for i, item_id in enumerate(new_inventory):
             self.rom[data_offset + INVENTORY_INDEX + i] = item_id
+
+        # When weapon level caps are disabled, weapon ranks fall back to each
+        # unit's own (vanilla) ranks. A player unit whose class was randomized
+        # would otherwise keep ranks for its base class's weapon types
+        if (
+            is_player
+            and self.config["player_rando"]
+            and not self.config["enable_weapon_level_caps"]
+        ):
+            wrank_base = (
+                CHARACTER_TABLE_BASE + char * CHARACTER_SIZE + CHARACTER_WRANK_OFFSET
+            )
+            # Build the unit's pool of actual vanilla ranks (nonzero, highest
+            # first, keeping duplicates so the pool is distribution-weighted).
+            row = self.character_wranks.get(char)
+            pool = sorted((r for r in row if r > 0), reverse=True) if row else []
+            if not pool:
+                pool = [int(WeaponRank.E)]
+
+            usable_kinds = sorted(int(kind) for kind in new_job.usable_weapons)
+            n = len(usable_kinds)
+
+            # Take the highest ranks first; once the whole pool is used, fill the
+            # remaining slots by sampling from the pool at random (with replacement).
+            if n <= len(pool):
+                ranks = pool[:n]
+            else:
+                ranks = pool + [self.random.choice(pool) for _ in range(n - len(pool))]
+
+            # Random rank -> weapon-type pairing.
+            self.random.shuffle(ranks)
+
+            usable_set = set(usable_kinds)
+            for i in range(8):
+                # Set unusuable weapon types to 0
+                if i not in usable_set:
+                    self.rom[wrank_base + i] = 0
+            for kind, rank in zip(usable_kinds, ranks):
+                # Dark has no E-rank weapon, so an E dark rank is unusable.
+                if kind == WeaponKind.DARK:
+                    rank = max(rank, int(WeaponRank.D))
+                self.rom[wrank_base + kind] = rank
 
         if (
             "ai1_mod" in logic
@@ -1030,18 +1122,31 @@ class FE8Randomizer:
         # Eirika's Rapier is given in a cutscene at the start of the chapter,
         # rather than being in her inventory
         eirika_job = self.character_store["Eirika"]
-        if any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
-            new_rapier = self.select_new_item(
-                eirika_job, self.weapons_by_name["Steel Blade"].id, {}
-            )
+        if eirika_job.id == EIRIKA_LORD:
+            new_rapier = self.weapons_by_name["Rapier"].id
         else:
-            new_rapier = self.random.choice(
-                [
-                    self.weapons_by_name["Heal"],
-                    self.weapons_by_name["Mend"],
-                    self.weapons_by_name["Recover"],
-                ]
-            ).id
+            # Cap the starting weapon's rank to what she can actually use: 
+            # party weapon ranks start at C when weapon level caps are enabled; 
+            # otherwise her starting rank is her highest base-class rank 
+            # (written into the character table during randomization).
+            if self.config["enable_weapon_level_caps"]:
+                max_rank = int(WeaponRank.C)
+            else:
+                max_rank = self.vanilla_highest_rank(EIRIKA)
+
+            if any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
+                new_rapier = self.select_starting_weapon(eirika_job, max_rank)
+            else:
+                healing = [
+                    weap
+                    for weap in (
+                        self.weapons_by_name["Heal"],
+                        self.weapons_by_name["Mend"],
+                        self.weapons_by_name["Recover"],
+                    )
+                    if int(weap.rank) <= max_rank
+                ] or [self.weapons_by_name["Heal"]]
+                new_rapier = self.random.choice(healing).id
         self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
 
         # While we force Vanessa to fly to give Ross a fighting chance, it's

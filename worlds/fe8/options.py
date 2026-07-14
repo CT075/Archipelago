@@ -49,6 +49,33 @@ class SmoothLevelCapProgression(Toggle):
     default = 1
 
 
+class EnableLevelCaps(Toggle):
+    """
+    If enabled, your party's level cap starts low and is raised by "Progressive
+    Level Cap" items shuffled into the item pool.
+
+    If disabled, those items are left out of the pool and your party is uncapped
+    from the start (up to the game's normal maximum). Note that `Minimum Endgame
+    Level Cap` and `Smooth Level Caps` have no effect when this is disabled.
+    """
+
+    display_name = "Enable Level Caps"
+    default = 1
+
+
+class EnableWeaponLevelCaps(Toggle):
+    """
+    If enabled, your party's weapon ranks start low and are raised by
+    "Progressive Weapon Level" items shuffled into the item pool.
+
+    If disabled, those items are left out of the pool and weapon levels
+    work like the base game
+    """
+
+    display_name = "Enable Weapon Level Caps"
+    default = 1
+
+
 class MinimumEndgameLevelCapRange(Range):
     """
     Attempt to place level uncaps such that your level cap will be at least
@@ -319,6 +346,8 @@ class FE8Options(PerGameCommonOptions):
     player_unit_monsters: PlayerMonsters
     super_demon_king: SuperDemonKing
     smooth_level_caps: SmoothLevelCapProgression
+    enable_level_caps: EnableLevelCaps
+    enable_weapon_level_caps: EnableWeaponLevelCaps
     min_endgame_level_cap: MinimumEndgameLevelCapRange
     required_holy_weapons: MinimumUsableHolyWeapons
     exclude_latona: ExcludeLatona

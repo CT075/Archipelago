@@ -19,7 +19,7 @@ from BaseClasses import (
 import settings
 
 from .client import FE8Client
-from .options import FE8Options
+from .options import FE8Options, Goal
 from .constants import (
     FE8_NAME,
     FE8_ID_PREFIX,
@@ -58,7 +58,7 @@ class FE8WebWorld(WebWorld):
         ["CT075"],
     )
 
-    tutorials = []
+    tutorials = [setup_en]
 
 
 class FE8Settings(settings.Group):
@@ -158,15 +158,19 @@ class FE8World(World):
                 else other_items
             ).append(self.create_item_with_classification(name, cls))
 
-        for i in range(NUM_LEVELCAPS):
-            register(
-                "Progressive Level Cap",
-                (
-                    ItemClassification.progression
-                    if i < needed_level_uncaps
-                    else ItemClassification.useful
-                ),
-            )
+        # When level caps are disabled, leave these items out of the pool
+        # entirely; the ROM reports an uncapped level via the `enable_level_caps`
+        # flag written in `rom.py`.
+        if self.options.enable_level_caps:
+            for i in range(NUM_LEVELCAPS):
+                register(
+                    "Progressive Level Cap",
+                    (
+                        ItemClassification.progression
+                        if i < needed_level_uncaps
+                        else ItemClassification.useful
+                    ),
+                )
 
         holy_weapon_pool = set(HOLY_WEAPONS.keys())
 
@@ -187,16 +191,20 @@ class FE8World(World):
 
         self.progression_holy_weapons = set(progression_holy_weapons)
 
-        for wtype in WEAPON_TYPES:
-            for _ in range(NUM_WEAPON_LEVELS):
-                register(
-                    "Progressive Weapon Level ({})".format(wtype),
-                    (
-                        ItemClassification.progression
-                        if wtype in progression_weapon_types
-                        else ItemClassification.useful
-                    ),
-                )
+        # When weapon level caps are disabled, leave these items out of the pool
+        # entirely; the ROM reports max weapon ranks via the
+        # `enable_weapon_level_caps` flag written in `rom.py`.
+        if self.options.enable_weapon_level_caps:
+            for wtype in WEAPON_TYPES:
+                for _ in range(NUM_WEAPON_LEVELS):
+                    register(
+                        "Progressive Weapon Level ({})".format(wtype),
+                        (
+                            ItemClassification.progression
+                            if wtype in progression_weapon_types
+                            else ItemClassification.useful
+                        ),
+                    )
 
         if self.options.recruit_checks_enabled:
             progressive_seth = bool(self.options.progressive_seth_deployment)
@@ -277,10 +285,17 @@ class FE8World(World):
 
         self.add_location_to_region("Defeat Formortiis", None, finalboss)
 
+        enable_level_caps = self.options.enable_level_caps
+        enable_weapon_level_caps = self.options.enable_weapon_level_caps
+
         def level_cap_at_least(n: int) -> Callable[[CollectionState], bool]:
             player = self.player
 
             def wrapped(state: CollectionState) -> bool:
+                # With level caps disabled the party is uncapped from the start,
+                # so any level requirement is trivially satisfied.
+                if not enable_level_caps:
+                    return True
                 return 10 + state.count("Progressive Level Cap", player) * 5 >= n
 
             return wrapped
@@ -324,14 +339,18 @@ class FE8World(World):
                 if not state.has(weapon, self.player):
                     return False
 
-            for weapon_type in weapon_types_needed:
-                if (
-                    state.count(
-                        "Progressive Weapon Level ({})".format(weapon_type), self.player
-                    )
-                    < NUM_WEAPON_LEVELS
-                ):
-                    return False
+            # With weapon level caps disabled the party is at max weapon rank
+            # from the start, so the required ranks are trivially satisfied.
+            if enable_weapon_level_caps:
+                for weapon_type in weapon_types_needed:
+                    if (
+                        state.count(
+                            "Progressive Weapon Level ({})".format(weapon_type),
+                            self.player,
+                        )
+                        < NUM_WEAPON_LEVELS
+                    ):
+                        return False
 
             return True
 
@@ -538,6 +557,16 @@ class FE8World(World):
 
                 campaign.add_exits({"Lagdou Ruins": "Complete Chapter 19"})
                 ruins.add_exits({"Campaign": "Complete Lagdou Ruins 10"})
+
+        goal_location = {
+            Goal.option_DefeatFormortiis: "Defeat Formortiis",
+            Goal.option_ClearValni: "Complete Tower of Valni 8",
+            Goal.option_DefeatTirado: "Complete Chapter 8",
+            Goal.option_ClearLagdou: "Complete Lagdou Ruins 10",
+        }[self.options.goal.value]
+        self.multiworld.completion_condition[self.player] = (
+            lambda state: state.can_reach_location(goal_location, self.player)
+        )
 
     def set_rules(self) -> None:
         if not self.options.recruit_checks_enabled:
