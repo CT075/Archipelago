@@ -35,7 +35,7 @@ from .locations import FE8Location
 from .items import FE8Item
 from .connector_config import locations, items
 
-from .rom import FE8ProcedurePatch, write_tokens
+from .rom import FE8MicroPatch, FE8ProcedurePatch, write_tokens
 
 # We need to import FE8Client to register it properly, so we use it to disable
 # the unused import warning
@@ -137,6 +137,12 @@ class FE8World(World):
         )
 
     def create_items(self) -> None:
+
+        
+        if(True):
+            micro = FE8MicroPatch
+            units=micro.world_builder_changes(micro, self.multiworld.seed, self.player, self.options)
+        
         smooth_level_caps = self.options.smooth_level_caps
         min_endgame_level_cap = int(self.options.min_endgame_level_cap)
         exclude_latona = self.options.exclude_latona
@@ -263,6 +269,7 @@ class FE8World(World):
                 self.multiworld.itempool.append(
                     self.create_item(self.random.choice(FILLER_ITEMS))
                 )
+
 
     def add_location_to_region(self, name: str, addr: Optional[int], region: Region):
         if addr is None:

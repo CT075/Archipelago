@@ -90,6 +90,7 @@ CHARACTERS = "data/characters.json"
 CHARACTER_WRANKS = "data/character_wranks.json"
 CHAPTER_UNIT_BLOCKS = "data/chapter_unit_blocks.json"
 ALLY_UNIT_BLOCKS = "data/ally_unit_blocks.json"
+MICRO_UNIT_BLOCKS = "data/micro_unit_blocks.json"
 INTERNAL_RANDO_VALID_DISTRIBS = "data/internal_rando_distribs.json"
 
 
@@ -386,7 +387,7 @@ class CharacterStore:
         if char_id not in self.names_by_id:
             return None
         return self.names_by_id[char_id]
-    
+     
     # these two could likely do the saftey checks faster / better but its still a improvement
     def set_inventory(self, char_id: int, invin: bytes) -> list[int]:
         if char_id not in self.names_by_id:
@@ -468,18 +469,31 @@ class FE8Randomizer:
     jobs_by_id: dict[int, JobData]
     valid_distribs_by_row: dict[int, list[int]]
     jobs_pools: dict[bool, dict[JobRace, dict[JobType, list[JobData]]]]
-    jobs_not_randomized: [int]
+    jobs_not_randomized: list[int]
     songs: dict[str, dict[int, str]]
     random: Random
     rom: bytearray
     config: dict[str, Any]
+    micro: bool
 
-    def __init__(self, rom: bytearray, random: Random, config: dict[str, Any]):
+    def __init__(self, rom: bytearray, random: Random, config: dict[str, Any], micro:bool = False):
         self.random = random
         self.rom = rom
         unit_blocks = fetch_json(CHAPTER_UNIT_BLOCKS)
-        ally_blocks = fetch_json(ALLY_UNIT_BLOCKS)
+        valid_distribs_by_row = fetch_json(INTERNAL_RANDO_VALID_DISTRIBS)
+        item_data = fetch_json(WEAPON_DATA, object_hook=WeaponData.of_object)
+        job_data = fetch_json(JOB_DATA,object_hook=JobData.of_object,)
+        self.character_store = CharacterStore(fetch_json(CHARACTERS))
+        songdata = fetch_json(SONG_DATA)
+        self.jobs_not_randomized= []
         self.config = config
+        self.micro = micro
+
+        if (self.micro):
+            ally_blocks = fetch_json(MICRO_UNIT_BLOCKS)  
+        else:
+            ally_blocks = fetch_json(ALLY_UNIT_BLOCKS)
+        
 
         self.character_wranks: dict[int, list[int]] = {
             int(k): v for k, v in fetch_json(CHARACTER_WRANKS).items()
@@ -495,19 +509,9 @@ class FE8Randomizer:
             for name, blocks in ally_blocks.items()
         }
 
-        valid_distribs_by_row = fetch_json(INTERNAL_RANDO_VALID_DISTRIBS)
         self.valid_distribs_by_row = {
             int(k): v for k, v in valid_distribs_by_row.items()
         }
-
-        item_data = fetch_json(WEAPON_DATA, object_hook=WeaponData.of_object)
-
-        job_data = fetch_json(
-            JOB_DATA,
-            object_hook=JobData.of_object,
-        )
-
-        self.character_store = CharacterStore(fetch_json(CHARACTERS))
 
         self.weapons_by_id = {item.id: item for item in item_data}
         self.weapons_by_name = {item.name: item for item in item_data}
@@ -594,7 +598,7 @@ class FE8Randomizer:
         # in, but I'm going to punt on it for now because that's a bunch of design
         # decisions we can make later.
 
-        songdata = fetch_json(SONG_DATA)
+
         self.songs = defaultdict(dict)
         for song in songdata:
             self.songs[song["category"]][int(song["id"], 16)] = song["name"]
@@ -883,7 +887,7 @@ class FE8Randomizer:
         # If an NPC isn't autoleveled, it's probably a boss or important NPC of
         # some kind, so we should force its weapon levels in the character
         # table.
-        if not is_player and not autolevel and char in self.character_store:
+        if not is_player and not autolevel and char in self.character_store and self.micro == False:
             for item_id in new_inventory:
                 if item_id not in self.weapons_by_id:
                     continue
@@ -913,23 +917,23 @@ class FE8Randomizer:
         # For options that change logic of allies before randomization
         
         # making sure that ch5x has at least 3 useable units to make it fun
-        ephraim_group = [14, 15, 16, 33]
-        for x in range(3):
-            chosen = self.random.choice(ephraim_group)
-            self.ally_blocks["Units"][chosen].logic[0]["must_fight"] = True
-            ephraim_group.remove(chosen)
+        #ephraim_group = [14, 15, 16, 33]
+        #for x in range(3):
+        #    chosen = self.random.choice(ephraim_group)
+        #    self.ally_blocks["Units"][chosen].logic[0]["must_fight"] = True
+        #    ephraim_group.remove(chosen)
 
         # l'arachel's group gets the same thing but its mainly so Dozla can protect her
-        LArachel_group = [23, 24, 28]
-        for x in range(2):
-            chosen = self.random.choice(LArachel_group)
-            self.ally_blocks["Units"][chosen].logic[0]["must_fight"] = True
-            LArachel_group.remove(chosen)
+        #LArachel_group = [23, 24, 28]
+        #for x in range(2):
+        #    chosen = self.random.choice(LArachel_group)
+        #    self.ally_blocks["Units"][chosen].logic[0]["must_fight"] = True
+        #    LArachel_group.remove(chosen)
 
         # adding tethys and myrrh to not be randomized
         self.jobs_not_randomized.append (MANAKETE_ID)
         self.jobs_not_randomized.append (DANCER_ID)
-        self.jobs_not_randomized.append (DRACO_ZOMBIE_ID)
+
 
 
 

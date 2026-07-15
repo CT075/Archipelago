@@ -4,7 +4,7 @@
 # randomization, stat tweaks, etc).
 import json
 from random import Random
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from worlds.Files import (
     APTokenMixin,
@@ -28,7 +28,7 @@ from .connector_config import (
     LOCATION_INFO_OFFS,
     LOCATION_INFO_SIZE,
 )
-from .fe8py import FE8Randomizer
+from .fe8py import FE8Randomizer, CharacterStore
 
 if TYPE_CHECKING:
     from . import FE8World
@@ -37,6 +37,7 @@ SLOT_NAME_OFFS = SLOT_NAME_ADDR - ROM_BASE_ADDRESS
 
 BASE_PATCH = "data/base_patch.bsdiff4"
 PATCH_FILE_EXT = ".apfe8"
+MICRO_ROM = "data/micro.bytes"
 
 AP_ITEM_KIND = 1
 SELF_ITEM_KIND = 2
@@ -108,6 +109,34 @@ class FE8ProcedurePatch(APProcedurePatch, APTokenMixin):
     def get_source_data(cls):
         return get_base_rom_as_bytes()
 
+class FE8MicroPatch():
+    
+    @staticmethod
+    def world_builder_changes(self, seed: int, player: int, options) ->CharacterStore:
+        config = self.config_translation(options)
+        seed2 =seed + player
+        random = Random(seed2)
+        mut_rom = self.get_micro_rom_as_bytes()
+        randomizer = FE8Randomizer(rom=mut_rom, random=random, config=config, micro=True)
+            
+        randomizer.allies_logic_changes()
+
+        randomizer.randomize_allies()
+
+        return randomizer.character_store
+
+    def config_translation(options) -> dict[str, Any]:
+        config = {"player_rando": options.player_unit_rando}
+        config["player_monster"] = [{options.player_unit_monsters}]
+        return config
+    
+    def get_micro_rom_as_bytes() -> bytearray:
+        with open(MICRO_ROM, "rb") as infile:
+            micro_rom_bytes = bytes(infile.read())
+
+        return bytearray(micro_rom_bytes)
+
+
 
 def get_base_rom_as_bytes() -> bytes:
     with open(get_settings().fe8_settings.rom_file, "rb") as infile:
@@ -118,6 +147,7 @@ def get_base_rom_as_bytes() -> bytes:
 
 def rom_location(loc: FE8Location):
     return LOCATION_INFO_OFFS + loc.local_address * LOCATION_INFO_SIZE
+
 
 
 def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):

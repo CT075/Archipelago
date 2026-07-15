@@ -1,5 +1,6 @@
 {
     "Units": [
+        {"name": "Eirika", "base": 9124904, "count": 1, "ids": 1,"logic": {}},
         {
             "name": "Seth",
             "base": 9124884,
@@ -7,7 +8,6 @@
             "ids": 2,
             "logic": {"0": {"must_fight": true}}
         },
-        {"name": "Eirika", "base": 9124904, "count": 1, "ids": 1,"logic": {}},
         {"name": "Franz", "base": 9126268, "count": 1, "ids": 4,"logic": {}},
         {"name": "Gilliam", "base": 9126288, "count": 1, "ids": 3,"logic": {}},
         {

@@ -1,0 +1,92 @@
+{
+    "Units": [
+        {"name": "Eirika", "base": 0, "count": 1, "ids": 1,"logic": {}},
+        {
+            "name": "Seth",
+            "base": 20,
+            "count": 1,
+            "ids": 2,
+            "logic": {"0": {"must_fight": true}}
+        },
+        {"name": "Franz", "base": 40, "count": 1, "ids": 4,"logic": {}},
+        {"name": "Gilliam", "base": 60, "count": 1, "ids": 3,"logic": {}},
+        {
+            "name": "Moulder",
+            "base": 80,
+            "count": 1,
+            "ids": 5,
+            "logic": {}
+        },
+        {"name": "Vanessa", "base": 80, "count": 1, "ids": 6,"logic": {}},
+        {
+            "name": "Ross",
+            "base": 100,
+            "count": 1,
+            "ids": 7,
+            "logic": {}
+        },
+                {
+            "name": "Garcia",
+            "base": 120,
+            "count": 1,
+            "ids": 10,
+            "logic": {"0": {"must_fight": true}}
+        },
+        {"name": "Neimi", "base": 140, "count": 1, "ids": 8,"logic": {}},
+        {"name": "Colm", "base": 160, "count": 1,"ids": 9, "logic": {}},
+        {"name": "Artur", "base": 180, "count": 1,"ids": 19, "logic": {}},
+        {"name": "Lute", "base": 200, "count": 1, "ids": 12,"logic": {}},
+        {"name": "Natasha", "base": 220, "count": 1,"ids": 13, "logic": {}},
+        {"name": "Joshua", "base": 240, "count": 1, "ids": 32,"logic": {}},
+        {
+            "name": "Ephraim",
+            "base": 260,
+            "count": 1,
+            "ids": 15,
+            "logic": {}
+        },
+                {
+            "name": "Forde",
+            "base": 280,
+            "count": 1,
+            "ids": 16,
+            "logic": {}
+        },
+                {
+            "name": "Kyle",
+            "base": 300,
+            "count": 1,
+            "ids": 17,
+            "logic": {}
+        },
+        {
+            "name": "Tana",
+            "base": 320,
+            "count": 1,
+            "ids": 34,
+            "logic": {}
+        },
+        {"name": "Amelia", "base": 340, "count": 1,"ids": 18, "logic": {}},
+        {"name": "Tethys", "base": 360, "count": 1, "ids": 21,"logic": {}},
+        {"name": "Gerik", "base": 380, "count": 1,"ids": 20, "logic": {}},
+        {"name": "Innes", "base": 400, "count": 1, "ids": 11,"logic": {}},
+        {"name": "Marisa", "base": 420, "count": 1, "ids": 22,"logic": {}},
+        {"name": "Dozla", "base": 440, "count": 1, "ids": 26,"logic": {}},
+        {"name": "L'Arachel", "base": 460, "count": 1,"ids": 25,  "logic": {}},
+        {"name": "Saleh", "base": 480, "count": 1,"ids": 23, "logic": {}},
+        {"name": "Ewan", "base": 500, "count": 1, "ids": 24,"logic": {}},
+        {"name": "Cormag", "base": 520, "count": 1, "ids": 14,"logic": {}},
+        {"name": "Rennac", "base": 540, "count": 1,"ids": 28, "logic": {}},
+        {"name": "Duessel", "base": 560, "count": 1, "ids": 29,"logic": {}},
+        {"name": "Knoll", "base": 580, "count": 1,"ids": 31, "logic": {}},
+        {"name": "Myrrh", "base": 600, "count": 1, "ids": 30,"logic": {}},
+        {"name": "Syrene", "base": 620, "count": 1, "ids": 33,"logic": {}},
+        {
+            "name": "Orson",
+            "base": 640,
+            "count": 1,
+            "ids": 36,
+            "logic": {}
+        }
+	]
+}
