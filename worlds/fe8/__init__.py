@@ -139,10 +139,6 @@ class FE8World(World):
     def create_items(self) -> None:
 
         
-        if(True):
-            micro = FE8MicroPatch
-            units=micro.world_builder_changes(micro, self.multiworld.seed, self.player, self.options)
-        
         smooth_level_caps = self.options.smooth_level_caps
         min_endgame_level_cap = int(self.options.min_endgame_level_cap)
         exclude_latona = self.options.exclude_latona
@@ -211,7 +207,14 @@ class FE8World(World):
                             else ItemClassification.useful
                         ),
                     )
+        free_deploy=[str]
+        if(self.options.first_healer_deployment):
+            micro = FE8MicroPatch
+            units=micro.world_builder_changes(micro, self.multiworld.seed, self.player, self.options)
+            
+            free_deploy.append("Deploy " + units.FindUnitTagged("healer"))
 
+        
         if self.options.recruit_checks_enabled:
             progressive_seth = bool(self.options.progressive_seth_deployment)
             # With smooth deployments, region exits and the Knoll/Myrrh recruit
@@ -222,16 +225,21 @@ class FE8World(World):
                 if self.options.smooth_deployments
                 else ItemClassification.useful
             )
+
             for name, _ in items:
-                if name == "Deploy Seth":
-                    if not progressive_seth:
-                        register(name, deploy_classification)
-                elif name == "Progressive Seth Deployment":
-                    if progressive_seth:
-                        for _ in range(4):
+                if (name not in free_deploy):
+                    if name == "Deploy Seth":
+                        if not progressive_seth:
                             register(name, deploy_classification)
-                elif "Deploy" in name:
-                    register(name, deploy_classification)
+                    elif name == "Progressive Seth Deployment":
+                        if progressive_seth:
+                            for _ in range(4):
+                                register(name, deploy_classification)
+                    elif "Deploy" in name:
+                        register(name, deploy_classification)
+
+
+                
 
         # We shuffle here to ensure that level caps and weapon levels come before
         # holy weapons in `other_weapons`.

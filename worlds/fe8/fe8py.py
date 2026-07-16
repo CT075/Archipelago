@@ -76,6 +76,7 @@ from .constants import (
     DANCER_ID,
     MANAKETE_ID,
     DRACO_ZOMBIE_ID,
+    CHARACTER_ORDER
 )
 
 DEBUG = False
@@ -415,6 +416,13 @@ class CharacterStore:
             name = char
         return self.character_tags[name]
     
+    def FindUnitTagged(self, tag: str) -> Optional[str]:
+        for x in CHARACTER_ORDER:
+            holder= self.lookup_jobs_by_id(x).tags
+            if  tag in holder :
+                return self.lookup_name(x)
+        return None
+
 
     def __setitem__(self, char: Union[int, str], job: JobData) -> None:
         if isinstance(char, int):
@@ -917,22 +925,23 @@ class FE8Randomizer:
         # For options that change logic of allies before randomization
         
         # making sure that ch5x has at least 3 useable units to make it fun
-        #ephraim_group = [14, 15, 16, 33]
-        #for x in range(3):
-        #    chosen = self.random.choice(ephraim_group)
-        #    self.ally_blocks["Units"][chosen].logic[0]["must_fight"] = True
-        #    ephraim_group.remove(chosen)
+        ephraim_group = [14, 15, 16, 33]
+        for x in range(3):
+            chosen = self.random.choice(ephraim_group)
+            self.ally_blocks["Units"][chosen].logic[0]["must_fight"] = True
+            ephraim_group.remove(chosen)
 
         # l'arachel's group gets the same thing but its mainly so Dozla can protect her
-        #LArachel_group = [23, 24, 28]
-        #for x in range(2):
-        #    chosen = self.random.choice(LArachel_group)
-        #    self.ally_blocks["Units"][chosen].logic[0]["must_fight"] = True
-        #    LArachel_group.remove(chosen)
+        LArachel_group = [23, 24, 28]
+        for x in range(2):
+            chosen = self.random.choice(LArachel_group)
+            self.ally_blocks["Units"][chosen].logic[0]["must_fight"] = True
+            LArachel_group.remove(chosen)
 
         # adding tethys and myrrh to not be randomized
         self.jobs_not_randomized.append (MANAKETE_ID)
         self.jobs_not_randomized.append (DANCER_ID)
+        self.jobs_not_randomized.append (DRACO_ZOMBIE_ID)
 
 
 
@@ -1016,9 +1025,9 @@ class FE8Randomizer:
                 job_id = self.rom[offs + j]
                 if not job_id or job_id >= 255:
                     break
-                job = self.jobs_by_id[job_id]
-                if job.name == "Dracozombie":
+                if job_id == DRACO_ZOMBIE_ID:
                     continue
+                job = self.jobs_by_id[job_id]
                 unpromoted_pool, promoted_pool = (
                     jobset.pools()
                     # We _could_ repoint this and not need to check, but eh

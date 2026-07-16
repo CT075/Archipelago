@@ -167,6 +167,16 @@ class ProgressiveSethDeployment(Toggle):
     display_name = "Progressive Seth deployment"
     default = 0
 
+class FirstHealerDeployment(Toggle):
+    """
+    Requires Enable recruit checks.
+
+    When enabled, your first healer will not need a item to be deployed.
+    This is done using Eirika route recruitment order.
+    """
+
+    display_name = "First healer deployement"
+    default = 0
 
 class SmoothDeployments(Toggle):
     """
@@ -355,6 +365,7 @@ class FE8Options(PerGameCommonOptions):
     unbreakable_regalia: UnbreakableRegalia
     recruit_checks_enabled: EnableRecruitChecks
     progressive_seth_deployment: ProgressiveSethDeployment
+    first_healer_deployment: FirstHealerDeployment
     smooth_deployments: SmoothDeployments
     tower_enabled: EnableTower
     ruins_enabled: EnableRuins

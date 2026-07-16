@@ -444,7 +444,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer"
     ]
   },
   {
@@ -457,7 +457,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer"
     ]
   },
   {
@@ -469,7 +469,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer"
     ]
   },
   {
@@ -481,7 +481,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer"
     ]
   },
   {
@@ -493,7 +493,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer"
     ]
   },
   {
@@ -505,7 +505,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer"
     ]
   },
   {
@@ -540,7 +540,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer"
     ]
   },
   {
@@ -553,7 +553,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer"
     ]
   },
   {
@@ -565,7 +565,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer"
     ]
   },
   {
@@ -577,7 +577,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer"
     ]
   },
   {
@@ -738,7 +738,8 @@
     ],
     "is_promoted":false,
     "tags":[
-      "cannot_fight"
+      "cannot_fight",
+      "healer"
     ]
   },
   {
@@ -794,7 +795,8 @@
     ],
     "is_promoted":false,
     "tags":[
-      "cannot_fight"
+      "cannot_fight",
+      "healer"
     ]
   },
   {
@@ -805,7 +807,8 @@
     ],
     "is_promoted":false,
     "tags":[
-      "cannot_fight"
+      "cannot_fight",
+      "healer"
     ]
   },
   {
@@ -817,7 +820,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer"
     ]
   },
   {
@@ -851,7 +854,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer"
     ]
   },
   {

@@ -233,6 +233,43 @@ INTERNAL_RANDO_WEAPON_TABLE_ROWS = [
     ("MonsterDark", 3),
 ]
 
+CHARACTER_ORDER=[
+    1,
+    2,
+    4,
+    3,
+    5,
+    6,
+    7,
+    10,
+    8,
+    9,
+    19,
+    12,
+    13,
+    32,
+    15,
+    16,
+    17,
+    34,
+    18,
+    21,
+    20,
+    11,
+    22,
+    26,
+    25,
+    23,
+    24,
+    14,
+    28,
+    29,
+    31,
+    30,
+    33,
+    36
+]
+
 DEPLOY_EARLY_UNITS = frozenset(
     {
         "Seth",

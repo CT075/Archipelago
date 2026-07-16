@@ -127,7 +127,8 @@ class FE8MicroPatch():
 
     def config_translation(options) -> dict[str, Any]:
         config = {"player_rando": options.player_unit_rando}
-        config["player_monster"] = [{options.player_unit_monsters}]
+        config["player_monster"] = [options.player_unit_monsters]
+        config["enable_weapon_level_caps"] = [options.enable_weapon_level_caps]
         return config
     
     def get_micro_rom_as_bytes() -> bytearray:
