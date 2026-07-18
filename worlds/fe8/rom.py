@@ -2,7 +2,6 @@
 # primarily concerned with interfacing the FE8 world with Archipelago, whereas
 # `fe8py` makes semantic changes to the game itself (meaning the core
 # randomization, stat tweaks, etc).
-
 import json
 from random import Random
 from typing import TYPE_CHECKING
@@ -25,6 +24,8 @@ from .connector_config import (
     LOCKPICK_USABILITY_OFFS,
     DEATH_LINK_KIND_OFFS,
     PROMOTION_UNLOCKS_OFFS,
+    LEVEL_CAPS_OFFS,
+    WEAPON_LEVEL_CAPS_OFFS,
     LOCATION_INFO_OFFS,
     LOCATION_INFO_SIZE,
 )
@@ -67,7 +68,6 @@ class FE8PatchExtension(APPatchExtension):
 
         randomizer.randomize_growths(*config["growth_rando"])
         randomizer.randomize_music(config["music_rando"])
-
         return bytes(mut_rom)
 
 
@@ -117,6 +117,7 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
     config_dict = {
         "player_rando": bool(options.player_unit_rando),
         "player_monster": bool(options.player_unit_monsters),
+        "enable_weapon_level_caps": bool(options.enable_weapon_level_caps),
         "easier_5x": bool(options.easier_5x),
         "unbreakable_regalia": bool(options.unbreakable_regalia),
         "shuffle_skirmish_tables": bool(options.shuffle_skirmish_tables),
@@ -154,5 +155,9 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
     patch.write_byte(LOCKPICK_USABILITY_OFFS, int(options.lockpick_usability))
     patch.write_byte(DEATH_LINK_KIND_OFFS, int(options.death_link))
     patch.write_byte(PROMOTION_UNLOCKS_OFFS, int(bool(options.promotion_unlocks)))
+    patch.write_byte(LEVEL_CAPS_OFFS, int(bool(options.enable_level_caps)))
+    patch.write_byte(
+        WEAPON_LEVEL_CAPS_OFFS, int(bool(options.enable_weapon_level_caps))
+    )
 
     patch.write_file("token_data.bin", patch.get_token_binary())

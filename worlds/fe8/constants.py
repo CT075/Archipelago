@@ -188,6 +188,11 @@ INTERNAL_RANDO_WEAPONS_ENTRY_SIZE = 0x20
 INTERNAL_RANDO_WEAPONS_NUM_ITEMS = 5
 INTERNAL_RANDO_WEAPONS_MAX_CLASSES = 22
 
+IS_PROMOTED = True
+NOT_PROMOTED = False
+
+
+
 # CR-soon cam: This is stretching the definition of a "constant" and should
 # probably go into a data file instead
 INTERNAL_RANDO_WEAPON_TABLE_ROWS = [
