@@ -493,7 +493,7 @@ class FE8Randomizer:
         job_data = fetch_json(JOB_DATA,object_hook=JobData.of_object,)
         self.character_store = CharacterStore(fetch_json(CHARACTERS))
         songdata = fetch_json(SONG_DATA)
-        self.jobs_not_randomized= []
+        self.jobs_not_randomized= [MANAKETE_ID, DANCER_ID, DRACO_ZOMBIE_ID]
         self.config = config
         self.micro = micro
 
@@ -807,9 +807,9 @@ class FE8Randomizer:
         if char in self.character_store and not no_store:
             new_job = self.character_store[char]
             # sets inventory from an earlier copy of yourself, if an inventory is stored
-            # as cutscene units usually have 0 items not all are inventory's are stored
+            # as cutscene units usually have 0 items not all are inventories are stored
             # as L'Arachel and other route splits have different inventories
-            # so this keeps each route with their own inventory's
+            # so this keeps each route with their own inventories
             # marisa is only exception as there is no 0 inventory marisa so used ephraim route
             # so in Eirika route she gets a elixer instead of vulnerary  
             new_inventory = self.character_store.get_inventory(char)
@@ -922,8 +922,11 @@ class FE8Randomizer:
             self.randomize_chapter_unit(offset, logic, Race)
 
     def allies_logic_changes(self) -> None:
-        # For options that change logic of allies before randomization
-        
+        '''
+        For options that change logic of allies before randomization
+        DO NOT DO ANY ROM BYTE MANIPULATION HERE AS WILL KILL WORLD GENERATION
+        '''
+
         # making sure that ch5x has at least 3 useable units to make it fun
         ephraim_group = [14, 15, 16, 33]
         for x in range(3):
@@ -932,17 +935,11 @@ class FE8Randomizer:
             ephraim_group.remove(chosen)
 
         # l'arachel's group gets the same thing but its mainly so Dozla can protect her
-        LArachel_group = [23, 24, 28]
+        larachel_group = [23, 24, 28]
         for x in range(2):
-            chosen = self.random.choice(LArachel_group)
+            chosen = self.random.choice(larachel_group)
             self.ally_blocks["Units"][chosen].logic[0]["must_fight"] = True
-            LArachel_group.remove(chosen)
-
-        # adding tethys and myrrh to not be randomized
-        self.jobs_not_randomized.append (MANAKETE_ID)
-        self.jobs_not_randomized.append (DANCER_ID)
-        self.jobs_not_randomized.append (DRACO_ZOMBIE_ID)
-
+            larachel_group.remove(chosen)
 
 
 
@@ -1234,7 +1231,6 @@ class FE8Randomizer:
                 new_rapier = self.random.choice(healing).id
         self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
 
-        # While there are 3 ways to get to Ross.
         # We might not be able to rescue him so setting HP to 15
         # likely will give you a extra turn to reach him.
         self.rom[ROSS_CH2_HP_OFFSET] = 15

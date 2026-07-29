@@ -73,11 +73,8 @@ class FE8PatchExtension(APPatchExtension):
         if config["normalize_genders"]:
             randomizer.normalize_genders()
         
-
-
         randomizer.randomize_growths(*config["growth_rando"])
         randomizer.randomize_music(config["music_rando"])
-
 
         return bytes(mut_rom)
 
@@ -110,6 +107,10 @@ class FE8ProcedurePatch(APProcedurePatch, APTokenMixin):
         return get_base_rom_as_bytes()
 
 class FE8MicroPatch():
+    '''
+    Function that goes through the first half of the randomizer for the world generator
+    works off a mirco rom that has all ally unit's in it
+    '''
     
     @staticmethod
     def world_builder_changes(self, seed: int, player: int, options) ->CharacterStore:
@@ -126,6 +127,9 @@ class FE8MicroPatch():
         return randomizer.character_store
 
     def config_translation(options) -> dict[str, Any]:
+        '''
+        Translates from world generator options system to the patch file options system
+        '''
         config = {"player_rando": options.player_unit_rando}
         config["player_monster"] = [options.player_unit_monsters]
         config["enable_weapon_level_caps"] = [options.enable_weapon_level_caps]
