@@ -133,6 +133,18 @@ class Easier5x(Toggle):
     display_name = "Buff Ephraim's party for chapter 5x"
     default = 1
 
+class ForceHealer(Range):
+    """
+    Will make sure you have a healer in the first X amount of units.
+    This is done using Eirika route recruitment order.
+    """
+
+    display_name = "Force healer in first X units"
+    range_start = 0
+    range_end = 34
+    default = 0
+
+
 
 class UnbreakableRegalia(Toggle):
     """
@@ -362,6 +374,7 @@ class FE8Options(PerGameCommonOptions):
     required_holy_weapons: MinimumUsableHolyWeapons
     exclude_latona: ExcludeLatona
     easier_5x: Easier5x
+    force_healer: ForceHealer
     unbreakable_regalia: UnbreakableRegalia
     recruit_checks_enabled: EnableRecruitChecks
     progressive_seth_deployment: ProgressiveSethDeployment

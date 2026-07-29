@@ -57,6 +57,8 @@ class FE8PatchExtension(APPatchExtension):
 
         randomizer.randomize_allies()
 
+        randomizer.allies_logic_checks()
+
         randomizer.randomize_units()
 
         randomizer.apply_base_changes()
@@ -124,6 +126,8 @@ class FE8MicroPatch():
 
         randomizer.randomize_allies()
 
+        randomizer.allies_logic_checks()
+
         return randomizer.character_store
 
     def config_translation(options) -> dict[str, Any]:
@@ -164,6 +168,7 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
         "player_monster": bool(options.player_unit_monsters),
         "enable_weapon_level_caps": bool(options.enable_weapon_level_caps),
         "easier_5x": bool(options.easier_5x),
+        "force_healer": int(options.force_healer),
         "unbreakable_regalia": bool(options.unbreakable_regalia),
         "shuffle_skirmish_tables": bool(options.shuffle_skirmish_tables),
         "normalize_genders": bool(options.normalize_genders),

@@ -623,7 +623,9 @@ class FE8Randomizer:
         # job is invalid if it has any of the tags in notags
         if notags and notags & job.tags:
             return False
-
+        if "must_heal" in logic and logic["must_heal"]:
+            if "healer" not in job.tags:
+                return False
         if "must_fight" in logic and logic["must_fight"]:
             if "cannot_fight" in job.tags:
                 return False
@@ -759,7 +761,7 @@ class FE8Randomizer:
         return self.random.choice(choices)
 
     def randomize_chapter_unit(
-        self, data_offset: int, logic: dict[str, Any], Race: JobRace 
+        self, data_offset: int, logic: dict[str, Any], Race: JobRace, not_force: bool = True
     ) -> None:
         # We *could* read the full struct, but we only need a few individual
         # bytes, so we may as well extract them ad-hoc.
@@ -804,7 +806,7 @@ class FE8Randomizer:
         autolevel = unit[3] & 1
         inventory = unit[INVENTORY_INDEX : INVENTORY_INDEX + INVENTORY_SIZE]
 
-        if char in self.character_store and not no_store:
+        if char in self.character_store and not_force and not no_store:
             new_job = self.character_store[char]
             # sets inventory from an earlier copy of yourself, if an inventory is stored
             # as cutscene units usually have 0 items not all are inventories are stored
@@ -813,7 +815,7 @@ class FE8Randomizer:
             # marisa is only exception as there is no 0 inventory marisa so used ephraim route
             # so in Eirika route she gets a elixer instead of vulnerary  
             new_inventory = self.character_store.get_inventory(char)
-            if new_inventory is None:
+            if new_inventory is None or not_force:
                 new_inventory = self.select_new_inventory(new_job, inventory, logic)
         else:
             # Checks to see what job pool to use
@@ -941,7 +943,74 @@ class FE8Randomizer:
             self.ally_blocks["Units"][chosen].logic[0]["must_fight"] = True
             larachel_group.remove(chosen)
 
+    def allies_logic_checks(self) -> None:
+        '''
+        For options that change logic of allies before after randomization
+        should be used to confirm things output right
+        DO NOT DO ANY ROM BYTE MANIPULATION HERE AS WILL KILL WORLD GENERATION
+        '''
+        if self.config["force_healer"] != 0:
+            # checks to see if you have a healer and if you do gives them the tag
+            if not (self.ally_check(self.config["force_healer"], "healer", "must_heal")):
+                # if no healer gives the tag and re rolls them with it
+                self.force_tag(self.config["force_healer"], "must_heal")
 
+    def ally_check(self, amount: int, needed_tag: str, given_logic: str) -> None:
+        '''
+        Checks to see if the needed tag is in the first amount of units
+        then picks one and gives it the tag to ensure it always is there
+        '''
+        found = []
+        count = 0
+        for Units, block in self.ally_blocks.items():
+            for unit in block:
+                count += 1
+                if count > amount:
+                    break
+                job = self.character_store.lookup_jobs_by_id(unit.ids)
+                if needed_tag in job.tags:
+                    found.append(unit)
+        if found == []:
+            return False
+        else:
+            self.random.choice(found).logic[0][given_logic] = True
+            return True
+
+    def force_tag(self, amount: int, given_logic: str) -> None:
+        '''
+        Checks the first amount of units and checks to see if they are allowed to re roll
+        Picks one legal unit gives them the logic tag, and rerolls them
+        '''
+        potentials = []
+        count = 0
+        for group, block in self.ally_blocks.items():
+            for unit in block:
+                count += 1
+                if count > amount:
+                    break
+                if self.force_legal(unit.logic, given_logic):
+                    potentials.append(unit)
+        choosen = self.random.choice(potentials)
+        choosen.logic[0][given_logic] = True
+        if not self.config["player_monster"]:
+            Race = JobRace.HUMAN
+        else:
+            Race = JobRace.ALL
+        self.randomize_chapter_unit(choosen.base, choosen.logic[0], Race, False)
+
+    def force_legal(self, logic: dict[str, Any], given_logic):
+        '''
+        checks to see if a unit is legal to reroll
+        '''
+
+        for entry in logic[0]:
+            if (
+                entry.startswith("must_")
+                and entry != given_logic
+                and not (bool(entry == "must_fight") ^ bool(given_logic == "must_heal")) 
+            ):
+                return False
+        return True
 
     # Randomize the classes and possible inventories for the game's internal
     # randomizer (used for skirmishes, tower/ruins, and the two random Wights

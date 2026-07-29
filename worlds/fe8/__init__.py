@@ -216,7 +216,7 @@ class FE8World(World):
         and if any of the children settings are enabled do we run this.
         It will run through all ally units and what the randomizer will output them
         '''
-
+        class_context =False
         if self.options.recruit_checks_enabled and (self.options.first_healer_deployment):
             class_context =True
         if(class_context):
