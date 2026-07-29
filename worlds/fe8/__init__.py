@@ -215,25 +215,17 @@ class FE8World(World):
         we should keep the setting off unless the parent setting.
         and if any of the children settings are enabled do we run this.
         It will run through all ally units and what the randomizer will output them
-
-        Something like this is how you would remove the item from unitsanity 
         '''
-        #if self.options.recruit_checks_enabled and (x or y)
-        #    class_context =True
-        #if(class_context):
-        #    micro = FE8MicroPatch
-        #    units=micro.world_builder_changes(micro, self.multiworld.seed, self.player, self.options)
-        #    if x:   
-        #       free_deploy.append("Deploy " + units.FindUnitTagged("x"))
-        #    if y:
-        #       free_deploy.append("Deploy " + units.FindUnitTagged("y"))  
+
+        if self.options.recruit_checks_enabled and (self.options.first_healer_deployment):
+            class_context =True
+        if(class_context):
+            micro = FE8MicroPatch
+            units=micro.world_builder_changes(micro, self.multiworld.seed, self.player, self.options)
+            if self.options.first_healer_deployment:
+               free_deploy.append("Deploy " + units.FindUnitTagged("healer"))
 
 
-        # for name, _ in items:
-        #   if name not in free_deploy
-        #     if name == "Deploy Seth": 
-
-        
         if self.options.recruit_checks_enabled:
             progressive_seth = bool(self.options.progressive_seth_deployment)
             # With smooth deployments, region exits and the Knoll/Myrrh recruit
@@ -246,16 +238,16 @@ class FE8World(World):
             )
 
             for name, _ in items:
-
-                if name == "Deploy Seth":
-                    if not progressive_seth:
-                        register(name, deploy_classification)
-                elif name == "Progressive Seth Deployment":
-                    if progressive_seth:
-                        for _ in range(4):
+                if name not in free_deploy:
+                    if name == "Deploy Seth":
+                        if not progressive_seth:
                             register(name, deploy_classification)
-                elif "Deploy" in name:
-                    register(name, deploy_classification)
+                    elif name == "Progressive Seth Deployment":
+                        if progressive_seth:
+                            for _ in range(4):
+                                register(name, deploy_classification)
+                    elif "Deploy" in name:
+                        register(name, deploy_classification)
 
 
                 
