@@ -137,6 +137,7 @@ class FE8MicroPatch():
         config = {"player_rando": options.player_unit_rando}
         config["player_monster"] = [options.player_unit_monsters]
         config["enable_weapon_level_caps"] = [options.enable_weapon_level_caps]
+        config["force_healer"] = [options.force_healer]
         return config
     
     def get_micro_rom_as_bytes() -> bytearray:
