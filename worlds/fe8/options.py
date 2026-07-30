@@ -146,7 +146,7 @@ class ForceHealer(Range):
 
 class ForceTheif(Toggle):
     """
-    Will make sure you have a healer in the first 6 amount of units.
+    Will make sure you have a thief in the first 6 amount of units.
     (Colm or before)
     """
 
