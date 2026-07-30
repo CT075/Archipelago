@@ -195,7 +195,7 @@ class FirstHealerDeployment(Toggle):
     This is done using Eirika route recruitment order.
     """
 
-    display_name = "First healer deployement"
+    display_name = "First healer deployment"
     default = 0
 
 class FirstThiefDeployment(Toggle):
@@ -206,7 +206,7 @@ class FirstThiefDeployment(Toggle):
     This is done using Eirika route recruitment order.
     """
 
-    display_name = "First thief deployement"
+    display_name = "First thief deployment"
     default = 0
 
 class SmoothDeployments(Toggle):
