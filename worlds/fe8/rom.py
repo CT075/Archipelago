@@ -139,6 +139,7 @@ class FE8MicroPatch():
         config = {"player_rando": options.player_unit_rando}
         config["player_monster"] = [options.player_unit_monsters]
         config["enable_weapon_level_caps"] = [options.enable_weapon_level_caps]
+        config["force_healer"] = [options.force_healer]
         config["force_thief"] = [options.force_thief]
         return config
     
