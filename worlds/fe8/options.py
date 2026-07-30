@@ -139,7 +139,7 @@ class ForceHealer(Range):
     This is done using Eirika route recruitment order.
     """
 
-    display_name = "Force healer in first X units"
+    display_name = "Guarantee a healer"
     range_start = 0
     range_end = 34
     default = 0
@@ -150,7 +150,7 @@ class ForceTheif(Toggle):
     (Colm or before)
     """
 
-    display_name = "Force thief in first 6 units"
+    display_name = "Guarantee a thief"
     default = 0
 
 
