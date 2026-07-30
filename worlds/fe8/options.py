@@ -160,13 +160,21 @@ class ForceHealer(Range):
     range_end = 34
     default = 0
 
-class ForceTheif(Toggle):
+class ForceThief(Toggle):
     """
-    Will make sure you have a healer in the first 6 amount of units.
+    Will make sure you have a thief in the first 6 amount of units.
     (Colm or before)
     """
 
     display_name = "Force thief in first 6 units"
+    default = 0
+
+class ForceDancer(Toggle):
+    """
+    Will make sure you have a dancer as one of your units.
+    """
+
+    display_name = "Force dancer"
     default = 0
 
 
@@ -211,7 +219,7 @@ class FirstHealerDeployment(Toggle):
     This is done using Eirika route recruitment order.
     """
 
-    display_name = "First healer deployement"
+    display_name = "First healer deployment"
     default = 0
 
 class FirstThiefDeployment(Toggle):
@@ -222,7 +230,7 @@ class FirstThiefDeployment(Toggle):
     This is done using Eirika route recruitment order.
     """
 
-    display_name = "First thief deployement"
+    display_name = "First thief deployment"
     default = 0
 
 class SmoothDeployments(Toggle):
@@ -420,7 +428,7 @@ class FE8Options(PerGameCommonOptions):
     required_holy_weapons: MinimumUsableHolyWeapons
     exclude_latona: ExcludeLatona
     easier_5x: Easier5x
-    force_thief: ForceTheif
+    force_thief: ForceThief
     no_rando_thief: NoRandoThief
     force_healer: ForceHealer
     unbreakable_regalia: UnbreakableRegalia
