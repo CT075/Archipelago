@@ -144,7 +144,7 @@ class ForceHealer(Range):
     range_end = 34
     default = 0
 
-class ForceTheif(Toggle):
+class ForceThief(Toggle):
     """
     Will make sure you have a thief in the first 6 amount of units.
     (Colm or before)
@@ -402,7 +402,7 @@ class FE8Options(PerGameCommonOptions):
     required_holy_weapons: MinimumUsableHolyWeapons
     exclude_latona: ExcludeLatona
     easier_5x: Easier5x
-    force_thief: ForceTheif
+    force_thief: ForceThief
     no_rando_thief: NoRandoThief
     force_healer: ForceHealer
     unbreakable_regalia: UnbreakableRegalia
