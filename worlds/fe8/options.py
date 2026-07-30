@@ -144,6 +144,14 @@ class ForceHealer(Range):
     range_end = 34
     default = 0
 
+class ForceTheif(Toggle):
+    """
+    Will make sure you have a healer in the first 6 amount of units.
+    (Colm or before)
+    """
+
+    display_name = "Force thief in first 6 units"
+    default = 0
 
 
 class UnbreakableRegalia(Toggle):
@@ -190,6 +198,17 @@ class FirstHealerDeployment(Toggle):
     display_name = "First healer deployement"
     default = 0
 
+class FirstThiefDeployment(Toggle):
+    """
+    Requires Enable recruit checks.
+
+    When enabled, your first thief will not need a item to be deployed.
+    This is done using Eirika route recruitment order.
+    """
+
+    display_name = "First thief deployement"
+    default = 0
+
 class SmoothDeployments(Toggle):
     """
     Gate chapter progression on the size of your deployable army.
@@ -202,6 +221,15 @@ class SmoothDeployments(Toggle):
     """
 
     display_name = "Smooth deployments"
+    default = 1
+
+class NoRandoThief(Toggle):
+    """
+    Don't randomize enemy theives
+
+    So they can stop stealing your treasure
+    """
+    display_name = "Don't randomize enemy theives"
     default = 1
 
 
@@ -374,11 +402,14 @@ class FE8Options(PerGameCommonOptions):
     required_holy_weapons: MinimumUsableHolyWeapons
     exclude_latona: ExcludeLatona
     easier_5x: Easier5x
+    force_thief: ForceTheif
+    no_rando_thief: NoRandoThief
     force_healer: ForceHealer
     unbreakable_regalia: UnbreakableRegalia
     recruit_checks_enabled: EnableRecruitChecks
     progressive_seth_deployment: ProgressiveSethDeployment
     first_healer_deployment: FirstHealerDeployment
+    first_thief_deployment: FirstThiefDeployment
     smooth_deployments: SmoothDeployments
     tower_enabled: EnableTower
     ruins_enabled: EnableRuins

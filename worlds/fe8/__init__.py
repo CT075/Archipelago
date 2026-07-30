@@ -217,13 +217,15 @@ class FE8World(World):
         It will run through all ally units and what the randomizer will output them
         '''
         class_context =False
-        if self.options.recruit_checks_enabled and (self.options.first_healer_deployment):
+        if self.options.recruit_checks_enabled and (self.options.first_healer_deployment or self.options.first_thief_deployment):
             class_context =True
         if(class_context):
             micro = FE8MicroPatch
             units=micro.world_builder_changes(micro, self.multiworld.seed, self.player, self.options)
             if self.options.first_healer_deployment:
                free_deploy.append("Deploy " + units.FindUnitTagged("healer"))
+            if self.options.first_thief_deployment:
+               free_deploy.append("Deploy " + units.FindUnitTagged("lockpick"))
 
 
         if self.options.recruit_checks_enabled:

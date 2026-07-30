@@ -147,7 +147,7 @@
     ],
     "is_promoted":false,
     "tags":[
-      "Lockpick"
+      "lockpick"
     ]
   },
   {
@@ -261,7 +261,7 @@
     "is_promoted":true,
     "tags":[
       "FastSword",
-      "Lockpick"
+      "lockpick"
     ]
   },
   {
@@ -273,7 +273,7 @@
     "is_promoted":true,
     "tags":[
       "FastSword",
-      "Lockpick"
+      "lockpick"
     ]
   },
   {
@@ -588,7 +588,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      "Lockpick"
+      "lockpick"
     ]
   },
   {

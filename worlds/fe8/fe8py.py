@@ -76,6 +76,7 @@ from .constants import (
     DANCER_ID,
     MANAKETE_ID,
     DRACO_ZOMBIE_ID,
+    THIEF_ID,
     CHARACTER_ORDER
 )
 
@@ -626,6 +627,9 @@ class FE8Randomizer:
         if "must_heal" in logic and logic["must_heal"]:
             if "healer" not in job.tags:
                 return False
+        if "must_lockpick" in logic and logic["must_lockpick"]:
+            if "lockpick" not in job.tags:
+                return False
         if "must_fight" in logic and logic["must_fight"]:
             if "cannot_fight" in job.tags:
                 return False
@@ -943,6 +947,14 @@ class FE8Randomizer:
             self.ally_blocks["Units"][chosen].logic[0]["must_fight"] = True
             larachel_group.remove(chosen)
 
+    def enemy_logic_changes(self) -> None:
+        '''
+        For options that change logic of enemy before randomization
+        '''
+        if self.config["no_rando_thief"]:
+            self.jobs_not_randomized.append (THIEF_ID)
+        
+
     def allies_logic_checks(self) -> None:
         '''
         For options that change logic of allies before after randomization
@@ -954,6 +966,11 @@ class FE8Randomizer:
             if not (self.ally_check(self.config["force_healer"], "healer", "must_heal")):
                 # if no healer gives the tag and re rolls them with it
                 self.force_tag(self.config["force_healer"], "must_heal")
+        if self.config["force_thief"]:
+            # checks to see if you have a healer and if you do gives them the tag
+            if not (self.ally_check(6, "lockpick", "must_lockpick")):
+                # if no healer gives the tag and re rolls them with it
+                self.force_tag(6, "must_lockpick")
 
     def ally_check(self, amount: int, needed_tag: str, given_logic: str) -> None:
         '''

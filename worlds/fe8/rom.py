@@ -59,6 +59,8 @@ class FE8PatchExtension(APPatchExtension):
 
         randomizer.allies_logic_checks()
 
+        randomizer.enemy_logic_changes()
+
         randomizer.randomize_units()
 
         randomizer.apply_base_changes()
@@ -137,6 +139,7 @@ class FE8MicroPatch():
         config = {"player_rando": options.player_unit_rando}
         config["player_monster"] = [options.player_unit_monsters]
         config["enable_weapon_level_caps"] = [options.enable_weapon_level_caps]
+        config["force_thief"] = [options.force_thief]
         return config
     
     def get_micro_rom_as_bytes() -> bytearray:
@@ -169,6 +172,8 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
         "enable_weapon_level_caps": bool(options.enable_weapon_level_caps),
         "easier_5x": bool(options.easier_5x),
         "force_healer": int(options.force_healer),
+        "force_thief": bool(options.force_thief),
+        "no_rando_thief": bool(options.no_rando_thief),
         "unbreakable_regalia": bool(options.unbreakable_regalia),
         "shuffle_skirmish_tables": bool(options.shuffle_skirmish_tables),
         "normalize_genders": bool(options.normalize_genders),
