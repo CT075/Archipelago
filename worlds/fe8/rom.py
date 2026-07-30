@@ -141,6 +141,8 @@ class FE8MicroPatch():
         config["enable_weapon_level_caps"] = [options.enable_weapon_level_caps]
         config["force_healer"] = [options.force_healer]
         config["force_thief"] = [options.force_thief]
+        config["random_myrrh"] = [options.random_myrrh]
+        config["random_tethys"] = [options.random_tethys]
         return config
     
     def get_micro_rom_as_bytes() -> bytearray:
@@ -174,6 +176,8 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
         "easier_5x": bool(options.easier_5x),
         "force_healer": int(options.force_healer),
         "force_thief": bool(options.force_thief),
+        "random_myrrh": bool(options.random_myrrh),
+        "random_tethys": bool(options.random_tethys),
         "no_rando_thief": bool(options.no_rando_thief),
         "unbreakable_regalia": bool(options.unbreakable_regalia),
         "shuffle_skirmish_tables": bool(options.shuffle_skirmish_tables),

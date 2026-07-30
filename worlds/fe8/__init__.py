@@ -218,7 +218,7 @@ class FE8World(World):
         '''
         class_context =False
         if self.options.recruit_checks_enabled and (self.options.first_healer_deployment or self.options.first_thief_deployment):
-            class_context =True
+            class_context = True
         if(class_context):
             micro = FE8MicroPatch
             units=micro.world_builder_changes(micro, self.multiworld.seed, self.player, self.options)

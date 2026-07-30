@@ -59,6 +59,8 @@ from .constants import (
     JOB_ABILITY_1_INDEX,
     CH15_AUTO_STEEL_SWORD,
     CH15_AUTO_STEEL_LANCE,
+    TETHYS_EIRIKA,
+    TETHYS_EPHRAIM,
     AI1_INDEX,
     INTERNAL_RANDO_CLASS_WEIGHTS_OFFS,
     INTERNAL_RANDO_CLASS_WEIGHT_ENTRY_SIZE,
@@ -494,7 +496,7 @@ class FE8Randomizer:
         job_data = fetch_json(JOB_DATA,object_hook=JobData.of_object,)
         self.character_store = CharacterStore(fetch_json(CHARACTERS))
         songdata = fetch_json(SONG_DATA)
-        self.jobs_not_randomized= [MANAKETE_ID, DANCER_ID, DRACO_ZOMBIE_ID]
+        self.jobs_not_randomized= [DRACO_ZOMBIE_ID]
         self.config = config
         self.micro = micro
 
@@ -947,6 +949,12 @@ class FE8Randomizer:
             self.ally_blocks["Units"][chosen].logic[0]["must_fight"] = True
             larachel_group.remove(chosen)
 
+        if not self.config["random_myrrh"]:
+            self.jobs_not_randomized.append (MANAKETE_ID)
+            
+        if not self.config["random_tethys"]:
+            self.jobs_not_randomized.append (DANCER_ID)
+
     def enemy_logic_changes(self) -> None:
         '''
         For options that change logic of enemy before randomization
@@ -1320,6 +1328,16 @@ class FE8Randomizer:
         # We might not be able to rescue him so setting HP to 15
         # likely will give you a extra turn to reach him.
         self.rom[ROSS_CH2_HP_OFFSET] = 15
+
+        # gives tethys a weapon to fight with when randomized 
+        if self.config["random_tethys"]:
+            tethys_job = self.character_store["Tethys"]
+            tethys_weapon = self.select_new_item(
+                tethys_job, self.weapons_by_name["Steel Sword"].id, {}
+            )
+            self.rom[TETHYS_EIRIKA] = tethys_weapon
+            self.rom[TETHYS_EPHRAIM] = tethys_weapon
+
 
         # Eirika and Ephraim get automatic steels on rejoining in Ch15, which
         # need to be adjusted.

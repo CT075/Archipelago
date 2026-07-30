@@ -24,6 +24,22 @@ class PlayerMonsters(Toggle):
     display_name = "Enable Playable Monsters"
     default = 1
 
+class RandomTethys(Toggle):
+    """
+    Allow Tethys to be randomized
+    """
+
+    display_name = "Randomize Tethys"
+    default = 0
+
+class RandomMyrrh(Toggle):
+    """
+    Allow Myrrh to be randomized
+    """
+
+    display_name = "Randomize Myrrh"
+    default = 0
+
 
 class SuperDemonKing(Toggle):
     """
@@ -393,6 +409,8 @@ class MusicRando(Choice):
 @dataclass
 class FE8Options(PerGameCommonOptions):
     player_unit_rando: PlayerRando
+    random_myrrh: RandomMyrrh
+    random_tethys: RandomTethys
     player_unit_monsters: PlayerMonsters
     super_demon_king: SuperDemonKing
     smooth_level_caps: SmoothLevelCapProgression

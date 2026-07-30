@@ -633,6 +633,15 @@
     "kind":"Sword"
   },
   {
+    "id":170,
+    "name":"Dragonstone",
+    "rank":"E",
+    "kind": "Dragonstone",
+    "locks":[
+      "Manakete"
+    ]
+  },
+  {
     "id":171,
     "name":"Demon Surge",
     "rank":"B",
