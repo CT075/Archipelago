@@ -19,7 +19,7 @@ from BaseClasses import (
 import settings
 
 from .client import FE8Client
-from .options import FE8Options, Goal
+from .options import FE8Options, Goal, create_option_groups
 from .constants import (
     FE8_NAME,
     FE8_ID_PREFIX,
@@ -49,6 +49,7 @@ class FE8WebWorld(WebWorld):
     """
 
     theme = "stone"
+    option_groups = create_option_groups()
     setup_en = Tutorial(
         "Multiworld Setup Guide",
         "A guide to playing FE8 with Archipelago",

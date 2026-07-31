@@ -1,7 +1,14 @@
 from dataclasses import dataclass
+from typing import List, TYPE_CHECKING, Dict, Any
 
-from Options import Choice, Range, Toggle, PerGameCommonOptions
+from Options import Choice, Range, Toggle, PerGameCommonOptions, OptionGroup
 
+def create_option_groups() -> List[OptionGroup]:
+    option_group_list: List[OptionGroup] = []
+    for name, options in FE8_option_groups.items():
+        option_group_list.append(OptionGroup(name=name, options=options))
+
+    return option_group_list
 
 def round_up_to(x, mod):
     return ((x + mod - 1) // mod) * mod
@@ -457,3 +464,23 @@ class FE8Options(PerGameCommonOptions):
 
     def ruins_checks_enabled(self):
         return bool(self.ruins_enabled) or self.goal == Goal.option_ClearLagdou
+
+FE8_option_groups:dict[str, List[Any]] = {
+    "Player Randomizer settings": [PlayerRando, PlayerMonsters, RandomMyrrh, RandomTethys, ForceThief, 
+                                   ForceHealer, ForceDancer, Easier5x, LockpickUsability],
+
+    "Growth Rate Settings": [GrowthRando, GrowthRandoMin, GrowthRandoMax, NormalizeGenders],
+
+    "Enemy Randomizer Settings": [SuperDemonKing, NoRandoThief], 
+
+    "Unitsanity": [EnableRecruitChecks, SmoothDeployments, ProgressiveSethDeployment, 
+                   FirstHealerDeployment, FirstThiefDeployment],
+
+    "Level Caps": [EnableLevelCaps, SmoothLevelCapProgression, MinimumEndgameLevelCapRange],
+
+    "Weapon Caps / Settings": [EnableWeaponLevelCaps, MinimumUsableHolyWeapons, ExcludeLatona,
+                                UnbreakableRegalia],
+
+    "Optional Fight Settings": [ EnableTower, EnableRuins, ShuffleSkirmishTables]
+
+} 
