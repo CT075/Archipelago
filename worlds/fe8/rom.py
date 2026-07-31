@@ -144,6 +144,7 @@ class FE8MicroPatch():
         config["enable_weapon_level_caps"] = [options.enable_weapon_level_caps]
         config["force_healer"] = [options.force_healer]
         config["force_thief"] = [options.force_thief]
+        config["force_dancer"] = [options.force_dancer]
         config["random_myrrh"] = [options.random_myrrh]
         config["random_tethys"] = [options.random_tethys]
         config["rescue_ross"] = [options.rescue_ross]
