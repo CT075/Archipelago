@@ -176,6 +176,7 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
         "easier_5x": bool(options.easier_5x),
         "force_healer": int(options.force_healer),
         "force_thief": bool(options.force_thief),
+        "force_dancer": bool(options.force_dancer),
         "random_myrrh": bool(options.random_myrrh),
         "random_tethys": bool(options.random_tethys),
         "no_rando_thief": bool(options.no_rando_thief),

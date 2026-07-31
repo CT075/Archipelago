@@ -79,7 +79,9 @@ from .constants import (
     MANAKETE_ID,
     DRACO_ZOMBIE_ID,
     THIEF_ID,
-    CHARACTER_ORDER
+    CHARACTER_ORDER,
+    VULNERARY_ID,
+    ELIXER_ID
 )
 
 DEBUG = False
@@ -821,7 +823,7 @@ class FE8Randomizer:
             # marisa is only exception as there is no 0 inventory marisa so used ephraim route
             # so in Eirika route she gets a elixer instead of vulnerary  
             new_inventory = self.character_store.get_inventory(char)
-            if new_inventory is None or not_force:
+            if new_inventory is None:
                 new_inventory = self.select_new_inventory(new_job, inventory, logic)
         else:
             # Checks to see what job pool to use
@@ -832,20 +834,24 @@ class FE8Randomizer:
                 Rules = JobType.FLIER
             else:
                 Rules = JobType.ANY
-
-            new_job = self.select_new_job(
-                job,
-                job_pool=self.jobs_pools[job.is_promoted][Race][Rules],
-                job_valid=lambda job: self.job_valid(job, char, logic),
-            )
-            new_inventory = self.select_new_inventory(new_job, inventory, logic)
+            if "must_dance" in logic and logic["must_dance"]:
+                new_job= self.jobs_by_id [DANCER_ID]
+                new_inventory = [VULNERARY_ID,VULNERARY_ID,0,0]
+                self.character_store.set_inventory(char, new_inventory)
+            else:
+                new_job = self.select_new_job(
+                    job,
+                    job_pool=self.jobs_pools[job.is_promoted][Race][Rules],
+                    job_valid=lambda job: self.job_valid(job, char, logic),
+                )
+                new_inventory = self.select_new_inventory(new_job, inventory, logic)
             if not no_store:
                 # likely could combine these 2 functions but might be read / stored in other places
                 # only storing if you have 2 items as all ally units appear in cutscenes have 0 somewhere in the game
                 # but Valter in prologue is his first apperance and only has 1 item then. 
                 # so only saves units that have 2 or more items
                 self.character_store[char] = new_job
-                if inventory[1] != 0:
+                if new_inventory[1] != 0:
                     self.character_store.set_inventory(char, new_inventory)
 
         self.rom[data_offset + 1] = new_job.id
@@ -979,6 +985,11 @@ class FE8Randomizer:
             if not (self.ally_check(6, "lockpick", "must_lockpick")):
                 # if no healer gives the tag and re rolls them with it
                 self.force_tag(6, "must_lockpick")
+        if self.config["force_dancer"]:
+            # checks to see if you have a dancer and if you do gives them the tag
+            if not (self.ally_check(33, "lockpick", "must_dance")):
+                # if no healer gives the tag and re rolls them with it
+                self.force_tag(33, "must_dance")
 
     def ally_check(self, amount: int, needed_tag: str, given_logic: str) -> None:
         '''
@@ -1013,7 +1024,7 @@ class FE8Randomizer:
                 count += 1
                 if count > amount:
                     break
-                if self.force_legal(unit.logic, given_logic):
+                if self.force_legal(unit.logic, given_logic, self.character_store.lookup_jobs_by_id(unit.ids) ):
                     potentials.append(unit)
         choosen = self.random.choice(potentials)
         choosen.logic[0][given_logic] = True
@@ -1023,7 +1034,7 @@ class FE8Randomizer:
             Race = JobRace.ALL
         self.randomize_chapter_unit(choosen.base, choosen.logic[0], Race, False)
 
-    def force_legal(self, logic: dict[str, Any], given_logic):
+    def force_legal(self, logic: dict[str, Any], given_logic, job: int):
         '''
         checks to see if a unit is legal to reroll
         '''
@@ -1032,7 +1043,9 @@ class FE8Randomizer:
             if (
                 entry.startswith("must_")
                 and entry != given_logic
-                and not (bool(entry == "must_fight") ^ bool(given_logic == "must_heal")) 
+                and not (bool(entry == "must_fight") ^ bool(given_logic == "must_heal"))
+                and not (bool(entry == "must_fight") ^ bool(given_logic == "must_dance")) 
+                and job not in self.jobs_not_randomized
             ):
                 return False
         return True
@@ -1285,7 +1298,9 @@ class FE8Randomizer:
 
         eirika_job = self.character_store["Eirika"]
         if self.config["player_rando"]:
-            if any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
+            if eirika_job == DANCER_ID:
+                new_rapier= VULNERARY_ID
+            elif any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
                 new_rapier = self.select_new_item(
                     eirika_job, self.weapons_by_name["Steel Blade"].id, {}
                 )
@@ -1309,8 +1324,9 @@ class FE8Randomizer:
                 max_rank = int(WeaponRank.C)
             else:
                 max_rank = self.vanilla_highest_rank(EIRIKA)
-
-            if any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
+            if eirika_job == DANCER_ID:
+                new_rapier= VULNERARY_ID
+            elif any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
                 new_rapier = self.select_starting_weapon(eirika_job, max_rank)
             else:
                 healing = [
@@ -1341,16 +1357,22 @@ class FE8Randomizer:
 
         # Eirika and Ephraim get automatic steels on rejoining in Ch15, which
         # need to be adjusted.
-        ch15_auto_steel_sword = self.select_new_item(
-            eirika_job, self.weapons_by_name["Steel Sword"].id, {}
-        )
-        
+        if eirika_job == DANCER_ID:
+            ch15_auto_steel_sword = ELIXER_ID
+        else:
+            ch15_auto_steel_sword = self.select_new_item(
+                eirika_job, self.weapons_by_name["Steel Sword"].id, {}
+            )
+            
         self.rom[CH15_AUTO_STEEL_SWORD] = ch15_auto_steel_sword
 
         ephraim_job = self.character_store["Ephraim"]
-        ch15_auto_steel_lance = self.select_new_item(
-            ephraim_job, self.weapons_by_name["Steel Lance"].id, {}
-        )
+        if ephraim_job == DANCER_ID:
+            ch15_auto_steel_lance = ELIXER_ID
+        else:
+            ch15_auto_steel_lance = self.select_new_item(
+                ephraim_job, self.weapons_by_name["Steel Lance"].id, {}
+            )
 
         self.rom[CH15_AUTO_STEEL_LANCE] = ch15_auto_steel_lance
 

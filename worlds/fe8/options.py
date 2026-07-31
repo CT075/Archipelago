@@ -155,7 +155,7 @@ class ForceHealer(Range):
     This is done using Eirika route recruitment order.
     """
 
-    display_name = "Force healer in first X units"
+    display_name = "Guarantee a healer"
     range_start = 0
     range_end = 34
     default = 0
@@ -166,7 +166,7 @@ class ForceThief(Toggle):
     (Colm or before)
     """
 
-    display_name = "Force thief in first 6 units"
+    display_name = "Guarantee a thief"
     default = 0
 
 class ForceDancer(Toggle):
@@ -174,7 +174,7 @@ class ForceDancer(Toggle):
     Will make sure you have a dancer as one of your units.
     """
 
-    display_name = "Force dancer"
+    display_name = "Guarantee a dancer"
     default = 0
 
 
@@ -431,6 +431,7 @@ class FE8Options(PerGameCommonOptions):
     force_thief: ForceThief
     no_rando_thief: NoRandoThief
     force_healer: ForceHealer
+    force_dancer: ForceDancer
     unbreakable_regalia: UnbreakableRegalia
     recruit_checks_enabled: EnableRecruitChecks
     progressive_seth_deployment: ProgressiveSethDeployment
