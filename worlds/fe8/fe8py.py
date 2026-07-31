@@ -797,8 +797,9 @@ class FE8Randomizer:
 
         no_store = "no_store" in logic and logic["no_store"]
 
-        # config option for disabling player unit randomization
-        if not self.config["player_rando"] and "player" in logic and logic["player"]:
+        # config option for disabling unit randomization
+        if ((not self.config["player_rando"] and "player" in logic and logic["player"])
+            or (not self.config["enemy_rando"]==1 and "player"  not in logic)):
             if char not in self.character_store and not no_store:
                 self.character_store[char] = job
             return

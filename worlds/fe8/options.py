@@ -42,7 +42,7 @@ class EnemyRando(Choice):
     """
 
     display_name = "Enemy Randomization"
-    #option_No_rando = 1
+    option_No_rando = 1
     option_All_classes = 2
     options_Monster_only = 3
     options_Human_only = 4
