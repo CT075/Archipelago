@@ -803,6 +803,12 @@ class FE8Randomizer:
             if char not in self.character_store and not no_store:
                 self.character_store[char] = job
             return
+        
+        if self.config["enemy_rando"]==5 and "player"  not in logic:
+            if "monster" in job.tags:
+                Race = JobRace.MONSTER
+            else:
+                Race = JobRace.HUMAN
 
         # stops any unit in jobs we dont want to be randomized
         # and saves them if they are a player unit

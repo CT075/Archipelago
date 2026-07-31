@@ -41,12 +41,12 @@ class EnemyRando(Choice):
     5. Humans into humans / Monsters into monsters
     """
 
-    display_name = "Enemy Randomization"
+    display_name = "Enemy Randomization Results"
     option_No_rando = 1
     option_All_classes = 2
     options_Monster_only = 3
     options_Human_only = 4
-    #options_Same_race = 5
+    options_Same_race = 5
     default = 2
 
 class RandomTethys(Toggle):
