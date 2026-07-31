@@ -410,7 +410,7 @@ class MusicRando(Choice):
       will be randomized to other battle themes, etc)
     - Chaos: Music tracks will be shuffled randomly
     """
-
+    display_name = "Random Music"
     option_Vanilla = 0
     alias_no = 0
     alias_off = 0
