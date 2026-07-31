@@ -42,6 +42,7 @@ from .constants import (
     EPHRAIM_LOCK,
     EIRIKA_RAPIER_OFFSET,
     ROSS_CH2_HP_OFFSET,
+    ROSS_CH2_MAP_OFFSET,
     MOVEMENT_COST_TABLE_BASE,
     MOVEMENT_COST_ENTRY_SIZE,
     MOVEMENT_COST_ENTRY_COUNT,
@@ -961,6 +962,10 @@ class FE8Randomizer:
         if not self.config["random_tethys"]:
             self.jobs_not_randomized.append (DANCER_ID)
 
+        # Setting to force Vanessa to be a flier
+        if self.config["rescue_ross"] == 0:
+            self.ally_blocks["Units"][5].logic[0]["must_fly"] = True
+
     def enemy_logic_changes(self) -> None:
         '''
         For options that change logic of enemy before randomization
@@ -980,11 +985,19 @@ class FE8Randomizer:
             if not (self.ally_check(self.config["force_healer"], "healer", "must_heal")):
                 # if no healer gives the tag and re rolls them with it
                 self.force_tag(self.config["force_healer"], "must_heal")
+
+        if self.config["rescue_ross"] == 2:
+            # checks to see if you have a flier and if you do gives them the tag
+            if not (self.ally_check(6, "flying", "must_fly")):
+                # if no flier gives the tag and re rolls them with it
+                self.force_tag(6, "must_fly")
+
         if self.config["force_thief"]:
-            # checks to see if you have a healer and if you do gives them the tag
+            # checks to see if you have a thief and if you do gives them the tag
             if not (self.ally_check(6, "lockpick", "must_lockpick")):
                 # if no healer gives the tag and re rolls them with it
                 self.force_tag(6, "must_lockpick")
+
         if self.config["force_dancer"]:
             # checks to see if you have a dancer and if you do gives them the tag
             if not (self.ally_check(33, "lockpick", "must_dance")):
@@ -1434,6 +1447,17 @@ class FE8Randomizer:
                 stats_base = char_base + CHARACTER_STATS_OFFSET
                 for i in range(STATS_COUNT):
                     self.rom[stats_base + i] += 2
+                    
+    def map_edit(self) -> None:
+        # make path to ross
+        # tile  1
+        self.rom[ROSS_CH2_MAP_OFFSET] = 156
+        self.rom[ROSS_CH2_MAP_OFFSET + 1] = 11
+        # tile 2
+        self.rom[ROSS_CH2_MAP_OFFSET + 2] = 168
+        self.rom[ROSS_CH2_MAP_OFFSET + 3] = 1
+        # make map look nicer
+        self.rom[ROSS_CH2_MAP_OFFSET + 31] = 196
 
     def apply_infinite_holy_weapons(self) -> None:
         for weapon_id in HOLY_WEAPON_IDS:

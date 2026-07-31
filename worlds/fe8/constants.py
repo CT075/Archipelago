@@ -201,6 +201,8 @@ THIEF_ID = 13
 VULNERARY_ID = 108
 ELIXER_ID = 109
 
+ROSS_CH2_MAP_OFFSET =0x1B74CD
+
 
 
 # CR-soon cam: This is stretching the definition of a "constant" and should

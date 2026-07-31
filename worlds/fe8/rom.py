@@ -64,6 +64,9 @@ class FE8PatchExtension(APPatchExtension):
         randomizer.randomize_units()
 
         randomizer.apply_base_changes()
+
+        if config["rescue_ross"] == 1:
+            randomizer.map_edit()
         
         if config["shuffle_skirmish_tables"]:
             randomizer.randomize_monster_gen()
@@ -177,6 +180,7 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
         "force_healer": int(options.force_healer),
         "force_thief": bool(options.force_thief),
         "force_dancer": bool(options.force_dancer),
+        "rescue_ross": int(options.rescue_ross),
         "random_myrrh": bool(options.random_myrrh),
         "random_tethys": bool(options.random_tethys),
         "no_rando_thief": bool(options.no_rando_thief),
