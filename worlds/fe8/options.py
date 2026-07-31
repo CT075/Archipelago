@@ -240,6 +240,19 @@ class FirstThiefDeployment(Toggle):
     display_name = "First thief deployment"
     default = 0
 
+class RescueRoss(Choice):
+    """
+    How would you like to rescue Ross/Garcia?
+    1. Force Vanessa to be a flier.
+    2. Create a path in the mountains.
+    3. Force any of Eirika up to Vanessa to be a flier.
+    """
+
+    display_name = "Rescue Ross method"
+    option_Vanessa = 0
+    option_Map = 1
+    option_Early = 2
+
 class SmoothDeployments(Toggle):
     """
     Gate chapter progression on the size of your deployable army.
@@ -438,6 +451,7 @@ class FE8Options(PerGameCommonOptions):
     force_thief: ForceThief
     no_rando_thief: NoRandoThief
     force_healer: ForceHealer
+    rescue_ross: RescueRoss
     force_dancer: ForceDancer
     unbreakable_regalia: UnbreakableRegalia
     recruit_checks_enabled: EnableRecruitChecks
@@ -467,7 +481,7 @@ class FE8Options(PerGameCommonOptions):
 
 FE8_option_groups:dict[str, List[Any]] = {
     "Player Randomizer settings": [PlayerRando, PlayerMonsters, RandomMyrrh, RandomTethys, ForceThief, 
-                                   ForceHealer, ForceDancer, Easier5x, LockpickUsability],
+                                   ForceHealer, ForceDancer,RescueRoss, Easier5x, LockpickUsability],
 
     "Growth Rate Settings": [GrowthRando, GrowthRandoMin, GrowthRandoMax, NormalizeGenders],
 
