@@ -987,7 +987,7 @@ class FE8Randomizer:
                 self.force_tag(6, "must_lockpick")
         if self.config["force_dancer"]:
             # checks to see if you have a dancer and if you do gives them the tag
-            if not (self.ally_check(33, "lockpick", "must_dance")):
+            if not (self.ally_check(33, "dancer", "must_dance")):
                 # if no healer gives the tag and re rolls them with it
                 self.force_tag(33, "must_dance")
 
