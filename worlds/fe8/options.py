@@ -31,6 +31,24 @@ class PlayerMonsters(Toggle):
     display_name = "Enable Playable Monsters"
     default = 1
 
+class EnemyRando(Choice):
+    """
+    How would you like enemy's to be randomzied into
+    1. No rando
+    2. All classes
+    3. Monsters only
+    4. Humans only
+    5. Humans into humans / Monsters into monsters
+    """
+
+    display_name = "Enemy Randomization"
+    #option_No_rando = 1
+    option_All_classes = 2
+    options_Monster_only = 3
+    options_Human_only = 4
+    #options_Same_race = 5
+    default = 2
+
 class RandomTethys(Toggle):
     """
     Allow Tethys to be randomized
@@ -507,6 +525,7 @@ class FE8Options(PerGameCommonOptions):
     normalize_genders: NormalizeGenders
 
     # Enemy Randomizer Settings
+    enemy_rando: EnemyRando
     super_demon_king: SuperDemonKing
     no_rando_thief: NoRandoThief
 
@@ -541,12 +560,12 @@ class FE8Options(PerGameCommonOptions):
         return bool(self.ruins_enabled) or self.goal == Goal.option_ClearLagdou
 
 FE8_option_groups:dict[str, List[Any]] = {
-    "Player Randomizer settings": [PlayerRando, PlayerMonsters,EirikaClass, RandomMyrrh, RandomTethys, ForceThief, 
+    "Player Randomizer settings": [PlayerRando, PlayerMonsters, EirikaClass, RandomMyrrh, RandomTethys, ForceThief, 
                                    ForceHealer, ForceDancer, RescueRoss, Easier5x, LockpickUsability],
 
     "Growth Rate Settings": [GrowthRando, GrowthRandoMin, GrowthRandoMax, NormalizeGenders],
 
-    "Enemy Randomizer Settings": [SuperDemonKing, NoRandoThief], 
+    "Enemy Randomizer Settings": [EnemyRando, SuperDemonKing, NoRandoThief], 
 
     "Unitsanity": [EnableRecruitChecks, SmoothDeployments, ProgressiveSethDeployment, 
                    FirstHealerDeployment, FirstThiefDeployment],

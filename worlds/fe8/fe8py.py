@@ -296,6 +296,7 @@ class JobRace(IntEnum):
     MONSTER = 2
 
 
+
 class JobType(IntEnum):
     ANY = 0
     RANGED = 1
@@ -1418,10 +1419,15 @@ class FE8Randomizer:
 
     def apply_base_changes(self) -> None:
         self.clear_weapon_ranks()
+    
     def randomize_units(self) -> None:
-        # TO DO
-        # add no monster enemy mode
+
         Race = JobRace.ALL
+        if self.config["enemy_rando"] == 3:
+            Race = JobRace.MONSTER
+        elif self.config["enemy_rando"] == 4:
+            Race = JobRace.HUMAN
+
         for chapter_name, chapter in self.unit_blocks.items():
             for block in chapter:
                 try:

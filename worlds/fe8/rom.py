@@ -178,6 +178,7 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
     config_dict = {
         "player_rando": bool(options.player_unit_rando),
         "player_monster": bool(options.player_unit_monsters),
+        "enemy_rando": int(options.enemy_rando),
         "enable_weapon_level_caps": bool(options.enable_weapon_level_caps),
         "easier_5x": bool(options.easier_5x),
         "force_healer": int(options.force_healer),
