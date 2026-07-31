@@ -251,7 +251,7 @@ class RescueRoss(Choice):
     display_name = "Rescue Ross method"
     option_Vanessa = 0
     option_Map = 1
-    option_Early = 2
+    option_Early_Flier = 2
 
 class SmoothDeployments(Toggle):
     """
