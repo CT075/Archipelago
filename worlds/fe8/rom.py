@@ -148,6 +148,7 @@ class FE8MicroPatch():
         config["random_myrrh"] = [options.random_myrrh]
         config["random_tethys"] = [options.random_tethys]
         config["rescue_ross"] = [options.rescue_ross]
+        config["eirika_class"] = [options.eirika_class]
         return config
     
     def get_micro_rom_as_bytes() -> bytearray:
@@ -183,6 +184,7 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
         "force_thief": bool(options.force_thief),
         "force_dancer": bool(options.force_dancer),
         "rescue_ross": int(options.rescue_ross),
+        "eirika_class": int(options.eirika_class),
         "random_myrrh": bool(options.random_myrrh),
         "random_tethys": bool(options.random_tethys),
         "no_rando_thief": bool(options.no_rando_thief),

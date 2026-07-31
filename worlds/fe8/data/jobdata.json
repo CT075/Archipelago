@@ -159,7 +159,8 @@
     "is_promoted":false,
     "tags":[
       "special",
-      "cannot_fight"
+      "cannot_fight",
+      "no_rando"
     ]
   },
   {
@@ -750,7 +751,8 @@
     ],
     "is_promoted":false,
     "tags":[
-      "cannot_fight"
+      "cannot_fight",
+      "no_rando"
     ]
   },
   {

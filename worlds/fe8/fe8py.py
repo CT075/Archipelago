@@ -82,7 +82,8 @@ from .constants import (
     THIEF_ID,
     CHARACTER_ORDER,
     VULNERARY_ID,
-    ELIXER_ID
+    ELIXER_ID,
+    DRAGONSTONE_ID
 )
 
 DEBUG = False
@@ -966,6 +967,15 @@ class FE8Randomizer:
         if self.config["rescue_ross"] == 0:
             self.ally_blocks["Units"][5].logic[0]["must_fly"] = True
 
+        if self.config["eirika_class"] == 0:
+            self.ally_blocks["Units"][0].logic[0]["must_fight"] = True
+        elif self.config["eirika_class"] > 0 and self.config["player_rando"]:
+            # sets the class and invintory to be propagated
+            self.character_store[EIRIKA] = self.jobs_by_id[self.config["eirika_class"]]
+            self.character_store.set_inventory(EIRIKA, [0,0,0,0])
+            # setting a varible that starts with "must_" so class reroller will skip her
+            self.ally_blocks["Units"][0].logic[0]["must_pick"] = self.config["eirika_class"]
+
     def enemy_logic_changes(self) -> None:
         '''
         For options that change logic of enemy before randomization
@@ -1313,6 +1323,8 @@ class FE8Randomizer:
         if self.config["player_rando"]:
             if eirika_job == DANCER_ID:
                 new_rapier= VULNERARY_ID
+            elif eirika_job == MANAKETE_ID:
+                new_rapier= DRAGONSTONE_ID
             elif any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
                 new_rapier = self.select_new_item(
                     eirika_job, self.weapons_by_name["Steel Blade"].id, {}
@@ -1339,6 +1351,8 @@ class FE8Randomizer:
                 max_rank = self.vanilla_highest_rank(EIRIKA)
             if eirika_job == DANCER_ID:
                 new_rapier= VULNERARY_ID
+            elif eirika_job == MANAKETE_ID:
+                new_rapier= DRAGONSTONE_ID
             elif any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
                 new_rapier = self.select_starting_weapon(eirika_job, max_rank)
             else:
@@ -1372,6 +1386,8 @@ class FE8Randomizer:
         # need to be adjusted.
         if eirika_job == DANCER_ID:
             ch15_auto_steel_sword = ELIXER_ID
+        elif eirika_job == MANAKETE_ID:
+            ch15_auto_steel_sword= DRAGONSTONE_ID
         else:
             ch15_auto_steel_sword = self.select_new_item(
                 eirika_job, self.weapons_by_name["Steel Sword"].id, {}
@@ -1382,6 +1398,8 @@ class FE8Randomizer:
         ephraim_job = self.character_store["Ephraim"]
         if ephraim_job == DANCER_ID:
             ch15_auto_steel_lance = ELIXER_ID
+        elif ephraim_job == MANAKETE_ID:
+            ch15_auto_steel_lance= DRAGONSTONE_ID
         else:
             ch15_auto_steel_lance = self.select_new_item(
                 ephraim_job, self.weapons_by_name["Steel Lance"].id, {}

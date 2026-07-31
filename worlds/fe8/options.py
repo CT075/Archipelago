@@ -252,6 +252,52 @@ class RescueRoss(Choice):
     option_Vanessa = 0
     option_Map = 1
     option_Early_Flier = 2
+    default = 0
+
+class EirikaClass(Choice):
+    """
+    Pick Eirika's class
+
+    only works if Randomize Player Units is enabled
+    """
+
+    display_name = "Eirika class"
+    option_Random_class = -1
+    option_Combat_class = 0
+    option_Ephraim_lord = 1
+    option_Eirika_lord = 2
+    option_Cavalier = 5
+    option_Armour_Knight = 9
+    option_Thief = 13
+    option_Mercenary = 15
+    option_Myrmidon = 19
+    option_Archer = 25
+    option_Fighter = 63
+    option_Brigand = 65
+    option_Pirate = 66
+    option_Wyvern_Rider = 31
+    option_Pegasus_Knight = 72
+    option_Journeyman = 126
+    option_Recruit = 55
+    option_Pupil = 127
+    option_Mage = 37
+    option_Shaman = 45
+    option_Monk = 68
+    option_Troubadour=75
+    option_Cleric = 74
+    option_Priest = 69
+    option_Manakete = 60
+    option_Dancer = 77
+    option_Bonewalker=84
+    option_Bonewalker_Bow=85
+    option_Bael = 88
+    option_Mauthe_Doog = 91
+    option_Tarvos = 93
+    option_Mogall = 95
+    option_Gargoyle= 99
+    default = -1
+
+
 
 class SmoothDeployments(Toggle):
     """
@@ -444,6 +490,7 @@ class FE8Options(PerGameCommonOptions):
     # Player Randomizer settings
     player_unit_rando: PlayerRando
     player_unit_monsters: PlayerMonsters
+    eirika_class: EirikaClass
     random_myrrh: RandomMyrrh
     random_tethys: RandomTethys
     rescue_ross: RescueRoss
@@ -494,7 +541,7 @@ class FE8Options(PerGameCommonOptions):
         return bool(self.ruins_enabled) or self.goal == Goal.option_ClearLagdou
 
 FE8_option_groups:dict[str, List[Any]] = {
-    "Player Randomizer settings": [PlayerRando, PlayerMonsters, RandomMyrrh, RandomTethys, ForceThief, 
+    "Player Randomizer settings": [PlayerRando, PlayerMonsters,EirikaClass, RandomMyrrh, RandomTethys, ForceThief, 
                                    ForceHealer, ForceDancer, RescueRoss, Easier5x, LockpickUsability],
 
     "Growth Rate Settings": [GrowthRando, GrowthRandoMin, GrowthRandoMax, NormalizeGenders],
