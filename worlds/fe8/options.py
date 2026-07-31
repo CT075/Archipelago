@@ -227,7 +227,7 @@ class NoRandoThief(Toggle):
     """
     Don't randomize enemy theives
 
-    So they can stop stealing your treasure
+    So they can steal your treasure
     """
     display_name = "Don't randomize enemy theives"
     default = 1
