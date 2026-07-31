@@ -146,6 +146,7 @@ class FE8MicroPatch():
         config["force_thief"] = [options.force_thief]
         config["random_myrrh"] = [options.random_myrrh]
         config["random_tethys"] = [options.random_tethys]
+        config["rescue_ross"] = [options.rescue_ross]
         return config
     
     def get_micro_rom_as_bytes() -> bytearray:

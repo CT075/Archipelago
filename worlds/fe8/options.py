@@ -436,41 +436,55 @@ class MusicRando(Choice):
 # CR-someday cam: Eventually, it would be nice to be able to generate this.
 @dataclass
 class FE8Options(PerGameCommonOptions):
-    player_unit_rando: PlayerRando
-    random_myrrh: RandomMyrrh
-    random_tethys: RandomTethys
-    player_unit_monsters: PlayerMonsters
-    super_demon_king: SuperDemonKing
-    smooth_level_caps: SmoothLevelCapProgression
-    enable_level_caps: EnableLevelCaps
-    enable_weapon_level_caps: EnableWeaponLevelCaps
-    min_endgame_level_cap: MinimumEndgameLevelCapRange
-    required_holy_weapons: MinimumUsableHolyWeapons
-    exclude_latona: ExcludeLatona
-    easier_5x: Easier5x
-    force_thief: ForceThief
-    no_rando_thief: NoRandoThief
-    force_healer: ForceHealer
-    rescue_ross: RescueRoss
-    force_dancer: ForceDancer
-    unbreakable_regalia: UnbreakableRegalia
-    recruit_checks_enabled: EnableRecruitChecks
-    progressive_seth_deployment: ProgressiveSethDeployment
-    first_healer_deployment: FirstHealerDeployment
-    first_thief_deployment: FirstThiefDeployment
-    smooth_deployments: SmoothDeployments
-    tower_enabled: EnableTower
-    ruins_enabled: EnableRuins
-    shuffle_skirmish_tables: ShuffleSkirmishTables
-    lockpick_usability: LockpickUsability
-    normalize_genders: NormalizeGenders
+    # Game Options
     death_link: DeathLink
-    growth_rando: GrowthRando
-    growth_rando_min: GrowthRandoMin
-    growth_rando_max: GrowthRandoMax
     music_rando: MusicRando
     goal: Goal
 
+    # Player Randomizer settings
+    player_unit_rando: PlayerRando
+    player_unit_monsters: PlayerMonsters
+    random_myrrh: RandomMyrrh
+    random_tethys: RandomTethys
+    rescue_ross: RescueRoss
+    force_healer: ForceHealer
+    force_dancer: ForceDancer
+    force_thief: ForceThief
+    lockpick_usability: LockpickUsability
+    easier_5x: Easier5x
+
+    # Growth Rate Settings
+    growth_rando: GrowthRando
+    growth_rando_min: GrowthRandoMin
+    growth_rando_max: GrowthRandoMax
+    normalize_genders: NormalizeGenders
+
+    # Enemy Randomizer Settings
+    super_demon_king: SuperDemonKing
+    no_rando_thief: NoRandoThief
+
+    # Unitsanity
+    recruit_checks_enabled: EnableRecruitChecks
+    smooth_deployments: SmoothDeployments
+    progressive_seth_deployment: ProgressiveSethDeployment
+    first_healer_deployment: FirstHealerDeployment
+    first_thief_deployment: FirstThiefDeployment
+
+    # Level Caps / Settings
+    enable_level_caps: EnableLevelCaps
+    smooth_level_caps: SmoothLevelCapProgression
+    min_endgame_level_cap: MinimumEndgameLevelCapRange
+
+    # Weapon Caps / Settings
+    enable_weapon_level_caps: EnableWeaponLevelCaps
+    required_holy_weapons: MinimumUsableHolyWeapons
+    exclude_latona: ExcludeLatona
+    unbreakable_regalia: UnbreakableRegalia
+
+    # Optional Fight Settings
+    tower_enabled: EnableTower
+    ruins_enabled: EnableRuins
+    shuffle_skirmish_tables: ShuffleSkirmishTables
     # Convenience methods for options that imply each other
 
     def tower_checks_enabled(self):
@@ -481,7 +495,7 @@ class FE8Options(PerGameCommonOptions):
 
 FE8_option_groups:dict[str, List[Any]] = {
     "Player Randomizer settings": [PlayerRando, PlayerMonsters, RandomMyrrh, RandomTethys, ForceThief, 
-                                   ForceHealer, ForceDancer,RescueRoss, Easier5x, LockpickUsability],
+                                   ForceHealer, ForceDancer, RescueRoss, Easier5x, LockpickUsability],
 
     "Growth Rate Settings": [GrowthRando, GrowthRandoMin, GrowthRandoMax, NormalizeGenders],
 
