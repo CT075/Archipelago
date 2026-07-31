@@ -476,7 +476,7 @@ FE8_option_groups:dict[str, List[Any]] = {
     "Unitsanity": [EnableRecruitChecks, SmoothDeployments, ProgressiveSethDeployment, 
                    FirstHealerDeployment, FirstThiefDeployment],
 
-    "Level Caps": [EnableLevelCaps, SmoothLevelCapProgression, MinimumEndgameLevelCapRange],
+    "Level Caps / Settings": [EnableLevelCaps, SmoothLevelCapProgression, MinimumEndgameLevelCapRange],
 
     "Weapon Caps / Settings": [EnableWeaponLevelCaps, MinimumUsableHolyWeapons, ExcludeLatona,
                                 UnbreakableRegalia],
