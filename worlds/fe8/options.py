@@ -44,9 +44,9 @@ class EnemyRando(Choice):
     display_name = "Enemy Randomization Results"
     option_No_rando = 1
     option_All_classes = 2
-    options_Monster_only = 3
-    options_Human_only = 4
-    options_Same_race = 5
+    option_Monster_only = 3
+    option_Human_only = 4
+    option_Same_race = 5
     default = 2
 
 class RandomTethys(Toggle):
