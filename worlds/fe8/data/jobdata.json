@@ -29,7 +29,8 @@
     ],
     "is_promoted":true,
     "tags":[
-      "Ephraim"
+      "Ephraim",
+      "mounted"
     ]
   },
   {
@@ -40,7 +41,8 @@
     ],
     "is_promoted":true,
     "tags":[
-      "Eirika"
+      "Eirika",
+      "mounted"
     ]
   },
   {
@@ -52,7 +54,7 @@
     ],
     "is_promoted":false,
     "tags":[
-      
+      "mounted"
     ]
   },
   {
@@ -64,7 +66,7 @@
     ],
     "is_promoted":false,
     "tags":[
-      
+      "mounted"
     ]
   },
   {
@@ -76,7 +78,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "mounted"
     ]
   },
   {
@@ -88,7 +90,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "mounted"
     ]
   },
   {
@@ -330,7 +332,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "mounted"
     ]
   },
   {
@@ -342,7 +344,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "mounted"
     ]
   },
   {
@@ -470,7 +472,8 @@
     ],
     "is_promoted":true,
     "tags":[
-      "healer"
+      "healer",
+      "mounted"
     ]
   },
   {
@@ -482,7 +485,8 @@
     ],
     "is_promoted":true,
     "tags":[
-      "healer"
+      "healer",
+      "mounted"
     ]
   },
   {
@@ -602,7 +606,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "mounted"
     ]
   },
   {
@@ -615,7 +619,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "mounted"
     ]
   },
   {
@@ -810,7 +814,8 @@
     "is_promoted":false,
     "tags":[
       "cannot_fight",
-      "healer"
+      "healer",
+      "mounted"
     ]
   },
   {
@@ -822,7 +827,8 @@
     ],
     "is_promoted":true,
     "tags":[
-      "healer"
+      "healer",
+      "mounted"
     ]
   },
   {
@@ -1014,7 +1020,8 @@
     "is_promoted":false,
     "tags":[
       "monster",
-      "special"
+      "special",
+      "mounted"
     ]
   },
   {
@@ -1027,7 +1034,8 @@
     "is_promoted":true,
     "tags":[
       "monster",
-      "special"
+      "special",
+      "mounted"
     ]
   },
   {

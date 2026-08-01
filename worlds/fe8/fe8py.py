@@ -83,7 +83,9 @@ from .constants import (
     CHARACTER_ORDER,
     VULNERARY_ID,
     ELIXER_ID,
-    DRAGONSTONE_ID
+    DRAGONSTONE_ID,
+    BANDIT_AI,
+    DELAYED_BANDIT_AI
 )
 
 DEBUG = False
@@ -795,6 +797,13 @@ class FE8Randomizer:
             if t not in logic:
                 logic[t] = True
 
+        AI_type = unit[17]
+
+        if self.config["stop_bandit_mounted"] and not ("player" in logic and logic["player"]):
+            if AI_type == BANDIT_AI or AI_type == DELAYED_BANDIT_AI:
+                logic["no_flying"] = True
+                logic["no_mounted"] = True
+
         no_store = "no_store" in logic and logic["no_store"]
 
         # config option for disabling unit randomization
@@ -990,7 +999,6 @@ class FE8Randomizer:
         '''
         if self.config["no_rando_thief"]:
             self.jobs_not_randomized.append (THIEF_ID)
-        
 
     def allies_logic_checks(self) -> None:
         '''

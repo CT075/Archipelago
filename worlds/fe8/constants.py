@@ -204,6 +204,8 @@ ELIXER_ID = 109
 
 ROSS_CH2_MAP_OFFSET =0x1B74CD
 
+BANDIT_AI = 4
+DELAYED_BANDIT_AI = 17
 
 
 # CR-soon cam: This is stretching the definition of a "constant" and should

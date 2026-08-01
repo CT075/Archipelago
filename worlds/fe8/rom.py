@@ -149,6 +149,7 @@ class FE8MicroPatch():
         config["random_tethys"] = [options.random_tethys]
         config["rescue_ross"] = [options.rescue_ross]
         config["eirika_class"] = [options.eirika_class]
+        config["stop_bandit_mounted"] = [options.stop_bandit_mounted]
         return config
     
     def get_micro_rom_as_bytes() -> bytearray:
@@ -189,6 +190,7 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
         "random_myrrh": bool(options.random_myrrh),
         "random_tethys": bool(options.random_tethys),
         "no_rando_thief": bool(options.no_rando_thief),
+        "stop_bandit_mounted": bool(options.stop_bandit_mounted), 
         "unbreakable_regalia": bool(options.unbreakable_regalia),
         "shuffle_skirmish_tables": bool(options.shuffle_skirmish_tables),
         "normalize_genders": bool(options.normalize_genders),

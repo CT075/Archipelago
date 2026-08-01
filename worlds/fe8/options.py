@@ -49,6 +49,8 @@ class EnemyRando(Choice):
     option_Same_race = 5
     default = 2
 
+
+
 class RandomTethys(Toggle):
     """
     Allow Tethys to be randomized
@@ -340,6 +342,16 @@ class NoRandoThief(Toggle):
     display_name = "Don't randomize enemy theives"
     default = 1
 
+class StopBanditMounted(Toggle):
+    """
+    Stops enemys that destroy villages from being flying / mounted
+
+    Needs "Enemy Randomization Results" to not be set to "no rando"
+    """
+
+    display_name = "No enhanced movement bandits"
+    default = 0
+
 
 class EnableTower(Toggle):
     """
@@ -528,6 +540,7 @@ class FE8Options(PerGameCommonOptions):
     enemy_rando: EnemyRando
     super_demon_king: SuperDemonKing
     no_rando_thief: NoRandoThief
+    stop_bandit_mounted: StopBanditMounted
 
     # Unitsanity
     recruit_checks_enabled: EnableRecruitChecks
@@ -565,7 +578,7 @@ FE8_option_groups:dict[str, List[Any]] = {
 
     "Growth Rate Settings": [GrowthRando, GrowthRandoMin, GrowthRandoMax, NormalizeGenders],
 
-    "Enemy Randomizer Settings": [EnemyRando, SuperDemonKing, NoRandoThief], 
+    "Enemy Randomizer Settings": [EnemyRando, SuperDemonKing, NoRandoThief, StopBanditMounted], 
 
     "Unitsanity": [EnableRecruitChecks, SmoothDeployments, ProgressiveSethDeployment, 
                    FirstHealerDeployment, FirstThiefDeployment],
