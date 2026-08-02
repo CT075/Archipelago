@@ -54,6 +54,10 @@
     "kind":"Sword",
     "locks":[
       "Eirika"
+    ],
+    "effective":[
+      "armoured",
+      "mounted"
     ]
   },
   {
@@ -81,13 +85,15 @@
     "id":14,
     "name":"Armorslayer",
     "rank":"D",
-    "kind":"Sword"
+    "kind":"Sword",
+    "effective":["armoured"]
   },
   {
     "id":15,
     "name":"Wyrmslayer",
     "rank":"C",
-    "kind":"Sword"
+    "kind":"Sword",
+    "effective":["dragon"]
   },
   {
     "id":16,
@@ -111,7 +117,8 @@
     "id":19,
     "name":"Zanbato",
     "rank":"D",
-    "kind":"Sword"
+    "kind":"Sword",
+    "effective": ["mounted"]
   },
   {
     "id":20,
@@ -159,7 +166,8 @@
     "id":27,
     "name":"Horseslayer",
     "rank":"D",
-    "kind":"Lance"
+    "kind":"Lance",
+    "effective":["mounted"]
   },
   {
     "id":28,
@@ -219,13 +227,15 @@
     "id":37,
     "name":"Halberd",
     "rank":"D",
-    "kind":"Axe"
+    "kind":"Axe",
+    "effective":["mounted"]
   },
   {
     "id":38,
     "name":"Hammer",
     "rank":"D",
-    "kind":"Axe"
+    "kind":"Axe",
+    "effective":["armoured"]
   },
   {
     "id":39,
@@ -267,49 +277,57 @@
     "id":45,
     "name":"Iron Bow",
     "rank":"E",
-    "kind":"Bow"
+    "kind":"Bow",
+    "effective":["flying"]
   },
   {
     "id":46,
     "name":"Steel Bow",
     "rank":"D",
-    "kind":"Bow"
+    "kind":"Bow",
+    "effective":["flying"]
   },
   {
     "id":47,
     "name":"Silver Bow",
     "rank":"A",
-    "kind":"Bow"
+    "kind":"Bow",
+    "effective":["flying"]
   },
   {
     "id":48,
     "name":"Poison Bow",
     "rank":"D",
-    "kind":"Bow"
+    "kind":"Bow",
+    "effective":["flying"]
   },
   {
     "id":49,
     "name":"Killer Bow",
     "rank":"C",
-    "kind":"Bow"
+    "kind":"Bow",
+    "effective":["flying"]
   },
   {
     "id":50,
     "name":"Brave Bow",
     "rank":"B",
-    "kind":"Bow"
+    "kind":"Bow",
+    "effective":["flying"]
   },
   {
     "id":51,
     "name":"Short Bow",
     "rank":"D",
-    "kind":"Bow"
+    "kind":"Bow",
+    "effective":["flying"]
   },
   {
     "id":52,
     "name":"Longbow",
     "rank":"D",
-    "kind":"Bow"
+    "kind":"Bow",
+    "effective":["flying"]
   },
   {
     "id":56,
@@ -507,7 +525,8 @@
     "id":90,
     "name":"Dragon Axe",
     "rank":"C",
-    "kind":"Axe"
+    "kind":"Axe",
+    "effective":["dragon"]
   },
   {
     "id":120,
@@ -516,31 +535,39 @@
     "kind":"Lance",
     "locks":[
       "Ephraim"
+    ],
+    "effective":[      
+      "armoured",
+      "mounted"
     ]
   },
   {
     "id":129,
     "name":"Shadowkiller",
     "rank":"E",
-    "kind":"Sword"
+    "kind":"Sword",
+    "effective":["monster"]
   },
   {
     "id":130,
     "name":"Bright Lance",
     "rank":"E",
-    "kind":"Lance"
+    "kind":"Lance",
+    "effective":["monster"]
   },
   {
     "id":131,
     "name":"Fiendcleaver",
     "rank":"E",
-    "kind":"Axe"
+    "kind":"Axe",
+    "effective":["monster"]
   },
   {
     "id":132,
     "name":"Beacon Bow",
     "rank":"E",
-    "kind":"Bow"
+    "kind":"Bow",
+    "effective":["monster"]
   },
   {
     "id":134,
@@ -552,7 +579,8 @@
     "id":135,
     "name":"Ivaldi",
     "rank":"S",
-    "kind":"Light"
+    "kind":"Light",
+    "effective":["monster"]
   },
   {
     "id":139,
@@ -573,13 +601,15 @@
     "id":141,
     "name":"Dragonspear",
     "rank":"C",
-    "kind":"Lance"
+    "kind":"Lance",
+    "effective":["dragon"]
   },
   {
     "id":142,
     "name":"Vidofnir",
     "rank":"S",
-    "kind":"Lance"
+    "kind":"Lance",
+    "effective":["monster"]
   },
   {
     "id":143,
@@ -600,25 +630,29 @@
     "id":145,
     "name":"Audhulma",
     "rank":"S",
-    "kind":"Sword"
+    "kind":"Sword",
+    "effective":["monster"]
   },
   {
     "id":147,
     "name":"Garm",
     "rank":"S",
-    "kind":"Axe"
+    "kind":"Axe",
+    "effective":["monster"]
   },
   {
     "id":148,
     "name":"Nidhogg",
     "rank":"S",
-    "kind":"Bow"
+    "kind":"Bow",
+    "effective":["monster", "flying"]
   },
   {
     "id":149,
     "name":"Heavy Lance",
     "rank":"D",
-    "kind":"Lance"
+    "kind":"Lance",
+    "effective":["armoured"]
   },
   {
     "id":150,

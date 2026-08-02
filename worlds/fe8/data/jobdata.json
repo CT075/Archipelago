@@ -101,7 +101,7 @@
     ],
     "is_promoted":false,
     "tags":[
-      
+      "armoured"
     ]
   },
   {
@@ -112,7 +112,7 @@
     ],
     "is_promoted":false,
     "tags":[
-      
+      "armoured"
     ]
   },
   {
@@ -125,7 +125,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "armoured"
     ]
   },
   {
@@ -138,7 +138,7 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "armoured"
     ]
   },
   {
@@ -355,7 +355,8 @@
     ],
     "is_promoted":false,
     "tags":[
-      "flying"
+      "flying",
+      "dragon"
     ]
   },
   {
@@ -366,7 +367,8 @@
     ],
     "is_promoted":false,
     "tags":[
-      "flying"
+      "flying",
+      "dragon"
     ]
   },
   {
@@ -378,7 +380,8 @@
     ],
     "is_promoted":true,
     "tags":[
-      "flying"
+      "flying",
+      "dragon"
     ]
   },
   {
@@ -390,7 +393,8 @@
     ],
     "is_promoted":true,
     "tags":[
-      "flying"
+      "flying",
+      "dragon"
     ]
   },
   {
@@ -401,7 +405,8 @@
     ],
     "is_promoted":true,
     "tags":[
-      "flying"
+      "flying",
+      "dragon"
     ]
   },
   {
@@ -412,7 +417,8 @@
     ],
     "is_promoted":true,
     "tags":[
-      "flying"
+      "flying",
+      "dragon"
     ]
   },
   {
@@ -606,7 +612,8 @@
     ],
     "is_promoted":true,
     "tags":[
-      "mounted"
+      "mounted",
+      "armoured"
     ]
   },
   {
@@ -619,7 +626,8 @@
     ],
     "is_promoted":true,
     "tags":[
-      "mounted"
+      "mounted",
+      "armoured"
     ]
   },
   {
@@ -631,7 +639,8 @@
     "is_promoted":true,
     "tags":[
       "special",
-      "flying"
+      "flying",
+      "dragon"
     ]
   },
   {
@@ -643,7 +652,8 @@
     "is_promoted":false,
     "tags":[
       "special",
-      "flying"
+      "flying",
+      "dragon"
     ]
   },
   {

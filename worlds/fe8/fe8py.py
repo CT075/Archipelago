@@ -313,6 +313,7 @@ class WeaponData:
     rank: WeaponRank
     kind: WeaponKind
     locks: set[str]
+    effective: set[str]
 
     @classmethod
     def of_object(cls, obj: dict[str, Any]):
@@ -322,6 +323,7 @@ class WeaponData:
             rank=WeaponRank.of_str(obj["rank"]),
             kind=WeaponKind.of_str(obj["kind"]),
             locks=obj.get("locks", set()),
+            effective=obj.get("effective", set())
         )
 
 
@@ -460,7 +462,7 @@ class CharacterStore:
 
 # CR cam: Eirika and Ephraim should be able to use their respective weapons if
 # they get randomized into the right class.
-def weapon_usable(weapon: WeaponData, job: JobData, logic: dict[str, Any]) -> bool:
+def weapon_usable(weapon: WeaponData, job: JobData, logic: dict[str, Any], character_store: CharacterStore) -> bool:
     if any(lock not in job.tags for lock in weapon.locks):
         return False
 
@@ -470,6 +472,17 @@ def weapon_usable(weapon: WeaponData, job: JobData, logic: dict[str, Any]) -> bo
         WeaponKind.RING,
     ]:
         return False
+
+    context_tags = []
+
+    for x in logic:
+        if x.startswith("Context_") and logic[x]:
+            context_tags.append(x.removeprefix("Context_"))
+
+    for x in context_tags:
+        context_job = character_store.lookup_jobs(x)
+        if any (effective in context_job.tags for effective in weapon.effective):
+            return False
 
     return True
 
@@ -626,13 +639,23 @@ class FE8Randomizer:
         # the "no_" prefix adds the tag to the invalid tag list
         # "no_flying" makes any job with "flying" tag invalid
         notags = set()
+        context_tags = []
 
         for x in logic:
             if x.startswith("no_") and logic[x]:
                 notags.add(x.removeprefix("no_"))
+            elif x.startswith("Context_") and logic[x]:
+                context_tags.append(x.removeprefix("Context_"))
         # job is invalid if it has any of the tags in notags
         if notags and notags & job.tags:
             return False
+
+        # stops bow only units spawning if context_unit if a flier
+        for x in context_tags:
+            context_job = self.character_store.lookup_jobs(x)
+            if "bow_only" in job.tags and "flier" in context_job.tags:
+                return False
+        
         if "must_heal" in logic and logic["must_heal"]:
             if "healer" not in job.tags:
                 return False
@@ -682,7 +705,7 @@ class FE8Randomizer:
         for weapon_levels in job.usable_weapons:
             useable += self.weapons_by_kind_rank[weapon_levels][weapon_attrs.rank]
 
-        choices = [weap for weap in useable if weapon_usable(weap, job, logic)]
+        choices = [weap for weap in useable if weapon_usable(weap, job, logic, self.character_store)]
 
         if not choices:
             import json
@@ -697,7 +720,7 @@ class FE8Randomizer:
             choices = [
                 weap
                 for weap in self.weapons_by_kind_rank[WeaponRank.E][first_type]
-                if weapon_usable(weap, job, dict())
+                if weapon_usable(weap, job, dict(), self.character_store)
             ]
 
             if not choices:
@@ -721,7 +744,7 @@ class FE8Randomizer:
         candidates = [
             weap
             for weap in self.weapons_by_id.values()
-            if weap.kind in job.usable_weapons and weapon_usable(weap, job, {})
+            if weap.kind in job.usable_weapons and weapon_usable(weap, job, {}, self.character_store)
         ]
         if not candidates:
             return self.weapons_by_name["Iron Sword"].id
@@ -987,7 +1010,7 @@ class FE8Randomizer:
         if self.config["eirika_class"] == 0:
             self.ally_blocks["Units"][0].logic[0]["must_fight"] = True
         elif self.config["eirika_class"] > 0 and self.config["player_rando"]:
-            # sets the class and invintory to be propagated
+            # sets the class and inventory to be propagated
             self.character_store[EIRIKA] = self.jobs_by_id[self.config["eirika_class"]]
             self.character_store.set_inventory(EIRIKA, [0,0,0,0])
             # setting a varible that starts with "must_" so class reroller will skip her
@@ -1423,8 +1446,6 @@ class FE8Randomizer:
 
         self.rom[CH15_AUTO_STEEL_LANCE] = ch15_auto_steel_lance
 
-    # TODO: logic
-    #   - Flying Duessel vs enemy archers in Ephraim 10 may be unbeatable
     def clear_weapon_ranks(self) -> None:
         for ids in self.character_store.ids_by_name.values():
             for char_id in ids:
