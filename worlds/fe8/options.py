@@ -171,6 +171,7 @@ class ForceThief(Toggle):
     """
     Will make sure you have a thief in the first 6 amount of units.
     (Colm or before)
+    Colm will also come with a lockpick.
     """
 
     display_name = "Guarantee a thief"
@@ -178,7 +179,7 @@ class ForceThief(Toggle):
 
 class ForceDancer(Toggle):
     """
-    Will make sure you have a dancer as one of your units.
+    Will make sure you have a dancer as one of your unpromoted units.
     """
 
     display_name = "Guarantee a dancer"
@@ -271,7 +272,7 @@ class NoRandoThief(Toggle):
     """
     Don't randomize enemy theives
 
-    So they can stop stealing your treasure
+    So they can steal your treasure
     """
     display_name = "Don't randomize enemy theives"
     default = 1
@@ -485,6 +486,7 @@ class FE8Options(PerGameCommonOptions):
     tower_enabled: EnableTower
     ruins_enabled: EnableRuins
     shuffle_skirmish_tables: ShuffleSkirmishTables
+
     # Convenience methods for options that imply each other
 
     def tower_checks_enabled(self):
@@ -493,6 +495,9 @@ class FE8Options(PerGameCommonOptions):
     def ruins_checks_enabled(self):
         return bool(self.ruins_enabled) or self.goal == Goal.option_ClearLagdou
 
+# does not determine order on the options creator / yaml templates
+# FE8Options(PerGameCommonOptions) determines setting order
+# this determines group oder
 FE8_option_groups:dict[str, List[Any]] = {
     "Player Randomizer settings": [PlayerRando, PlayerMonsters, RandomMyrrh, RandomTethys, ForceThief, 
                                    ForceHealer, ForceDancer, RescueRoss, Easier5x, LockpickUsability],
