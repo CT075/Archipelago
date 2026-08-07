@@ -79,6 +79,11 @@ from .constants import (
     CHARACTER_ORDER
 )
 
+from .connector_config import (
+    FREE_UNIT_LOC
+)
+
+
 DEBUG = False
 
 
@@ -1345,10 +1350,19 @@ class FE8Randomizer:
                     raise
 
     def apply_base_changes(self) -> None:
+        self.free_deploys()
         self.fix_movement_costs()
         self.fix_cutscenes()
         self.tweak_lords()
         self.make_monsters_mounted()
+
+    def free_deploys(self) -> None:
+        if self.config["first_healer_deployment"]:
+            self.make_deploy(self.character_store.FindUnitTagged("healer"))
+
+    def make_deploy(self, unit:str):
+        if unit != None:
+            self.rom[FREE_UNIT_LOC.get (unit)] = 1
 
     def apply_5x_buffs(self) -> None:
         for char in ["Ephraim", "Forde", "Kyle"]:

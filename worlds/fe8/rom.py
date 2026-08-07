@@ -172,6 +172,7 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
         "enable_weapon_level_caps": bool(options.enable_weapon_level_caps),
         "easier_5x": bool(options.easier_5x),
         "force_healer": int(options.force_healer),
+        "first_healer_deployment": bool(options.first_healer_deployment),
         "unbreakable_regalia": bool(options.unbreakable_regalia),
         "shuffle_skirmish_tables": bool(options.shuffle_skirmish_tables),
         "normalize_genders": bool(options.normalize_genders),
