@@ -1403,6 +1403,15 @@ class FE8Randomizer:
             )
             self.rom[CH15_AUTO_STEEL_LANCE] = ch15_auto_steel_lance
 
+            tethys_job = self.character_store["Tethys"]
+            if tethys_job != DANCER_ID:
+                tethys_weapon = self.select_new_item(
+                    tethys_job, self.weapons_by_name["Steel Lance"].id, {}
+                )
+                self.rom[TETHYS_EPHRAIM] = tethys_weapon
+                self.rom[TETHYS_EIRIKA] = tethys_weapon
+            
+
     # TODO: logic
     #   - Flying Duessel vs enemy archers in Ephraim 10 may be unbeatable
     def clear_weapon_ranks(self) -> None:
