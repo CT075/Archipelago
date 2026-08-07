@@ -677,7 +677,7 @@ class FE8Randomizer:
         if item_id not in self.weapons_by_id:
             return item_id
 
-        if job == DANCER_ID:
+        if job.id == DANCER_ID:
             return VULNERARY_ID
         
         weapon_attrs = self.weapons_by_id[item_id]
