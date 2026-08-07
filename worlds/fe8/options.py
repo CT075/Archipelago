@@ -171,6 +171,7 @@ class ForceThief(Toggle):
     """
     Will make sure you have a thief in the first 6 amount of units.
     (Colm or before)
+    Colm will also come with a lockpick.
     """
 
     display_name = "Guarantee a thief"
@@ -178,7 +179,7 @@ class ForceThief(Toggle):
 
 class ForceDancer(Toggle):
     """
-    Will make sure you have a dancer as one of your units.
+    Will make sure you have a dancer as one of your unpromoted units.
     """
 
     display_name = "Guarantee a dancer"
@@ -258,7 +259,7 @@ class NoRandoThief(Toggle):
     """
     Don't randomize enemy theives
 
-    So they can stop stealing your treasure
+    So they can steal your treasure
     """
     display_name = "Don't randomize enemy theives"
     default = 1
