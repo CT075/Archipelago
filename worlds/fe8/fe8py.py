@@ -86,6 +86,11 @@ from .constants import (
     DRAGONSTONE_ID
 )
 
+from .connector_config import (
+    FREE_UNIT_LOC
+)
+
+
 DEBUG = False
 
 
@@ -302,6 +307,7 @@ class JobType(IntEnum):
     RANGED = 1
     FLIER = 2
     LOCKPICK = 3
+    HEALER = 4
 
 
 @dataclass
@@ -490,6 +496,7 @@ class FE8Randomizer:
     random: Random
     rom: bytearray
     config: dict[str, Any]
+    ally_pick:bool
     micro: bool
 
     def __init__(self, rom: bytearray, random: Random, config: dict[str, Any], micro:bool = False):
@@ -502,15 +509,15 @@ class FE8Randomizer:
         self.character_store = CharacterStore(fetch_json(CHARACTERS))
         songdata = fetch_json(SONG_DATA)
         self.jobs_not_randomized= [DRACO_ZOMBIE_ID]
+        self.ally_pick = False
         self.config = config
         self.micro = micro
-
+        
         if (self.micro):
             ally_blocks = fetch_json(MICRO_UNIT_BLOCKS)  
         else:
             ally_blocks = fetch_json(ALLY_UNIT_BLOCKS)
         
-
         self.character_wranks: dict[int, list[int]] = {
             int(k): v for k, v in fetch_json(CHARACTER_WRANKS).items()
         }
@@ -564,6 +571,11 @@ class FE8Randomizer:
                     self.jobs_pools[job.is_promoted][Race][JobType.RANGED].append(job)
                     self.jobs_pools[job.is_promoted][JobRace.ALL][
                         JobType.RANGED
+                    ].append(job)
+                if "healer" in job.tags:
+                    self.jobs_pools[job.is_promoted][Race][JobType.HEALER].append(job)
+                    self.jobs_pools[job.is_promoted][JobRace.ALL][
+                        JobType.HEALER
                     ].append(job)
                 self.jobs_pools[job.is_promoted][JobRace.ALL][JobType.ANY].append(job)
                 self.jobs_pools[job.is_promoted][Race][JobType.ANY].append(job)
@@ -631,12 +643,6 @@ class FE8Randomizer:
         # job is invalid if it has any of the tags in notags
         if notags and notags & job.tags:
             return False
-        if "must_heal" in logic and logic["must_heal"]:
-            if "healer" not in job.tags:
-                return False
-        if "must_lockpick" in logic and logic["must_lockpick"]:
-            if "lockpick" not in job.tags:
-                return False
         if "must_fight" in logic and logic["must_fight"]:
             if "cannot_fight" in job.tags:
                 return False
@@ -658,7 +664,7 @@ class FE8Randomizer:
 
     def select_new_item(self, job: JobData, item_id: int, logic: dict[str, Any]) -> int:
         if item_id == LOCKPICK:
-            if "Lockpick" in job.tags:
+            if "lockpick" in job.tags or self.ally_pick == True:
                 return LOCKPICK
             else:
                 return CHEST_KEY_5
@@ -673,6 +679,10 @@ class FE8Randomizer:
 
         if item_id not in self.weapons_by_id:
             return item_id
+
+        if job.id == DANCER_ID:
+            return VULNERARY_ID
+        
         weapon_attrs = self.weapons_by_id[item_id]
 
         # gets the weapon types equipable and adds them to the pool for the current weapon being changed
@@ -842,12 +852,14 @@ class FE8Randomizer:
             # but should never need to
             if "must_fly" in logic and logic["must_fly"]:
                 Rules = JobType.FLIER
+            elif "must_heal" in logic and logic["must_heal"]:
+                Rules = JobType.HEALER
+            elif "must_lockpick" in logic and logic["must_lockpick"]:
+                Rules = JobType.LOCKPICK
             else:
                 Rules = JobType.ANY
             if "must_dance" in logic and logic["must_dance"]:
                 new_job= self.jobs_by_id [DANCER_ID]
-                new_inventory = [VULNERARY_ID,VULNERARY_ID,0,0]
-                self.character_store.set_inventory(char, new_inventory)
             else:
                 new_job = self.select_new_job(
                     job,
@@ -950,7 +962,9 @@ class FE8Randomizer:
         For options that change logic of allies before randomization
         DO NOT DO ANY ROM BYTE MANIPULATION HERE AS WILL KILL WORLD GENERATION
         '''
-
+        # if forcing a thief need a was to make sure we get a pick, why not use colms
+        if self.config["force_thief"]:
+            self.ally_pick = True
         # making sure that ch5x has at least 3 useable units to make it fun
         ephraim_group = [14, 15, 16, 33]
         for x in range(3):
@@ -988,6 +1002,9 @@ class FE8Randomizer:
         '''
         For options that change logic of enemy before randomization
         '''
+        # we not a ally anymore
+        self.ally_pick = False
+
         if self.config["no_rando_thief"]:
             self.jobs_not_randomized.append (THIEF_ID)
         
@@ -1018,7 +1035,7 @@ class FE8Randomizer:
 
         if self.config["force_dancer"]:
             # checks to see if you have a dancer and if you do gives them the tag
-            if not (self.ally_check(33, "lockpick", "must_dance")):
+            if not (self.ally_check(33, "dancer", "must_dance")):
                 # if no healer gives the tag and re rolls them with it
                 self.force_tag(33, "must_dance")
 
@@ -1324,31 +1341,17 @@ class FE8Randomizer:
             self.rom[ability_4_base] |= lock_mask
 
     def fix_cutscenes(self) -> None:
-        # Eirika's Rapier is given in a cutscene at the start of the chapter,
-        # rather than being in her inventory
 
-        eirika_job = self.character_store["Eirika"]
+        # We might not be able to rescue him so setting HP to 15
+        # likely will give you a extra turn to reach him.
+        self.rom[ROSS_CH2_HP_OFFSET] = 15
+
+        # only need to adjust Eirika weapon if randomizing classes
+        # if class's are random then Rapier should also be random
         if self.config["player_rando"]:
-            if eirika_job == DANCER_ID:
-                new_rapier= VULNERARY_ID
-            elif eirika_job == MANAKETE_ID:
-                new_rapier= DRAGONSTONE_ID
-            elif any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
-                new_rapier = self.select_new_item(
-                    eirika_job, self.weapons_by_name["Steel Blade"].id, {}
-                )
-            else:
-                new_rapier = self.random.choice(
-                    [
-                        self.weapons_by_name["Heal"],
-                        self.weapons_by_name["Mend"],
-                        self.weapons_by_name["Recover"],
-                    ]
-                ).id
-            self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
-        if eirika_job.id == EIRIKA_LORD:
-            new_rapier = self.weapons_by_name["Rapier"].id
-        else:
+            # Eirika's Rapier is given in a cutscene at the start of the chapter,
+            # rather than being in her inventory
+            eirika_job = self.character_store["Eirika"]
             # Cap the starting weapon's rank to what she can actually use: 
             # party weapon ranks start at C when weapon level caps are enabled; 
             # otherwise her starting rank is her highest base-class rank 
@@ -1374,46 +1377,31 @@ class FE8Randomizer:
                     if int(weap.rank) <= max_rank
                 ] or [self.weapons_by_name["Heal"]]
                 new_rapier = self.random.choice(healing).id
-        self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
+            self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
 
-        # We might not be able to rescue him so setting HP to 15
-        # likely will give you a extra turn to reach him.
-        self.rom[ROSS_CH2_HP_OFFSET] = 15
-
-        # gives tethys a weapon to fight with when randomized 
-        if self.config["random_tethys"]:
-            tethys_job = self.character_store["Tethys"]
-            tethys_weapon = self.select_new_item(
-                tethys_job, self.weapons_by_name["Steel Sword"].id, {}
-            )
-            self.rom[TETHYS_EIRIKA] = tethys_weapon
-            self.rom[TETHYS_EPHRAIM] = tethys_weapon
-
-
-        # Eirika and Ephraim get automatic steels on rejoining in Ch15, which
-        # need to be adjusted.
-        if eirika_job == DANCER_ID:
-            ch15_auto_steel_sword = ELIXER_ID
-        elif eirika_job == MANAKETE_ID:
-            ch15_auto_steel_sword= DRAGONSTONE_ID
-        else:
-            ch15_auto_steel_sword = self.select_new_item(
+            # Eirika and Ephraim get automatic steels on rejoining in Ch15, which
+            # need to be adjusted.
+            if eirika_job == DANCER_ID:
+                ch15_auto_steel_sword= ELIXER_ID
+            elif eirika_job == MANAKETE_ID:
+                ch15_auto_steel_sword= DRAGONSTONE_ID
+            else:
+                ch15_auto_steel_sword = self.select_new_item(
                 eirika_job, self.weapons_by_name["Steel Sword"].id, {}
             )
-            
-        self.rom[CH15_AUTO_STEEL_SWORD] = ch15_auto_steel_sword
+            self.rom[CH15_AUTO_STEEL_SWORD] = ch15_auto_steel_sword
 
-        ephraim_job = self.character_store["Ephraim"]
-        if ephraim_job == DANCER_ID:
-            ch15_auto_steel_lance = ELIXER_ID
-        elif ephraim_job == MANAKETE_ID:
-            ch15_auto_steel_lance= DRAGONSTONE_ID
-        else:
-            ch15_auto_steel_lance = self.select_new_item(
+            ephraim_job = self.character_store["Ephraim"]
+
+            if ephraim_job == DANCER_ID:
+                ch15_auto_steel_lance= ELIXER_ID
+            elif ephraim_job == MANAKETE_ID:
+                ch15_auto_steel_lance= DRAGONSTONE_ID
+            else:
+                ch15_auto_steel_lance = self.select_new_item(
                 ephraim_job, self.weapons_by_name["Steel Lance"].id, {}
             )
-
-        self.rom[CH15_AUTO_STEEL_LANCE] = ch15_auto_steel_lance
+            self.rom[CH15_AUTO_STEEL_LANCE] = ch15_auto_steel_lance
 
     # TODO: logic
     #   - Flying Duessel vs enemy archers in Ephraim 10 may be unbeatable
@@ -1424,9 +1412,6 @@ class FE8Randomizer:
                 for i in range(8):
                     self.rom[wrank_base + i] = 0
 
-    def apply_base_changes(self) -> None:
-        self.clear_weapon_ranks()
-    
     def randomize_units(self) -> None:
 
         Race = JobRace.ALL
@@ -1446,6 +1431,9 @@ class FE8Randomizer:
                     raise
 
     def randomize_allies(self) -> None:
+        '''
+        Where all playable units are randomized
+        '''
         # Checks to see if monsters are in logic or if it should just use humans
         if not self.config["player_monster"]:
             Race = JobRace.HUMAN
@@ -1462,10 +1450,27 @@ class FE8Randomizer:
                     raise
 
     def apply_base_changes(self) -> None:
+        self.free_deploys()
         self.fix_movement_costs()
         self.fix_cutscenes()
         self.tweak_lords()
         self.make_monsters_mounted()
+
+    def free_deploys(self) -> None:
+        '''
+        For units that always get deployed even though unitsanity
+        '''
+        if self.config["first_healer_deployment"]:
+            self.make_deploy(self.character_store.FindUnitTagged("healer"))
+        if self.config["first_thief_deployment"]:
+            self.make_deploy(self.character_store.FindUnitTagged("lockpick"))
+
+    def make_deploy(self, unit:str):
+        '''
+        Sets the units flag to true that lets them skip the item check
+        '''
+        if unit != None:
+            self.rom[FREE_UNIT_LOC.get (unit)] = 1
 
     def apply_5x_buffs(self) -> None:
         for char in ["Ephraim", "Forde", "Kyle"]:
