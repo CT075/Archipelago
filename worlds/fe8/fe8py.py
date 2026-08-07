@@ -1334,6 +1334,9 @@ class FE8Randomizer:
                     raise
 
     def randomize_allies(self) -> None:
+        '''
+        Where all playable units are randomized
+        '''
         # Checks to see if monsters are in logic or if it should just use humans
         if not self.config["player_monster"]:
             Race = JobRace.HUMAN
@@ -1357,10 +1360,16 @@ class FE8Randomizer:
         self.make_monsters_mounted()
 
     def free_deploys(self) -> None:
+        '''
+        For units that always get deployed even though unitsanity
+        '''
         if self.config["first_healer_deployment"]:
             self.make_deploy(self.character_store.FindUnitTagged("healer"))
 
     def make_deploy(self, unit:str):
+        '''
+        Sets the units flag to true that lets them skip the item check
+        '''
         if unit != None:
             self.rom[FREE_UNIT_LOC.get (unit)] = 1
 
