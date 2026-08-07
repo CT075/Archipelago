@@ -1382,6 +1382,8 @@ class FE8Randomizer:
         '''
         if self.config["first_healer_deployment"]:
             self.make_deploy(self.character_store.FindUnitTagged("healer"))
+        if self.config["first_thief_deployment"]:
+            self.make_deploy(self.character_store.FindUnitTagged("lockpick"))
 
     def make_deploy(self, unit:str):
         '''
