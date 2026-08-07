@@ -178,6 +178,7 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
         "force_thief": bool(options.force_thief),
         "no_rando_thief": bool(options.no_rando_thief),
         "first_healer_deployment": bool(options.first_healer_deployment),
+        "first_thief_deployment": bool(options.first_thief_deployment), 
         "unbreakable_regalia": bool(options.unbreakable_regalia),
         "shuffle_skirmish_tables": bool(options.shuffle_skirmish_tables),
         "normalize_genders": bool(options.normalize_genders),

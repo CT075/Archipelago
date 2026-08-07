@@ -489,6 +489,7 @@ class FE8Randomizer:
     random: Random
     rom: bytearray
     config: dict[str, Any]
+    ally_pick:bool
     micro: bool
 
     def __init__(self, rom: bytearray, random: Random, config: dict[str, Any], micro:bool = False):
@@ -501,15 +502,15 @@ class FE8Randomizer:
         self.character_store = CharacterStore(fetch_json(CHARACTERS))
         songdata = fetch_json(SONG_DATA)
         self.jobs_not_randomized= [MANAKETE_ID, DANCER_ID, DRACO_ZOMBIE_ID]
+        self.ally_pick = False
         self.config = config
         self.micro = micro
-
+        
         if (self.micro):
             ally_blocks = fetch_json(MICRO_UNIT_BLOCKS)  
         else:
             ally_blocks = fetch_json(ALLY_UNIT_BLOCKS)
         
-
         self.character_wranks: dict[int, list[int]] = {
             int(k): v for k, v in fetch_json(CHARACTER_WRANKS).items()
         }
@@ -656,7 +657,7 @@ class FE8Randomizer:
 
     def select_new_item(self, job: JobData, item_id: int, logic: dict[str, Any]) -> int:
         if item_id == LOCKPICK:
-            if "Lockpick" in job.tags:
+            if "lockpick" in job.tags or self.ally_pick == True:
                 return LOCKPICK
             else:
                 return CHEST_KEY_5
@@ -941,7 +942,9 @@ class FE8Randomizer:
         For options that change logic of allies before randomization
         DO NOT DO ANY ROM BYTE MANIPULATION HERE AS WILL KILL WORLD GENERATION
         '''
-
+        # if forcing a thief need a was to make sure we get a pick, why not use colms
+        if self.config["force_thief"]:
+            self.ally_pick = True
         # making sure that ch5x has at least 3 useable units to make it fun
         ephraim_group = [14, 15, 16, 33]
         for x in range(3):
@@ -960,6 +963,9 @@ class FE8Randomizer:
         '''
         For options that change logic of enemy before randomization
         '''
+        # we not a ally anymore
+        self.ally_pick = False
+
         if self.config["no_rando_thief"]:
             self.jobs_not_randomized.append (THIEF_ID)
         

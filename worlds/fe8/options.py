@@ -148,6 +148,7 @@ class ForceThief(Toggle):
     """
     Will make sure you have a thief in the first 6 amount of units.
     (Colm or before)
+    Colm will also come with a lockpick.
     """
 
     display_name = "Guarantee a thief"
