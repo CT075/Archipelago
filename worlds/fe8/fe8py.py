@@ -1244,8 +1244,7 @@ class FE8Randomizer:
                 for i in range(8):
                     self.rom[wrank_base + i] = 0
 
-    def apply_base_changes(self) -> None:
-        self.clear_weapon_ranks()
+
     def randomize_units(self) -> None:
         # TO DO
         # add no monster enemy mode
