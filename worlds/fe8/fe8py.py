@@ -300,6 +300,7 @@ class JobType(IntEnum):
     RANGED = 1
     FLIER = 2
     LOCKPICK = 3
+    HEALER = 4
 
 
 @dataclass
@@ -563,6 +564,11 @@ class FE8Randomizer:
                     self.jobs_pools[job.is_promoted][JobRace.ALL][
                         JobType.RANGED
                     ].append(job)
+                if "healer" in job.tags:
+                    self.jobs_pools[job.is_promoted][Race][JobType.HEALER].append(job)
+                    self.jobs_pools[job.is_promoted][JobRace.ALL][
+                        JobType.HEALER
+                    ].append(job)
                 self.jobs_pools[job.is_promoted][JobRace.ALL][JobType.ANY].append(job)
                 self.jobs_pools[job.is_promoted][Race][JobType.ANY].append(job)
 
@@ -629,12 +635,6 @@ class FE8Randomizer:
         # job is invalid if it has any of the tags in notags
         if notags and notags & job.tags:
             return False
-        if "must_heal" in logic and logic["must_heal"]:
-            if "healer" not in job.tags:
-                return False
-        if "must_lockpick" in logic and logic["must_lockpick"]:
-            if "lockpick" not in job.tags:
-                return False
         if "must_fight" in logic and logic["must_fight"]:
             if "cannot_fight" in job.tags:
                 return False
@@ -833,6 +833,10 @@ class FE8Randomizer:
             # but should never need to
             if "must_fly" in logic and logic["must_fly"]:
                 Rules = JobType.FLIER
+            elif "must_heal" in logic and logic["must_heal"]:
+                Rules = JobType.HEALER
+            elif "must_lockpick" in logic and logic["must_lockpick"]:
+                Rules = JobType.LOCKPICK
             else:
                 Rules = JobType.ANY
 
