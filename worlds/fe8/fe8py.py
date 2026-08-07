@@ -80,6 +80,11 @@ from .constants import (
     CHARACTER_ORDER
 )
 
+from .connector_config import (
+    FREE_UNIT_LOC
+)
+
+
 DEBUG = False
 
 
@@ -1272,27 +1277,17 @@ class FE8Randomizer:
             self.rom[ability_4_base] |= lock_mask
 
     def fix_cutscenes(self) -> None:
-        # Eirika's Rapier is given in a cutscene at the start of the chapter,
-        # rather than being in her inventory
 
-        eirika_job = self.character_store["Eirika"]
+        # We might not be able to rescue him so setting HP to 15
+        # likely will give you a extra turn to reach him.
+        self.rom[ROSS_CH2_HP_OFFSET] = 15
+
+        # only need to adjust Eirika weapon if randomizing classes
+        # if class's are random then Rapier should also be random
         if self.config["player_rando"]:
-            if any(wkind != WeaponKind.STAFF for wkind in eirika_job.usable_weapons):
-                new_rapier = self.select_new_item(
-                    eirika_job, self.weapons_by_name["Steel Blade"].id, {}
-                )
-            else:
-                new_rapier = self.random.choice(
-                    [
-                        self.weapons_by_name["Heal"],
-                        self.weapons_by_name["Mend"],
-                        self.weapons_by_name["Recover"],
-                    ]
-                ).id
-            self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
-        if eirika_job.id == EIRIKA_LORD:
-            new_rapier = self.weapons_by_name["Rapier"].id
-        else:
+            # Eirika's Rapier is given in a cutscene at the start of the chapter,
+            # rather than being in her inventory
+            eirika_job = self.character_store["Eirika"]
             # Cap the starting weapon's rank to what she can actually use: 
             # party weapon ranks start at C when weapon level caps are enabled; 
             # otherwise her starting rank is her highest base-class rank 
@@ -1315,26 +1310,21 @@ class FE8Randomizer:
                     if int(weap.rank) <= max_rank
                 ] or [self.weapons_by_name["Heal"]]
                 new_rapier = self.random.choice(healing).id
-        self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
+            self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
 
-        # We might not be able to rescue him so setting HP to 15
-        # likely will give you a extra turn to reach him.
-        self.rom[ROSS_CH2_HP_OFFSET] = 15
+            # Eirika and Ephraim get automatic steels on rejoining in Ch15, which
+            # need to be adjusted.
+            ch15_auto_steel_sword = self.select_new_item(
+                eirika_job, self.weapons_by_name["Steel Sword"].id, {}
+            )
+            self.rom[CH15_AUTO_STEEL_SWORD] = ch15_auto_steel_sword
 
-        # Eirika and Ephraim get automatic steels on rejoining in Ch15, which
-        # need to be adjusted.
-        ch15_auto_steel_sword = self.select_new_item(
-            eirika_job, self.weapons_by_name["Steel Sword"].id, {}
-        )
-        
-        self.rom[CH15_AUTO_STEEL_SWORD] = ch15_auto_steel_sword
+            ephraim_job = self.character_store["Ephraim"]
 
-        ephraim_job = self.character_store["Ephraim"]
-        ch15_auto_steel_lance = self.select_new_item(
-            ephraim_job, self.weapons_by_name["Steel Lance"].id, {}
-        )
-
-        self.rom[CH15_AUTO_STEEL_LANCE] = ch15_auto_steel_lance
+            ch15_auto_steel_lance = self.select_new_item(
+                ephraim_job, self.weapons_by_name["Steel Lance"].id, {}
+            )
+            self.rom[CH15_AUTO_STEEL_LANCE] = ch15_auto_steel_lance
 
     # TODO: logic
     #   - Flying Duessel vs enemy archers in Ephraim 10 may be unbeatable
@@ -1345,8 +1335,7 @@ class FE8Randomizer:
                 for i in range(8):
                     self.rom[wrank_base + i] = 0
 
-    def apply_base_changes(self) -> None:
-        self.clear_weapon_ranks()
+
     def randomize_units(self) -> None:
         # TO DO
         # add no monster enemy mode
@@ -1362,6 +1351,9 @@ class FE8Randomizer:
                     raise
 
     def randomize_allies(self) -> None:
+        '''
+        Where all playable units are randomized
+        '''
         # Checks to see if monsters are in logic or if it should just use humans
         if not self.config["player_monster"]:
             Race = JobRace.HUMAN
@@ -1378,10 +1370,25 @@ class FE8Randomizer:
                     raise
 
     def apply_base_changes(self) -> None:
+        self.free_deploys()
         self.fix_movement_costs()
         self.fix_cutscenes()
         self.tweak_lords()
         self.make_monsters_mounted()
+
+    def free_deploys(self) -> None:
+        '''
+        For units that always get deployed even though unitsanity
+        '''
+        if self.config["first_healer_deployment"]:
+            self.make_deploy(self.character_store.FindUnitTagged("healer"))
+
+    def make_deploy(self, unit:str):
+        '''
+        Sets the units flag to true that lets them skip the item check
+        '''
+        if unit != None:
+            self.rom[FREE_UNIT_LOC.get (unit)] = 1
 
     def apply_5x_buffs(self) -> None:
         for char in ["Ephraim", "Forde", "Kyle"]:

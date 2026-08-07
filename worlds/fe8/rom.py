@@ -53,6 +53,8 @@ class FE8PatchExtension(APPatchExtension):
         mut_rom = bytearray(rom)
         randomizer = FE8Randomizer(rom=mut_rom, random=random, config=config)
         
+        randomizer.clear_weapon_ranks()
+        
         randomizer.allies_logic_changes()
 
         randomizer.randomize_allies()
@@ -175,6 +177,7 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
         "force_healer": int(options.force_healer),
         "force_thief": bool(options.force_thief),
         "no_rando_thief": bool(options.no_rando_thief),
+        "first_healer_deployment": bool(options.first_healer_deployment),
         "unbreakable_regalia": bool(options.unbreakable_regalia),
         "shuffle_skirmish_tables": bool(options.shuffle_skirmish_tables),
         "normalize_genders": bool(options.normalize_genders),
