@@ -246,7 +246,7 @@ class RescueRoss(Choice):
     How would you like to rescue Ross/Garcia?
     1. Force Vanessa to be a flier.
     2. Create a path in the mountains.
-    3. Force any of Eirika up to Vanessa to be a flier.
+    3. Force any unit from Eirika to Vanessa to be a flier.
     """
 
     display_name = "Rescue Ross method"
