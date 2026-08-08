@@ -16,7 +16,7 @@ from settings import get_settings
 
 from .items import FE8Item
 from .locations import FE8Location
-from .constants import FE8_NAME, ROM_BASE_ADDRESS
+from .constants import FE8_NAME, ROM_BASE_ADDRESS, MICRO_ROM
 from .options import FE8Options
 from .connector_config import (
     SLOT_NAME_ADDR,
@@ -37,7 +37,6 @@ SLOT_NAME_OFFS = SLOT_NAME_ADDR - ROM_BASE_ADDRESS
 
 BASE_PATCH = "data/base_patch.bsdiff4"
 PATCH_FILE_EXT = ".apfe8"
-MICRO_ROM = "data/micro.bytes"
 
 AP_ITEM_KIND = 1
 SELF_ITEM_KIND = 2
@@ -123,10 +122,10 @@ class FE8MicroPatch():
     
     @staticmethod
     def world_builder_changes(self, seed: int, player: int, options) ->CharacterStore:
-        config = self.config_translation(options)
         seed2 =seed + player
         random = Random(seed2)
-        mut_rom = self.get_micro_rom_as_bytes()
+        config = config_settings(options, player, seed)
+        mut_rom = MICRO_ROM
         randomizer = FE8Randomizer(rom=mut_rom, random=random, config=config, micro=True)
             
         randomizer.allies_logic_changes()
@@ -136,30 +135,6 @@ class FE8MicroPatch():
         randomizer.allies_logic_checks()
 
         return randomizer.character_store
-
-    def config_translation(options) -> dict[str, Any]:
-        '''
-        Translates from world generator options system to the patch file options system
-        '''
-        config = {"player_rando": options.player_unit_rando}
-        config["player_monster"] = [options.player_unit_monsters]
-        config["enable_weapon_level_caps"] = [options.enable_weapon_level_caps]
-        config["force_healer"] = [options.force_healer]
-        config["force_thief"] = [options.force_thief]
-        config["force_dancer"] = [options.force_dancer]
-        config["random_myrrh"] = [options.random_myrrh]
-        config["random_tethys"] = [options.random_tethys]
-        config["rescue_ross"] = [options.rescue_ross]
-        config["eirika_class"] = [options.eirika_class]
-        config["stop_bandit_mounted"] = [options.stop_bandit_mounted]
-        return config
-    
-    def get_micro_rom_as_bytes() -> bytearray:
-        with open(MICRO_ROM, "rb") as infile:
-            micro_rom_bytes = bytes(infile.read())
-
-        return bytearray(micro_rom_bytes)
-
 
 
 def get_base_rom_as_bytes() -> bytes:
@@ -172,12 +147,7 @@ def get_base_rom_as_bytes() -> bytes:
 def rom_location(loc: FE8Location):
     return LOCATION_INFO_OFFS + loc.local_address * LOCATION_INFO_SIZE
 
-
-
-def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
-    player = world.player
-    multiworld = world.multiworld
-    options: FE8Options = world.options
+def config_settings(options, player, multiworld) ->dict[str, Any]:
     config_dict = {
         "player_rando": bool(options.player_unit_rando),
         "player_monster": bool(options.player_unit_monsters),
@@ -213,6 +183,14 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
         "seed": multiworld.seed,
         "player": player,
     }
+    return config_dict
+
+
+def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
+    player = world.player
+    multiworld = world.multiworld
+    options: FE8Options = world.options
+    config_dict = config_settings(options, player, multiworld)
     patch.write_file("config.json", json.dumps(config_dict).encode("UTF-8"))
 
     # Player name
