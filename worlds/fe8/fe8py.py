@@ -695,12 +695,12 @@ class FE8Randomizer:
         row = self.character_wranks.get(char)
         return max(max(row) if row else 0, int(WeaponRank.E))
 
-    def select_new_item(self, job: JobData, item_id: int, logic: dict[str, Any]) -> int:
+    def select_new_item(self, job: JobData, item_id: int, logic: dict[str, Any]) -> tuple[int, WeaponKind]:
         if item_id == LOCKPICK:
             if "lockpick" in job.tags or self.ally_pick == True:
-                return LOCKPICK
+                return LOCKPICK, WeaponKind.ITEM
             else:
-                return CHEST_KEY_5
+                return CHEST_KEY_5, WeaponKind.ITEM
 
         if item_id == self.weapons_by_name["Reginleif"].id:
             # Ensure Ephraim gets a usable weapon to replace reginleif
@@ -708,10 +708,11 @@ class FE8Randomizer:
                 max_rank = int(WeaponRank.C)
             else:
                 max_rank = self.vanilla_highest_rank(EPHRAIM)
-            return self.select_starting_weapon(job, max_rank)
+            chosen = self.select_starting_weapon(job, max_rank)
+            return chosen, self.weapons_by_id[chosen].kind
 
         if item_id not in self.weapons_by_id:
-            return item_id
+            return item_id, WeaponKind.ITEM
 
         if job.id == DANCER_ID:
             return VULNERARY_ID
@@ -747,12 +748,36 @@ class FE8Randomizer:
                 )
                 choices = [self.weapons_by_name["Iron Sword"]]
 
-        return self.random.choice(choices).id
+        chosen = self.random.choice(choices).id
+
+        return chosen, self.weapons_by_id[chosen].kind
 
     def select_new_inventory(
         self, job: JobData, items: bytes, logic: dict[str, Any]
     ) -> list[int]:
-        return [self.select_new_item(job, item_id, logic) for item_id in items]
+        # selects items, and checks to see if they can deal damage
+        # if you are promoted and no damaging weapons (staffs)
+        # adds a E rank tome to  inventory
+        new_inventory=[]
+        can_fight = False
+
+        for item_id in items:
+            if item_id == 0:
+                break
+            new_item, type = self.select_new_item(job, item_id, logic)
+            if type.damaging():
+                can_fight=True
+            new_inventory.append(new_item)
+        
+        if job.is_promoted and not can_fight:
+            new_item, type = self.select_new_item(
+                    job, self.weapons_by_name["Iron Sword"].id, {"must_fight": True}
+                )
+            new_inventory.append(new_item)
+        
+        new_inventory = new_inventory + [0] * (4 - len(new_inventory))
+
+        return new_inventory
 
     def select_starting_weapon(self, job: JobData, max_rank: int) -> int:
         """Pick a weapon `job` can actually use at the start, given a starting
@@ -1485,7 +1510,7 @@ class FE8Randomizer:
             elif eirika_job == MANAKETE_ID:
                 ch15_auto_steel_sword= DRAGONSTONE_ID
             else:
-                ch15_auto_steel_sword = self.select_new_item(
+                ch15_auto_steel_sword, kind = self.select_new_item(
                 eirika_job, self.weapons_by_name["Steel Sword"].id, {}
             )
             self.rom[CH15_AUTO_STEEL_SWORD] = ch15_auto_steel_sword
@@ -1497,14 +1522,14 @@ class FE8Randomizer:
             elif ephraim_job == MANAKETE_ID:
                 ch15_auto_steel_lance= DRAGONSTONE_ID
             else:
-                ch15_auto_steel_lance = self.select_new_item(
+                ch15_auto_steel_lance, kind = self.select_new_item(
                 ephraim_job, self.weapons_by_name["Steel Lance"].id, {}
             )
             self.rom[CH15_AUTO_STEEL_LANCE] = ch15_auto_steel_lance
 
             tethys_job = self.character_store["Tethys"]
             if tethys_job != DANCER_ID:
-                tethys_weapon = self.select_new_item(
+                tethys_weapon, kind = self.select_new_item(
                     tethys_job, self.weapons_by_name["Steel Lance"].id, {}
                 )
                 self.rom[TETHYS_EPHRAIM] = tethys_weapon
