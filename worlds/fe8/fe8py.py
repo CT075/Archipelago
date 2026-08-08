@@ -1271,6 +1271,9 @@ class FE8Randomizer:
                         self.jobs_pools[NOT_PROMOTED][JobRace.ALL][JobType.ANY],
                         self.jobs_pools[IS_PROMOTED][JobRace.ALL][JobType.ANY],
                     )
+                    if len(jobset) >= INTERNAL_RANDO_CLASS_MAX_CLASSES
+                    else (self.jobs_pools[NOT_PROMOTED][JobRace.ALL][JobType.ANY], 
+                          self.jobs_pools[IS_PROMOTED][JobRace.ALL][JobType.ANY])
                 )
                 new_job = self.select_new_job(
                     job,
