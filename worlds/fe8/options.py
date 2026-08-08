@@ -380,6 +380,45 @@ class EnableRuins(Toggle):
     display_name = "Enable Lagdou Ruins checks"
     default = 0
 
+class PickMyUnits(Toggle):
+    """
+    Makes the game only have a subset of useable units
+    """
+
+    display_name = "Enable PMU mode"
+    default = 0
+
+class PickedAmount(Range):
+    """
+    Amount of units avalible in "Pick My Units Mode" once all checks are gotten.
+    Twins are included in the amount chosen automatically. 
+    """
+
+    display_name = "Amount of picked units"
+    range_start = 0
+    range_end = 31
+    default = 13
+
+class NoSethPMU(Toggle):
+    """
+    Seth can't be selected for PMU mode.
+    """
+
+    display_name = "Seth can't be picked"
+    default = 0
+
+class AmountFreePMU(Range):
+    """
+    Makes the game only have a subset of useable units.
+    the two twins do not need items and are automatically included.
+
+    Need Enable PMU mode and Unitsanity both enabled
+    """
+
+    display_name = "PMU units that do not need deployment items"
+    range_start = 0
+    range_end = 31
+    default = 0
 
 class ShuffleSkirmishTables(Toggle):
     """
@@ -559,6 +598,13 @@ class FE8Options(PerGameCommonOptions):
     first_healer_deployment: FirstHealerDeployment
     first_thief_deployment: FirstThiefDeployment
 
+    # PMU
+    pick_my_units: PickMyUnits
+    picked_amount: PickedAmount
+    amount_free_PMU: AmountFreePMU
+    no_seth_PMU: NoSethPMU
+
+
     # Level Caps / Settings
     enable_level_caps: EnableLevelCaps
     smooth_level_caps: SmoothLevelCapProgression
@@ -596,6 +642,8 @@ FE8_option_groups:dict[str, List[Any]] = {
 
     "Unitsanity": [EnableRecruitChecks, SmoothDeployments, ProgressiveSethDeployment, 
                    FirstHealerDeployment, FirstThiefDeployment],
+
+    "Pick my units": [PickMyUnits, PickedAmount,NoSethPMU, AmountFreePMU],
 
     "Level Caps / Settings": [EnableLevelCaps, SmoothLevelCapProgression, MinimumEndgameLevelCapRange],
 

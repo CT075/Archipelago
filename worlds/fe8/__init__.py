@@ -208,7 +208,7 @@ class FE8World(World):
                             else ItemClassification.useful
                         ),
                     )
-        free_deploy=[str]
+        no_deploy_item=[str]
 
         '''
         Here is a micro patcher to find out what classes units are during world generation.
@@ -218,15 +218,20 @@ class FE8World(World):
         It will run through all ally units and what the randomizer will output them
         '''
         class_context =False
-        if self.options.recruit_checks_enabled and (self.options.first_healer_deployment or self.options.first_thief_deployment):
+        if self.options.recruit_checks_enabled and (self.options.first_healer_deployment
+                                                     or self.options.first_thief_deployment
+                                                       or self.options.pick_my_units):
             class_context = True
         if(class_context):
             micro = FE8MicroPatch
             units=micro.world_builder_changes(micro, self.multiworld.seed, self.player, self.options)
             if self.options.first_healer_deployment:
-               free_deploy.append("Deploy " + units.FindUnitTagged("healer"))
+               no_deploy_item.append("Deploy " + units.FindUnitTagged("healer"))
             if self.options.first_thief_deployment:
-               free_deploy.append("Deploy " + units.FindUnitTagged("lockpick"))
+               no_deploy_item.append("Deploy " + units.FindUnitTagged("lockpick"))
+            if self.options.pick_my_units:
+                for x in units.units_not_picked:
+                    no_deploy_item.append("Deploy " + x)
 
 
         if self.options.recruit_checks_enabled:
@@ -241,7 +246,7 @@ class FE8World(World):
             )
 
             for name, _ in items:
-                if name not in free_deploy:
+                if name not in no_deploy_item:
                     if name == "Deploy Seth":
                         if not progressive_seth:
                             register(name, deploy_classification)

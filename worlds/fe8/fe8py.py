@@ -370,12 +370,18 @@ class CharacterStore:
     character_jobs: dict[str, JobData]
     character_tags: dict[str, set[str]]
     character_inventory: dict[str, list[int]]
+    units_not_picked: list[str]
+    units_picked: list[str]
+    units_free: list[str]
 
     def __init__(self, char_data: dict[str, dict[str, Any]]):
         self.names_by_id = {}
         self.character_tags = dict()
         self.ids_by_name = dict()
         self.character_inventory = dict()
+        units_not_picked =[]
+        units_picked =[]
+        units_free =[]
 
         for name, data in char_data.items():
             for i in data["ids"]:
@@ -1099,6 +1105,7 @@ class FE8Randomizer:
         should be used to confirm things output right
         DO NOT DO ANY ROM BYTE MANIPULATION HERE AS WILL KILL WORLD GENERATION
         '''
+
         if self.config["force_healer"] != 0:
             # checks to see if you have a healer and if you do gives them the tag
             if not (self.ally_check(self.config["force_healer"], "healer", "must_heal")):
@@ -1122,6 +1129,51 @@ class FE8Randomizer:
             if not (self.ally_check(33, "dancer", "must_dance")):
                 # if no healer gives the tag and re rolls them with it
                 self.force_tag(33, "must_dance")
+        if self.config["pick_my_units"]:
+            self.pick_my_units()
+
+    def pick_my_units(self) -> None:
+        for x in CHARACTER_ORDER:
+            self.character_store.units_not_picked.append(self.character_store.names_by_id(x))
+        # units that can't be picked
+        self.character_store.units_not_picked.remove("Eirika")
+        self.character_store.units_picked.append("Eirika")
+        self.character_store.units_not_picked.remove("Ephraim")
+        self.character_store.units_picked.append("Ephraim")
+        self.character_store.units_not_picked.remove("Orson")
+
+        unit_amount = self.config[self.picked_amount] 
+
+        if self.config["first_thief_deployment"]:
+            thief = self.character_store.FindUnitTagged("lockpick")
+            if thief != None:
+                unit_amount= unit_amount -1
+                self.character_store.units_not_picked.remove(thief)
+                self.character_store.units_picked.append(thief)
+        if self.config["first_healer_deployment"]:
+            healer = self.character_store.FindUnitTagged("healer")
+            if healer != None:
+                unit_amount= unit_amount -1
+                self.character_store.units_not_picked.remove(healer)
+                self.character_store.units_picked.append(healer)
+
+        if self.config["no_seth_PMU"]:
+            self.character_store.units_not_picked.remove("Seth")
+
+        for unit_amount in range:
+            picked = self.random.choice(self.character_store.units_not_picked)
+            self.character_store.units_picked.append(picked)
+            self.character_store.units_not_picked.remove(picked)
+
+        if self.config["no_seth_PMU"]:
+            self.character_store.units_not_picked.append("Seth")
+
+        for self.config["amount_free_PMU"] in range:
+            free = self.random.choice(self.character_store.units_picked)
+            self.character_store.units_free.append(free)
+            # removes the deploy item for them
+            self.character_store.units_not_picked.append(free)
+
 
     def ally_check(self, amount: int, needed_tag: str, given_logic: str) -> None:
         '''
@@ -1606,6 +1658,17 @@ class FE8Randomizer:
             self.make_deploy(self.character_store.FindUnitTagged("healer"))
         if self.config["first_thief_deployment"]:
             self.make_deploy(self.character_store.FindUnitTagged("lockpick"))
+
+        # flags units as deployable if they free
+        if self.config["recruit_checks_enabled"]:
+            for x in self.character_store.units_free:
+                self.make_deploy(x)
+        else:
+            # if only pmu is on need to make all picked units deployable
+            # and make deploy checks enables to stop the deployment of other units
+            for x in self.character_store.units_picked:
+                self.make_deploy(x)
+            self.rom.RECRUIT_CHECKS_OFFS = False
 
     def make_deploy(self, unit:str):
         '''
