@@ -877,6 +877,10 @@ class FE8Randomizer:
             or (self.config["enemy_rando"] == 1 and "player"  not in logic)):
             if char not in self.character_store and not no_store:
                 self.character_store[char] = job
+            # Weapon level fix for green / red "allys" so they can use weapons when not blue
+            # effects joshua, dozla, orson ETC
+            if not is_player and not autolevel:
+                    self.add_weapon_rank(inventory, char)    
             return
         
         if self.config["enemy_rando"]==5 and "player"  not in logic:
@@ -999,14 +1003,18 @@ class FE8Randomizer:
         # some kind, so we should force its weapon levels in the character
         # table.
         if not is_player and not autolevel and char in self.character_store and self.micro == False:
-            for item_id in new_inventory:
-                if item_id not in self.weapons_by_id:
-                    continue
-                boss_data_offs = CHARACTER_TABLE_BASE + char * CHARACTER_SIZE
-                weapon = self.weapons_by_id[item_id]
-                boss_wrank_offs = boss_data_offs + CHARACTER_WRANK_OFFSET + weapon.kind
-                rank = self.rom[boss_wrank_offs]
-                self.rom[boss_wrank_offs] = max(rank, weapon.rank)
+            self.add_weapon_rank(new_inventory,char)
+
+
+    def add_weapon_rank(self, inventory: bytes, char: int):
+        for item_id in inventory:
+            if item_id not in self.weapons_by_id:
+                continue
+            boss_data_offs = CHARACTER_TABLE_BASE + char * CHARACTER_SIZE
+            weapon = self.weapons_by_id[item_id]
+            boss_wrank_offs = boss_data_offs + CHARACTER_WRANK_OFFSET + weapon.kind
+            rank = self.rom[boss_wrank_offs]
+            self.rom[boss_wrank_offs] = max(rank, weapon.rank)
 
     def randomize_block(self, block: UnitBlock, Race: JobRace):
 
