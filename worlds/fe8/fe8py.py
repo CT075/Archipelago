@@ -1266,11 +1266,6 @@ class FE8Randomizer:
                 unpromoted_pool, promoted_pool = (
                     jobset.pools()
                     # We _could_ repoint this and not need to check, but eh
-                    if len(jobset) >= INTERNAL_RANDO_WEAPONS_MAX_CLASSES
-                    else (
-                        self.jobs_pools[NOT_PROMOTED][JobRace.ALL][JobType.ANY],
-                        self.jobs_pools[IS_PROMOTED][JobRace.ALL][JobType.ANY],
-                    )
                     if len(jobset) >= INTERNAL_RANDO_CLASS_MAX_CLASSES
                     else (self.jobs_pools[NOT_PROMOTED][JobRace.ALL][JobType.ANY], 
                           self.jobs_pools[IS_PROMOTED][JobRace.ALL][JobType.ANY])
