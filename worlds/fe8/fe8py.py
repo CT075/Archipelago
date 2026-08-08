@@ -466,33 +466,6 @@ class CharacterStore:
         return name in self.character_jobs
 
 
-# CR cam: Eirika and Ephraim should be able to use their respective weapons if
-# they get randomized into the right class.
-def weapon_usable(weapon: WeaponData, job: JobData, logic: dict[str, Any], character_store: CharacterStore) -> bool:
-    if any(lock not in job.tags for lock in weapon.locks):
-        return False
-
-    if "must_fight" in logic and weapon.kind in [
-        WeaponKind.ITEM,
-        WeaponKind.STAFF,
-        WeaponKind.RING,
-    ]:
-        return False
-
-    context_tags = []
-
-    for x in logic:
-        if x.startswith("Context_") and logic[x]:
-            context_tags.append(x.removeprefix("Context_"))
-
-    for x in context_tags:
-        context_job = character_store.lookup_jobs(x)
-        if any (effective in context_job.tags for effective in weapon.effective):
-            return False
-
-    return True
-
-
 # CR cam: ensure that all the progression weapons are usable
 # CR-soon cam: This class does way too much. We should refactor this so things
 # like `apply_5x_buffs` can happen external to this class.
@@ -507,6 +480,7 @@ class FE8Randomizer:
     valid_distribs_by_row: dict[int, list[int]]
     jobs_pools: dict[bool, dict[JobRace, dict[JobType, list[JobData]]]]
     jobs_not_randomized: list[int]
+    weapons_not_given: list[int]
     songs: dict[str, dict[int, str]]
     random: Random
     rom: bytearray
@@ -524,6 +498,7 @@ class FE8Randomizer:
         self.character_store = CharacterStore(fetch_json(CHARACTERS))
         songdata = fetch_json(SONG_DATA)
         self.jobs_not_randomized= [DRACO_ZOMBIE_ID]
+        self.weapons_not_given = []
         self.ally_pick = False
         self.config = config
         self.micro = micro
@@ -676,6 +651,37 @@ class FE8Randomizer:
 
         return True
 
+    # CR cam: Eirika and Ephraim should be able to use their respective weapons if
+    # they get randomized into the right class.
+    def weapon_usable(self, weapon: WeaponData, job: JobData, logic: dict[str, Any], character_store: CharacterStore) -> bool:
+        if any(lock not in job.tags for lock in weapon.locks):
+            return False
+
+        # removes weapons the AI can not use
+
+        if weapon.id in self.weapons_not_given:
+            return False
+        
+        if "must_fight" in logic and weapon.kind in [
+            WeaponKind.ITEM,
+            WeaponKind.STAFF,
+            WeaponKind.RING,
+        ]:
+            return False
+
+        context_tags = []
+
+        for x in logic:
+            if x.startswith("Context_") and logic[x]:
+                context_tags.append(x.removeprefix("Context_"))
+
+        for x in context_tags:
+            context_job = character_store.lookup_jobs(x)
+            if any (effective in context_job.tags for effective in weapon.effective):
+                return False
+
+        return True
+
     def vanilla_highest_rank(self, char: int) -> int:
         """The highest weapon rank `char` had in the vanilla game, floored to E.
 
@@ -715,7 +721,7 @@ class FE8Randomizer:
         for weapon_levels in job.usable_weapons:
             useable += self.weapons_by_kind_rank[weapon_levels][weapon_attrs.rank]
 
-        choices = [weap for weap in useable if weapon_usable(weap, job, logic, self.character_store)]
+        choices = [weap for weap in useable if self.weapon_usable(weap, job, logic, self.character_store)]
 
         if not choices:
             import json
@@ -730,7 +736,7 @@ class FE8Randomizer:
             choices = [
                 weap
                 for weap in self.weapons_by_kind_rank[WeaponRank.E][first_type]
-                if weapon_usable(weap, job, dict(), self.character_store)
+                if self.weapon_usable(weap, job, dict(), self.character_store)
             ]
 
             if not choices:
@@ -754,7 +760,7 @@ class FE8Randomizer:
         candidates = [
             weap
             for weap in self.weapons_by_id.values()
-            if weap.kind in job.usable_weapons and weapon_usable(weap, job, {}, self.character_store)
+            if weap.kind in job.usable_weapons and self.weapon_usable(weap, job, {}, self.character_store)
         ]
         if not candidates:
             return self.weapons_by_name["Iron Sword"].id
@@ -1036,6 +1042,16 @@ class FE8Randomizer:
         '''
         # we not a ally anymore
         self.ally_pick = False
+
+        self.weapons_not_given.append(self.weapons_by_name("Restore"))
+        self.weapons_not_given.append(self.weapons_by_name("Warp"))
+        self.weapons_not_given.append(self.weapons_by_name("Rescue"))
+        self.weapons_not_given.append(self.weapons_by_name("Torch"))
+        self.weapons_not_given.append(self.weapons_by_name("Hammerne"))
+        self.weapons_not_given.append(self.weapons_by_name("Unlock"))
+        self.weapons_not_given.append(self.weapons_by_name("Barrier"))
+        if self.config["remove_berserk"]:
+            self.weapons_not_given.append(self.weapons_by_name("Berserk"))
 
         if self.config["no_rando_thief"]:
             self.jobs_not_randomized.append (THIEF_ID)

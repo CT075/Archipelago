@@ -165,6 +165,14 @@ class ExcludeLatona(Toggle):
     display_name = "Exclude Latona from holy weapon pool"
     default = 1
 
+class RemoveBerserk(Toggle):
+    """
+    Non recrutable units can not get Berserk (staff).
+    """
+
+    display_name = "Remove Berserk (staff)"
+    default = 0
+
 
 # Cam: Should we make this a sliding scale?
 class Easier5x(Toggle):
@@ -542,6 +550,7 @@ class FE8Options(PerGameCommonOptions):
     super_demon_king: SuperDemonKing
     no_rando_thief: NoRandoThief
     stop_bandit_mounted: StopBanditMounted
+    remove_berserk: RemoveBerserk
 
     # Unitsanity
     recruit_checks_enabled: EnableRecruitChecks
@@ -583,7 +592,7 @@ FE8_option_groups:dict[str, List[Any]] = {
 
     "Growth Rate Settings": [GrowthRando, GrowthRandoMin, GrowthRandoMax, NormalizeGenders],
 
-    "Enemy Randomizer Settings": [EnemyRando, SuperDemonKing, NoRandoThief, StopBanditMounted], 
+    "Enemy Randomizer Settings": [EnemyRando, SuperDemonKing, NoRandoThief, StopBanditMounted, RemoveBerserk], 
 
     "Unitsanity": [EnableRecruitChecks, SmoothDeployments, ProgressiveSethDeployment, 
                    FirstHealerDeployment, FirstThiefDeployment],

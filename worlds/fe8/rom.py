@@ -191,6 +191,7 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
         "eirika_class": int(options.eirika_class),
         "random_myrrh": bool(options.random_myrrh),
         "random_tethys": bool(options.random_tethys),
+        "remove_berserk": bool(options.remove_berserk),
         "no_rando_thief": bool(options.no_rando_thief),
         "stop_bandit_mounted": bool(options.stop_bandit_mounted), 
         "first_healer_deployment": bool(options.first_healer_deployment),
