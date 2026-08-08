@@ -894,6 +894,8 @@ class FE8Randomizer:
                 Rules = JobType.HEALER
             elif "must_lockpick" in logic and logic["must_lockpick"]:
                 Rules = JobType.LOCKPICK
+            elif "must_ranged" in logic and logic["must_ranged"]:
+                Rules = JobType.RANGED
             else:
                 Rules = JobType.ANY
             if "must_dance" in logic and logic["must_dance"]:
