@@ -186,10 +186,12 @@ INTERNAL_RANDO_CLASS_WEIGHTS_OFFS = 0x8D2060
 INTERNAL_RANDO_CLASS_WEIGHT_ENTRY_SIZE = 12
 INTERNAL_RANDO_CLASS_WEIGHTS_COUNT = 30
 INTERNAL_RANDO_CLASS_WEIGHT_NUM_CLASSES = 5
-INTERNAL_RANDO_WEAPONS_OFFS = 0x8D2440
-INTERNAL_RANDO_WEAPONS_ENTRY_SIZE = 0x20
-INTERNAL_RANDO_WEAPONS_NUM_ITEMS = 5
-INTERNAL_RANDO_WEAPONS_MAX_CLASSES = 22
+INTERNAL_RANDO_CLASS_OFFS = 0x8D2440
+INTERNAL_RANDO_CLASS_ENTRY_SIZE = 0x20
+INTERNAL_RANDO_CLASS_NUM_ITEMS = 5
+INTERNAL_RANDO_CLASS_MAX_CLASSES = 22
+INTERNAL_RANDO_WEAPON_OFFS = 0x8D21C8
+INTERNAL_RANDO_WEAPON_ENTRY_SIZE = 5
 
 IS_PROMOTED = True
 NOT_PROMOTED = False
@@ -218,7 +220,6 @@ INTERNAL_RANDO_WEAPON_TABLE_ROWS = [
     ("Sword", 2),
     ("Sword", 4),
     ("Lance", 0),
-    # CR-soon cam: this row has both Runesword and Javelin in it.
     ("Lance", 1),
     ("Lance", 3),
     ("Lance", 2),
@@ -242,6 +243,26 @@ INTERNAL_RANDO_WEAPON_TABLE_ROWS = [
     ("Fang", 0),
     ("Fang", 1),
     ("MonsterDark", 3),
+    ("Breath", 0),
+    ("Item", 0),
+    ("Item", 1),
+    ("Item", 2),
+    ("Item", 3),
+    ("Item", 4),
+    ("Item", 5),
+    ("Item", 6),
+    ("Item", 7),
+    ("Anima", 0),
+    ("Anima", 1),
+    ("Anima", 2),
+    ("Item", 8),
+    ("Item", 9),
+    ("Item", 10),
+    ("Item", 11),
+    ("Item", 12),
+    ("Item", 13),
+    ("Item", 14),
+    ("Item", 15),
 ]
 
 CHARACTER_ORDER=[

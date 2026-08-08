@@ -67,10 +67,12 @@ from .constants import (
     INTERNAL_RANDO_CLASS_WEIGHT_ENTRY_SIZE,
     INTERNAL_RANDO_CLASS_WEIGHTS_COUNT,
     INTERNAL_RANDO_CLASS_WEIGHT_NUM_CLASSES,
-    INTERNAL_RANDO_WEAPONS_OFFS,
-    INTERNAL_RANDO_WEAPONS_ENTRY_SIZE,
-    INTERNAL_RANDO_WEAPONS_MAX_CLASSES,
+    INTERNAL_RANDO_CLASS_OFFS,
+    INTERNAL_RANDO_CLASS_ENTRY_SIZE,
+    INTERNAL_RANDO_CLASS_MAX_CLASSES,
     INTERNAL_RANDO_WEAPON_TABLE_ROWS,
+    INTERNAL_RANDO_WEAPON_OFFS,
+    INTERNAL_RANDO_WEAPON_ENTRY_SIZE,
     FEMALE_JOBS,
     SONG_TABLE_BASE,
     SONG_SIZE,
@@ -894,6 +896,8 @@ class FE8Randomizer:
                 Rules = JobType.HEALER
             elif "must_lockpick" in logic and logic["must_lockpick"]:
                 Rules = JobType.LOCKPICK
+            elif "must_ranged" in logic and logic["must_ranged"]:
+                Rules = JobType.RANGED
             else:
                 Rules = JobType.ANY
             if "must_dance" in logic and logic["must_dance"]:
@@ -1173,19 +1177,15 @@ class FE8Randomizer:
                     yield j
 
         def job_valid_for_internal_rando(job: JobData) -> bool:
-            # We disable mages because there aren't any entries for them in the
-            # base weapon tables. Eventually we'll add them back in, but for
-            # now we can just disable them.
+            # only Light and normal Dark magic are not in tables
+            # Here are the jobs that only use Light Dark and staffs
+            # While also being in the job pools for randomization 
             # CR-soon cam: Add these back in
             if any(
                 map(
                     job.name.startswith,
                     (
-                        # catches both regular Mages and "Mage Knight"
-                        "Mage",
-                        "Sage",
                         "Shaman",
-                        "Druid",
                         "Priest",
                         "Cleric",
                         "Monk",
@@ -1193,17 +1193,53 @@ class FE8Randomizer:
                         "Troubadour",
                         "Valkyrie",
                         "Summoner",
-                        "Necromancer",
-                        "Pupil",
-                        "Journeyman",
-                        "Recruit",
-                        "Dracozombie",
+                        "Necromancer"
                     ),
                 )
             ):
                 return False
 
             return True
+
+        def internal_rando_weapon_updates():
+            # function for any and all changes to internal rando weapons 
+
+            # removes the sword in lance tables
+            offset = (
+                INTERNAL_RANDO_WEAPON_OFFS
+                + weapon_tables[(WeaponKind.LANCE, 1)] * INTERNAL_RANDO_WEAPON_ENTRY_SIZE
+            )
+            for i in range(4):
+                self.rom[offset + i] = self.rom[offset + i + 1]
+
+            # turns 2 blank tables and a unused axe table into ANIMA tables
+            # (unsed by us ) axe table 5 -> low level anima
+            offset = (
+                INTERNAL_RANDO_WEAPON_OFFS
+                + weapon_tables[(WeaponKind.ANIMA, 0)] * INTERNAL_RANDO_WEAPON_ENTRY_SIZE
+            )
+            self.rom[offset] = self.weapons_by_name["Fire"].id
+            self.rom[offset + 1] = self.weapons_by_name["Thunder"].id
+            self.rom[offset + 2] = 0
+            self.rom[offset + 3] = 0
+            self.rom[offset + 4] = 0
+
+            # blank table 1 -> mid level anima
+            offset = (
+                INTERNAL_RANDO_WEAPON_OFFS
+                + weapon_tables[(WeaponKind.ANIMA, 1)] * INTERNAL_RANDO_WEAPON_ENTRY_SIZE
+            )
+            self.rom[offset] = self.weapons_by_name["Elfire"].id
+            self.rom[offset + 1] = self.weapons_by_name["Thunder"].id
+
+            # blank table 2 -> high level anima
+            offset = (
+                INTERNAL_RANDO_WEAPON_OFFS
+                + weapon_tables[(WeaponKind.ANIMA, 2)] * INTERNAL_RANDO_WEAPON_ENTRY_SIZE
+            )
+            self.rom[offset] = self.weapons_by_name["Elfire"].id
+            self.rom[offset + 1] = self.weapons_by_name["Fimbulvetr"].id
+
 
         # CR-soon cam: do this better
         weapon_tables = {
@@ -1244,10 +1280,12 @@ class FE8Randomizer:
                 self.rom[offs + j] = new_job.id
                 jobset.add(new_job)
 
+        internal_rando_weapon_updates
+
         # CR-someday cam: There is a lot of hardcoding going on here. It would
         # be nice to move some of the special-casing here to the data files.
         for i, job in enumerate(jobset.iter()):
-            offs = INTERNAL_RANDO_WEAPONS_OFFS + i * INTERNAL_RANDO_WEAPONS_ENTRY_SIZE
+            offs = INTERNAL_RANDO_CLASS_OFFS + i * INTERNAL_RANDO_CLASS_ENTRY_SIZE
             row1: Tuple[int, int, int, int, int]
             row1weights: Tuple[int, int, int, int, int]
             row1distrib: Tuple[int, int, int, int, int]
@@ -1288,6 +1326,20 @@ class FE8Randomizer:
                 row1 = (idx, 0, 0, 0, 0)
                 row1weights = (100, 0, 0, 0, 0)
                 row1distrib = (distrib_idx, 0, 0, 0, 0)
+            elif WeaponKind.ANIMA in job.usable_weapons:
+                kind = WeaponKind.ANIMA
+                lo_pwr, hi_pwr = (1, 2) if job.is_promoted else (0, 1)
+                lo_idx = weapon_tables[(kind, lo_pwr)]
+                hi_idx = weapon_tables[(kind, hi_pwr)]
+                row1 = (lo_idx, hi_idx, 0, 0, 0)
+                row1weights = (45, 55, 0, 0, 0)
+                row1distrib = (
+                    self.random.choice(self.valid_distribs_by_row[row1[0]]),
+                    self.random.choice(self.valid_distribs_by_row[row1[1]]),
+                    0,
+                    0,
+                    0,
+                )
             elif len(job.usable_weapons) > 1:
                 lo_pwr, mid_pwr, hi_pwr = (2, 3, 4) if job.is_promoted else (0, 1, 2)
                 lo_kind1, lo_kind2 = self.random.sample(list(job.usable_weapons), k=2)
