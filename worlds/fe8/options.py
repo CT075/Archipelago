@@ -517,6 +517,20 @@ class GrowthRandoMax(Range):
     default = 70
 
 
+class EnablePromotionUnlocks(Toggle):
+    """
+    Gate class promotion behind Archipelago items. Adds one "... Promotion"
+    item per promoted class (Great Lord is always available); units cannot
+    promote into a class until its item has been received. Also makes the
+    super trainee path available from the start of the game.
+
+    When disabled, promotion behaves as in the vanilla game.
+    """
+
+    display_name = "Enable promotion unlocks"
+    default = 0
+
+
 # CR-someday cam: think about how this interacts with creature campaign mode
 class Goal(Choice):
     """
@@ -577,6 +591,7 @@ class FE8Options(PerGameCommonOptions):
     force_thief: ForceThief
     lockpick_usability: LockpickUsability
     easier_5x: Easier5x
+    promotion_unlocks: EnablePromotionUnlocks
 
     # Growth Rate Settings
     growth_rando: GrowthRando
@@ -634,7 +649,7 @@ class FE8Options(PerGameCommonOptions):
 # this determines group oder
 FE8_option_groups:dict[str, List[Any]] = {
     "Player Randomizer settings": [PlayerRando, PlayerMonsters, EirikaClass, RandomMyrrh, RandomTethys, ForceThief, 
-                                   ForceHealer, ForceDancer, RescueRoss, Easier5x, LockpickUsability],
+                                   ForceHealer, ForceDancer, RescueRoss, Easier5x, LockpickUsability, EnablePromotionUnlocks],
 
     "Growth Rate Settings": [GrowthRando, GrowthRandoMin, GrowthRandoMax, NormalizeGenders],
 

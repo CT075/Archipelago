@@ -209,7 +209,7 @@ class FE8World(World):
                             else ItemClassification.useful
                         ),
                     )
-        no_deploy_item=[str]
+        
 
         '''
         Here is a micro patcher to find out what classes units are during world generation.
@@ -223,6 +223,11 @@ class FE8World(World):
                                                      or self.options.first_thief_deployment
                                                        or self.options.pick_my_units):
             class_context = True
+        if self.options.promotion_unlocks:
+            class_context = True
+
+        no_deploy_item=[str]
+        promotions_possible=[str]
         if(class_context):
             micro = FE8MicroPatch
             units=micro.world_builder_changes(micro, self.multiworld.seed, self.player, self.options)
@@ -233,6 +238,12 @@ class FE8World(World):
             if self.options.pick_my_units:
                 for x in units.units_not_picked:
                     no_deploy_item.append("Deploy " + x)
+            if self.options.promotion_unlocks:
+                for x in units.units_picked:
+                    promo = units.lookup_promotions(x)
+                    for n in promo:
+                        promotions_possible.append(n + " Promotion")
+            
 
 
         # Shuffle the level caps and weapon levels together. As the
@@ -247,7 +258,7 @@ class FE8World(World):
         # before holy weapons when locations are scarce.
         permit_promo_start = len(other_items)
 
-        if self.options.recruit_checks_enabled:
+        if self.options.recruit_checks_enabled and not self.options.pick_my_units:
             progressive_seth = bool(self.options.progressive_seth_deployment)
             # With smooth deployments, region exits and the Knoll/Myrrh recruit
             # checks have rules counting deploy permits, so the permits must be
@@ -276,7 +287,8 @@ class FE8World(World):
         if self.options.promotion_unlocks:
             for name, _ in items:
                 if name.endswith(" Promotion"):
-                    register(name, ItemClassification.useful)
+                    if name in promotions_possible:
+                        register(name, ItemClassification.useful)
 
         permit_promo = other_items[permit_promo_start:]
         self.random.shuffle(permit_promo)

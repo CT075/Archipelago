@@ -342,6 +342,7 @@ class JobData:
     is_promoted: bool
     usable_weapons: set[WeaponKind]
     tags: set[str]
+    promotion: set[str]
 
     @classmethod
     def of_object(cls, obj: dict[str, Any]):
@@ -353,6 +354,7 @@ class JobData:
                 WeaponKind.of_str(kind) for kind in obj["usable_weapons"]
             ),
             tags=set(obj["tags"]),
+            promotion=set(obj["promotion"]),
         )
 
     def __hash__(self):
@@ -394,6 +396,11 @@ class CharacterStore:
             self.ids_by_name[name] = data["ids"]
 
         self.character_jobs = {}
+
+    def lookup_promotions(self, char_name: str) -> Optional[list[str]]:
+        if char_name not in self.ids_by_name:
+            return None
+        return self.character_jobs[char_name].promotion
 
     def lookup_ids(self, char_name: str) -> Optional[list[int]]:
         if char_name not in self.ids_by_name:

@@ -53,8 +53,8 @@ class FE8PatchExtension(APPatchExtension):
         random = Random(config["seed"] + config["player"])
         mut_rom = bytearray(rom)
         randomizer = FE8Randomizer(rom=mut_rom, random=random, config=config)
-        
-        randomizer.clear_weapon_ranks()
+
+        randomizer.restore_vanilla_weapon_ranks()
         
         randomizer.allies_logic_changes()
 
