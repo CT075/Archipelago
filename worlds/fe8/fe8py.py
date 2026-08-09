@@ -1618,7 +1618,16 @@ class FE8Randomizer:
                     self.rom[wrank_base + i] = row[i]
 
     def randomize_units(self) -> None:
-
+        # The character-table ranks are already blanked in the base patch,
+        # which is what randomized classes want. When classes are NOT
+        # randomized and weapon level caps are disabled, units read their own
+        # personal ranks, so the vanilla ranks must be restored. (When caps
+        # are enabled, player units use party-wide ranks and the table is
+        # ignored.)
+        if not self.config["player_rando"] and not self.config[
+            "enable_weapon_level_caps"
+        ]:
+            self.restore_vanilla_weapon_ranks()
         Race = JobRace.ALL
         if self.config["enemy_rando"] == 3:
             Race = JobRace.MONSTER
