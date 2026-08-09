@@ -4,7 +4,7 @@
 # randomization, stat tweaks, etc).
 import json
 from random import Random
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from worlds.Files import (
     APTokenMixin,
@@ -16,7 +16,7 @@ from settings import get_settings
 
 from .items import FE8Item
 from .locations import FE8Location
-from .constants import FE8_NAME, ROM_BASE_ADDRESS
+from .constants import FE8_NAME, ROM_BASE_ADDRESS, MICRO_ROM
 from .options import FE8Options
 from .connector_config import (
     SLOT_NAME_ADDR,
@@ -26,10 +26,11 @@ from .connector_config import (
     PROMOTION_UNLOCKS_OFFS,
     LEVEL_CAPS_OFFS,
     WEAPON_LEVEL_CAPS_OFFS,
+    RECRUIT_CHECKS_OFFS,
     LOCATION_INFO_OFFS,
     LOCATION_INFO_SIZE,
 )
-from .fe8py import FE8Randomizer
+from .fe8py import FE8Randomizer, CharacterStore
 
 if TYPE_CHECKING:
     from . import FE8World
@@ -52,8 +53,24 @@ class FE8PatchExtension(APPatchExtension):
         random = Random(config["seed"] + config["player"])
         mut_rom = bytearray(rom)
         randomizer = FE8Randomizer(rom=mut_rom, random=random, config=config)
+
+        randomizer.restore_vanilla_weapon_ranks()
+        
+        randomizer.allies_logic_changes()
+
+        randomizer.randomize_allies()
+
+        randomizer.allies_logic_checks()
+
+        randomizer.enemy_logic_changes()
+
+        randomizer.randomize_units()
+
         randomizer.apply_base_changes()
 
+        if config["rescue_ross"] == 1:
+            randomizer.map_edit()
+        
         if config["shuffle_skirmish_tables"]:
             randomizer.randomize_monster_gen()
 
@@ -65,9 +82,10 @@ class FE8PatchExtension(APPatchExtension):
 
         if config["normalize_genders"]:
             randomizer.normalize_genders()
-
+        
         randomizer.randomize_growths(*config["growth_rando"])
         randomizer.randomize_music(config["music_rando"])
+
         return bytes(mut_rom)
 
 
@@ -98,6 +116,28 @@ class FE8ProcedurePatch(APProcedurePatch, APTokenMixin):
     def get_source_data(cls):
         return get_base_rom_as_bytes()
 
+class FE8MicroPatch():
+    '''
+    Function that goes through the first half of the randomizer for the world generator
+    works off a mirco rom that has all ally unit's in it
+    '''
+    
+    @staticmethod
+    def world_builder_changes(self, seed: int, player: int, options) ->CharacterStore:
+        seed2 =seed + player
+        random = Random(seed2)
+        config = config_settings(options, player, seed)
+        mut_rom = bytearray(MICRO_ROM)
+        randomizer = FE8Randomizer(rom=mut_rom, random=random, config=config, micro=True)
+            
+        randomizer.allies_logic_changes()
+
+        randomizer.randomize_allies()
+
+        randomizer.allies_logic_checks()
+
+        return randomizer.character_store
+
 
 def get_base_rom_as_bytes() -> bytes:
     with open(get_settings().fe8_settings.rom_file, "rb") as infile:
@@ -109,16 +149,30 @@ def get_base_rom_as_bytes() -> bytes:
 def rom_location(loc: FE8Location):
     return LOCATION_INFO_OFFS + loc.local_address * LOCATION_INFO_SIZE
 
-
-def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
-    player = world.player
-    multiworld = world.multiworld
-    options: FE8Options = world.options
+def config_settings(options, player, multiworld) ->dict[str, Any]:
     config_dict = {
         "player_rando": bool(options.player_unit_rando),
         "player_monster": bool(options.player_unit_monsters),
+        "enemy_rando": int(options.enemy_rando),
         "enable_weapon_level_caps": bool(options.enable_weapon_level_caps),
         "easier_5x": bool(options.easier_5x),
+        "force_healer": int(options.force_healer),
+        "force_thief": bool(options.force_thief),
+        "force_dancer": bool(options.force_dancer),
+        "recruit_checks_enabled": bool(options.recruit_checks_enabled),
+        "rescue_ross": int(options.rescue_ross),
+        "eirika_class": int(options.eirika_class),
+        "random_myrrh": bool(options.random_myrrh),
+        "random_tethys": bool(options.random_tethys),
+        "remove_berserk": bool(options.remove_berserk),
+        "pick_my_units": bool(options.pick_my_units),
+        "picked_amount": int (options.picked_amount),
+        "no_seth_PMU": int (options.no_seth_PMU),
+        "amount_free_PMU": int(options.amount_free_PMU),
+        "no_rando_thief": bool(options.no_rando_thief),
+        "stop_bandit_mounted": bool(options.stop_bandit_mounted), 
+        "first_healer_deployment": bool(options.first_healer_deployment),
+        "first_thief_deployment": bool(options.first_thief_deployment), 
         "unbreakable_regalia": bool(options.unbreakable_regalia),
         "shuffle_skirmish_tables": bool(options.shuffle_skirmish_tables),
         "normalize_genders": bool(options.normalize_genders),
@@ -128,9 +182,17 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
             int(options.growth_rando_max),
         ),
         "music_rando": int(options.music_rando),
-        "seed": multiworld.seed,
+        "seed": multiworld,
         "player": player,
     }
+    return config_dict
+
+
+def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
+    player = world.player
+    multiworld = world.multiworld
+    options: FE8Options = world.options
+    config_dict = config_settings(options, player, multiworld.seed)
     patch.write_file("config.json", json.dumps(config_dict).encode("UTF-8"))
 
     # Player name
@@ -159,5 +221,6 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
     patch.write_byte(
         WEAPON_LEVEL_CAPS_OFFS, int(bool(options.enable_weapon_level_caps))
     )
+    patch.write_byte(RECRUIT_CHECKS_OFFS, int(bool(options.recruit_checks_enabled)))
 
     patch.write_file("token_data.bin", patch.get_token_binary())

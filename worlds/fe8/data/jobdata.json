@@ -8,6 +8,9 @@
     "is_promoted":false,
     "tags":[
       "Ephraim"
+    ],
+    "promotion": [
+      "Ephraim Master Lord"
     ]
   },
   {
@@ -19,6 +22,9 @@
     "is_promoted":false,
     "tags":[
       "Eirika"
+    ],
+    "promotion": [
+      "Eirika Master Lord"
     ]
   },
   {
@@ -29,7 +35,10 @@
     ],
     "is_promoted":true,
     "tags":[
-      "Ephraim"
+      "Ephraim",
+      "mounted"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -40,7 +49,10 @@
     ],
     "is_promoted":true,
     "tags":[
-      "Eirika"
+      "Eirika",
+      "mounted"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -52,7 +64,11 @@
     ],
     "is_promoted":false,
     "tags":[
-      
+      "mounted"
+    ],
+    "promotion": [
+      "Paladin",
+      "Great Knight"
     ]
   },
   {
@@ -64,7 +80,11 @@
     ],
     "is_promoted":false,
     "tags":[
-      
+      "mounted"
+    ],
+    "promotion": [
+      "Paladin",
+      "Great Knight"
     ]
   },
   {
@@ -76,7 +96,9 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "mounted"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -88,7 +110,9 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "mounted"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -99,7 +123,11 @@
     ],
     "is_promoted":false,
     "tags":[
-      
+      "armoured"
+    ],
+    "promotion": [
+      "General",
+      "Great Knight"
     ]
   },
   {
@@ -110,7 +138,11 @@
     ],
     "is_promoted":false,
     "tags":[
-      
+      "armoured"
+    ],
+    "promotion": [
+      "General",
+      "Great Knight"
     ]
   },
   {
@@ -123,7 +155,9 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "armoured"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -136,7 +170,9 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "armoured"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -147,7 +183,11 @@
     ],
     "is_promoted":false,
     "tags":[
-      "Lockpick"
+      "lockpick"
+    ],
+    "promotion": [
+      "Assassin",
+      "Rogue"
     ]
   },
   {
@@ -159,7 +199,10 @@
     "is_promoted":false,
     "tags":[
       "special",
-      "cannot_fight"
+      "cannot_fight",
+      "no_rando"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -171,6 +214,10 @@
     "is_promoted":false,
     "tags":[
       
+    ],
+    "promotion": [
+      "Hero",
+      "Ranger"
     ]
   },
   {
@@ -182,6 +229,10 @@
     "is_promoted":false,
     "tags":[
       
+    ],
+    "promotion": [
+      "Hero",
+      "Ranger"
     ]
   },
   {
@@ -194,6 +245,8 @@
     "is_promoted":true,
     "tags":[
       
+   ],
+    "promotion": [
     ]
   },
   {
@@ -206,6 +259,8 @@
     "is_promoted":true,
     "tags":[
       
+   ],
+    "promotion": [
     ]
   },
   {
@@ -217,6 +272,10 @@
     "is_promoted":false,
     "tags":[
       "FastSword"
+    ],
+    "promotion": [
+      "Assassin",
+      "Swordmaster"
     ]
   },
   {
@@ -228,6 +287,10 @@
     "is_promoted":false,
     "tags":[
       "FastSword"
+    ],
+    "promotion": [
+      "Assassin",
+      "Swordmaster"
     ]
   },
   {
@@ -239,6 +302,8 @@
     "is_promoted":true,
     "tags":[
       "FastSword"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -250,6 +315,8 @@
     "is_promoted":true,
     "tags":[
       "FastSword"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -261,7 +328,9 @@
     "is_promoted":true,
     "tags":[
       "FastSword",
-      "Lockpick"
+      "lockpick"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -273,7 +342,9 @@
     "is_promoted":true,
     "tags":[
       "FastSword",
-      "Lockpick"
+      "lockpick"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -284,7 +355,12 @@
     ],
     "is_promoted":false,
     "tags":[
-      "bow_only"
+      "bow_only",
+      "ranged"
+    ],
+    "promotion": [
+      "Sniper",
+      "Ranger"
     ]
   },
   {
@@ -295,7 +371,12 @@
     ],
     "is_promoted":false,
     "tags":[
-      "bow_only"
+      "bow_only",
+      "ranged"
+    ],
+    "promotion": [
+      "Sniper",
+      "Ranger"
     ]
   },
   {
@@ -306,7 +387,10 @@
     ],
     "is_promoted":true,
     "tags":[
-      "bow_only"
+      "bow_only",
+      "ranged"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -317,7 +401,10 @@
     ],
     "is_promoted":true,
     "tags":[
-      "bow_only"
+      "bow_only",
+      "ranged"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -329,7 +416,9 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "mounted"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -341,7 +430,9 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "mounted"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -352,7 +443,12 @@
     ],
     "is_promoted":false,
     "tags":[
-      "flying"
+      "flying",
+      "dragon"
+    ],
+    "promotion": [
+      "Wyvern Lord",
+      "Wyvern Knight"
     ]
   },
   {
@@ -363,7 +459,12 @@
     ],
     "is_promoted":false,
     "tags":[
-      "flying"
+      "flying",
+      "dragon"
+    ],
+    "promotion": [
+      "Wyvern Lord",
+      "Wyvern Knight"
     ]
   },
   {
@@ -375,7 +476,10 @@
     ],
     "is_promoted":true,
     "tags":[
-      "flying"
+      "flying",
+      "dragon"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -387,7 +491,10 @@
     ],
     "is_promoted":true,
     "tags":[
-      "flying"
+      "flying",
+      "dragon"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -398,7 +505,10 @@
     ],
     "is_promoted":true,
     "tags":[
-      "flying"
+      "flying",
+      "dragon"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -409,7 +519,10 @@
     ],
     "is_promoted":true,
     "tags":[
-      "flying"
+      "flying",
+      "dragon"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -420,7 +533,11 @@
     ],
     "is_promoted":false,
     "tags":[
-      
+      "ranged"
+    ],
+    "promotion": [
+      "Mage Knight",
+      "Sage"
     ]
   },
   {
@@ -431,7 +548,11 @@
     ],
     "is_promoted":false,
     "tags":[
-      
+      "ranged"
+    ],
+    "promotion": [
+      "Mage Knight",
+      "Sage"
     ]
   },
   {
@@ -444,7 +565,10 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer",
+      "ranged"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -457,7 +581,10 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer",
+      "ranged"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -469,7 +596,11 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer",
+      "mounted",
+      "ranged"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -481,7 +612,11 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer",
+      "mounted",
+      "ranged"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -493,7 +628,10 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer",
+      "ranged"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -505,7 +643,10 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer",
+      "ranged"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -516,7 +657,11 @@
     ],
     "is_promoted":false,
     "tags":[
-      
+      "ranged"
+    ],
+    "promotion": [
+      "Druid",
+      "Summoner"
     ]
   },
   {
@@ -527,7 +672,11 @@
     ],
     "is_promoted":false,
     "tags":[
-      
+      "ranged"
+    ],
+    "promotion": [
+      "Druid",
+      "Summoner"
     ]
   },
   {
@@ -540,7 +689,10 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer",
+      "ranged"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -553,7 +705,10 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer",
+      "ranged"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -565,7 +720,10 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer",
+      "ranged"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -577,7 +735,10 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer",
+      "ranged"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -588,7 +749,9 @@
     ],
     "is_promoted":true,
     "tags":[
-      "Lockpick"
+      "lockpick"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -601,7 +764,10 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "mounted",
+      "armoured"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -614,7 +780,10 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "mounted",
+      "armoured"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -626,7 +795,10 @@
     "is_promoted":true,
     "tags":[
       "special",
-      "flying"
+      "flying",
+      "dragon"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -638,7 +810,10 @@
     "is_promoted":false,
     "tags":[
       "special",
-      "flying"
+      "flying",
+      "dragon"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -650,6 +825,10 @@
     "is_promoted":false,
     "tags":[
       "trainee"
+    ],
+    "promotion": [
+      "Hero",
+      "Journeyman"
     ]
   },
   {
@@ -660,7 +839,12 @@
     ],
     "is_promoted":false,
     "tags":[
-      "trainee"
+      "trainee",
+      "ranged"
+    ],
+    "promotion": [
+      "Sage",
+      "Pupil"
     ]
   },
   {
@@ -672,6 +856,10 @@
     "is_promoted":false,
     "tags":[
       
+    ],
+    "promotion": [
+      "Hero",
+      "Warrior"
     ]
   },
   {
@@ -684,6 +872,8 @@
     "is_promoted":true,
     "tags":[
       
+   ],
+    "promotion": [
     ]
   },
   {
@@ -695,6 +885,10 @@
     "is_promoted":false,
     "tags":[
       
+    ],
+    "promotion": [
+      "Berserker",
+      "Warrior"
     ]
   },
   {
@@ -706,6 +900,10 @@
     "is_promoted":false,
     "tags":[
       
+    ],
+    "promotion": [
+      "Berserker",
+      "Warrior"
     ]
   },
   {
@@ -717,6 +915,8 @@
     "is_promoted":true,
     "tags":[
       
+   ],
+    "promotion": [
     ]
   },
   {
@@ -727,7 +927,11 @@
     ],
     "is_promoted":false,
     "tags":[
-      
+      "ranged"
+    ],
+    "promotion": [
+      "Sage",
+      "Bishop"
     ]
   },
   {
@@ -738,7 +942,12 @@
     ],
     "is_promoted":false,
     "tags":[
-      "cannot_fight"
+      "cannot_fight",
+      "healer"
+    ],
+    "promotion": [
+      "Sage",
+      "Bishop"
     ]
   },
   {
@@ -749,7 +958,10 @@
     ],
     "is_promoted":false,
     "tags":[
-      "cannot_fight"
+      "cannot_fight",
+      "no_rando"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -761,6 +973,10 @@
     "is_promoted":false,
     "tags":[
       "trainee"
+    ],
+    "promotion": [
+      "Paladin",
+      "Recruit"
     ]
   },
   {
@@ -772,6 +988,10 @@
     "is_promoted":false,
     "tags":[
       "flying"
+    ],
+    "promotion": [
+      "Falcom Knight",
+      "Wyvern Knight"
     ]
   },
   {
@@ -784,6 +1004,8 @@
     "is_promoted":true,
     "tags":[
       "flying"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -794,7 +1016,12 @@
     ],
     "is_promoted":false,
     "tags":[
-      "cannot_fight"
+      "cannot_fight",
+      "healer"
+    ],
+    "promotion": [
+      "Valkyrie",
+      "Bishop"
     ]
   },
   {
@@ -805,7 +1032,13 @@
     ],
     "is_promoted":false,
     "tags":[
-      "cannot_fight"
+      "cannot_fight",
+      "healer",
+      "mounted"
+    ],
+    "promotion": [
+      "Valkyrie",
+      "Mage Knight"
     ]
   },
   {
@@ -817,7 +1050,11 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer",
+      "mounted",
+      "ranged"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -828,7 +1065,10 @@
     ],
     "is_promoted":false,
     "tags":[
-      "cannot_fight"
+      "cannot_fight",
+      "dancer"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -840,6 +1080,8 @@
     "is_promoted":false,
     "tags":[
       "generic"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -851,7 +1093,10 @@
     ],
     "is_promoted":true,
     "tags":[
-      
+      "healer",
+      "ranged"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -867,6 +1112,8 @@
       "generic",
       "Claw",
       "no_rando"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -882,6 +1129,8 @@
       "generic",
       "Claw",
       "no_rando"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -895,6 +1144,8 @@
     "tags":[
       "monster",
       "special"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -907,7 +1158,10 @@
     "tags":[
       "monster",
       "special",
-      "bow_only"
+      "bow_only",
+      "ranged"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -921,6 +1175,8 @@
     "tags":[
       "monster",
       "special"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -933,7 +1189,10 @@
     "tags":[
       "monster",
       "special",
-      "bow_only"
+      "bow_only",
+      "ranged"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -947,6 +1206,8 @@
       "monster",
       "special",
       "Claw"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -960,6 +1221,8 @@
       "monster",
       "special",
       "Claw"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -972,6 +1235,8 @@
     "tags":[
       "monster",
       "special"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -985,6 +1250,8 @@
       "monster",
       "special",
       "Fang"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -998,6 +1265,8 @@
       "monster",
       "special",
       "Fang"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -1009,7 +1278,10 @@
     "is_promoted":false,
     "tags":[
       "monster",
-      "special"
+      "special",
+      "mounted"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -1022,7 +1294,10 @@
     "is_promoted":true,
     "tags":[
       "monster",
-      "special"
+      "special",
+      "mounted"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -1036,7 +1311,10 @@
       "monster",
       "special",
       "flying",
-      "MonsterDark"
+      "MonsterDark",
+      "ranged"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -1050,7 +1328,10 @@
       "monster",
       "special",
       "flying",
-      "MonsterDark"
+      "MonsterDark",
+      "ranged"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -1063,7 +1344,10 @@
     "tags":[
       "monster",
       "special",
-      "MonsterDark"
+      "MonsterDark",
+      "ranged"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -1077,6 +1361,8 @@
       "monster",
       "special",
       "flying"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -1090,6 +1376,8 @@
       "monster",
       "special",
       "flying"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -1105,6 +1393,8 @@
       "flying",
       "Breath",
       "no_rando"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -1117,6 +1407,8 @@
     "tags":[
       "monster",
       "special"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -1130,6 +1422,8 @@
       "monster",
       "special",
       "Claw"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -1142,6 +1436,8 @@
     "tags":[
       "trainee",
       "no_rando"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -1154,6 +1450,8 @@
     "tags":[
       "trainee",
       "no_rando"
+   ],
+    "promotion": [
     ]
   },
   {
@@ -1166,6 +1464,8 @@
     "tags":[
       "trainee",
       "no_rando"
+    ],
+    "promotion": [
     ]
   }
 ]

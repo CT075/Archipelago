@@ -20,7 +20,7 @@ from BaseClasses import (
 import settings
 
 from .client import FE8Client
-from .options import FE8Options, Goal
+from .options import FE8Options, Goal, create_option_groups
 from .constants import (
     FE8_NAME,
     FE8_ID_PREFIX,
@@ -36,7 +36,7 @@ from .locations import FE8Location
 from .items import FE8Item
 from .connector_config import locations, items
 
-from .rom import FE8ProcedurePatch, write_tokens
+from .rom import FE8MicroPatch, FE8ProcedurePatch, write_tokens
 
 # We need to import FE8Client to register it properly, so we use it to disable
 # the unused import warning
@@ -50,6 +50,7 @@ class FE8WebWorld(WebWorld):
     """
 
     theme = "stone"
+    option_groups = create_option_groups()
     setup_en = Tutorial(
         "Multiworld Setup Guide",
         "A guide to playing FE8 with Archipelago",
@@ -138,6 +139,8 @@ class FE8World(World):
         )
 
     def create_items(self) -> None:
+
+        
         smooth_level_caps = self.options.smooth_level_caps
         min_endgame_level_cap = int(self.options.min_endgame_level_cap)
         exclude_latona = self.options.exclude_latona
@@ -206,6 +209,42 @@ class FE8World(World):
                             else ItemClassification.useful
                         ),
                     )
+        
+
+        '''
+        Here is a micro patcher to find out what classes units are during world generation.
+        We dont want to run this always, as it is a lot of over head
+        we should keep the setting off unless the parent setting.
+        and if any of the children settings are enabled do we run this.
+        It will run through all ally units and what the randomizer will output them
+        '''
+        class_context =False
+        if self.options.recruit_checks_enabled and (self.options.first_healer_deployment
+                                                     or self.options.first_thief_deployment
+                                                       or self.options.pick_my_units):
+            class_context = True
+        if self.options.promotion_unlocks:
+            class_context = True
+
+        no_deploy_item=[str]
+        promotions_possible=[str]
+        if(class_context):
+            micro = FE8MicroPatch
+            units=micro.world_builder_changes(micro, self.multiworld.seed, self.player, self.options)
+            if self.options.first_healer_deployment:
+               no_deploy_item.append("Deploy " + units.FindUnitTagged("healer"))
+            if self.options.first_thief_deployment:
+               no_deploy_item.append("Deploy " + units.FindUnitTagged("lockpick"))
+            if self.options.pick_my_units:
+                for x in units.units_not_picked:
+                    no_deploy_item.append("Deploy " + x)
+            if self.options.promotion_unlocks:
+                for x in units.units_picked:
+                    promo = units.lookup_promotions(x)
+                    for n in promo:
+                        promotions_possible.append(n + " Promotion")
+            
+
 
         # Shuffle the level caps and weapon levels together. As the
         # lowest-priority filler, these are dropped first when there are not
@@ -219,7 +258,7 @@ class FE8World(World):
         # before holy weapons when locations are scarce.
         permit_promo_start = len(other_items)
 
-        if self.options.recruit_checks_enabled:
+        if self.options.recruit_checks_enabled and not self.options.pick_my_units:
             progressive_seth = bool(self.options.progressive_seth_deployment)
             # With smooth deployments, region exits and the Knoll/Myrrh recruit
             # checks have rules counting deploy permits, so the permits must be
@@ -229,21 +268,27 @@ class FE8World(World):
                 if self.options.smooth_deployments
                 else ItemClassification.useful
             )
+
             for name, _ in items:
-                if name == "Deploy Seth":
-                    if not progressive_seth:
-                        register(name, deploy_classification)
-                elif name == "Progressive Seth Deployment":
-                    if progressive_seth:
-                        for _ in range(4):
+                if name not in no_deploy_item:
+                    if name == "Deploy Seth":
+                        if not progressive_seth:
                             register(name, deploy_classification)
-                elif "Deploy" in name:
-                    register(name, deploy_classification)
+                    elif name == "Progressive Seth Deployment":
+                        if progressive_seth:
+                            for _ in range(4):
+                                register(name, deploy_classification)
+                    elif "Deploy" in name:
+                        register(name, deploy_classification)
+
+
+                
 
         if self.options.promotion_unlocks:
             for name, _ in items:
                 if name.endswith(" Promotion"):
-                    register(name, ItemClassification.useful)
+                    if name in promotions_possible:
+                        register(name, ItemClassification.useful)
 
         permit_promo = other_items[permit_promo_start:]
         self.random.shuffle(permit_promo)

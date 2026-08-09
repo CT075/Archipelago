@@ -1,7 +1,14 @@
 from dataclasses import dataclass
+from typing import List, TYPE_CHECKING, Dict, Any
 
-from Options import Choice, Range, Toggle, PerGameCommonOptions
+from Options import Choice, Range, Toggle, PerGameCommonOptions, OptionGroup
 
+def create_option_groups() -> List[OptionGroup]:
+    option_group_list: List[OptionGroup] = []
+    for name, options in FE8_option_groups.items():
+        option_group_list.append(OptionGroup(name=name, options=options))
+
+    return option_group_list
 
 def round_up_to(x, mod):
     return ((x + mod - 1) // mod) * mod
@@ -23,6 +30,42 @@ class PlayerMonsters(Toggle):
 
     display_name = "Enable Playable Monsters"
     default = 1
+
+class EnemyRando(Choice):
+    """
+    How would you like enemy's to be randomzied into
+    1. No rando
+    2. All classes
+    3. Monsters only
+    4. Humans only
+    5. Humans into humans / Monsters into monsters
+    """
+
+    display_name = "Enemy Randomization Results"
+    option_No_rando = 1
+    option_All_classes = 2
+    option_Monster_only = 3
+    option_Human_only = 4
+    option_Same_race = 5
+    default = 2
+
+
+
+class RandomTethys(Toggle):
+    """
+    Allow Tethys to be randomized
+    """
+
+    display_name = "Randomize Tethys"
+    default = 0
+
+class RandomMyrrh(Toggle):
+    """
+    Allow Myrrh to be randomized
+    """
+
+    display_name = "Randomize Myrrh"
+    default = 0
 
 
 class SuperDemonKing(Toggle):
@@ -122,6 +165,14 @@ class ExcludeLatona(Toggle):
     display_name = "Exclude Latona from holy weapon pool"
     default = 1
 
+class RemoveBerserk(Toggle):
+    """
+    Non recrutable units can not get Berserk (staff).
+    """
+
+    display_name = "Remove Berserk (staff)"
+    default = 0
+
 
 # Cam: Should we make this a sliding scale?
 class Easier5x(Toggle):
@@ -132,6 +183,35 @@ class Easier5x(Toggle):
 
     display_name = "Buff Ephraim's party for chapter 5x"
     default = 1
+
+class ForceHealer(Range):
+    """
+    Will make sure you have a healer in the first X amount of units.
+    This is done using Eirika route recruitment order.
+    """
+
+    display_name = "Guarantee a healer"
+    range_start = 0
+    range_end = 34
+    default = 0
+
+class ForceThief(Toggle):
+    """
+    Will make sure you have a thief in the first 6 amount of units.
+    (Colm or before)
+    Colm will also come with a lockpick.
+    """
+
+    display_name = "Guarantee a thief"
+    default = 0
+
+class ForceDancer(Toggle):
+    """
+    Will make sure you have a dancer as one of your unpromoted units.
+    """
+
+    display_name = "Guarantee a dancer"
+    default = 0
 
 
 class UnbreakableRegalia(Toggle):
@@ -167,19 +247,85 @@ class ProgressiveSethDeployment(Toggle):
     display_name = "Progressive Seth deployment"
     default = 0
 
-
-class EnablePromotionUnlocks(Toggle):
+class FirstHealerDeployment(Toggle):
     """
-    Gate class promotion behind Archipelago items. Adds one "... Promotion"
-    item per promoted class (Great Lord is always available); units cannot
-    promote into a class until its item has been received. Also makes the
-    super trainee path available from the start of the game.
+    Requires Enable recruit checks.
 
-    When disabled, promotion behaves as in the vanilla game.
+    When enabled, your first healer will not need a item to be deployed.
+    This is done using Eirika route recruitment order.
     """
 
-    display_name = "Enable promotion unlocks"
+    display_name = "First healer deployment"
     default = 0
+
+class FirstThiefDeployment(Toggle):
+    """
+    Requires Enable recruit checks.
+
+    When enabled, your first thief will not need a item to be deployed.
+    This is done using Eirika route recruitment order.
+    """
+
+    display_name = "First thief deployment"
+    default = 0
+
+class RescueRoss(Choice):
+    """
+    How would you like to rescue Ross/Garcia?
+    1. Force Vanessa to be a flier.
+    2. Create a path in the mountains.
+    3. Force any unit from Eirika to Vanessa to be a flier.
+    """
+
+    display_name = "Rescue Ross method"
+    option_Vanessa = 0
+    option_Map = 1
+    option_Early_Flier = 2
+    default = 0
+
+class EirikaClass(Choice):
+    """
+    Pick Eirika's class
+
+    only works if Randomize Player Units is enabled
+    """
+
+    display_name = "Eirika class"
+    option_Random_class = -1
+    option_Combat_class = 0
+    option_Ephraim_lord = 1
+    option_Eirika_lord = 2
+    option_Cavalier = 5
+    option_Armour_Knight = 9
+    option_Thief = 13
+    option_Mercenary = 15
+    option_Myrmidon = 19
+    option_Archer = 25
+    option_Fighter = 63
+    option_Brigand = 65
+    option_Pirate = 66
+    option_Wyvern_Rider = 31
+    option_Pegasus_Knight = 72
+    option_Journeyman = 126
+    option_Recruit = 55
+    option_Pupil = 127
+    option_Mage = 37
+    option_Shaman = 45
+    option_Monk = 68
+    option_Troubadour=75
+    option_Cleric = 74
+    option_Priest = 69
+    option_Manakete = 60
+    option_Dancer = 77
+    option_Bonewalker=84
+    option_Bonewalker_Bow=85
+    option_Bael = 88
+    option_Mauthe_Doog = 91
+    option_Tarvos = 93
+    option_Mogall = 95
+    option_Gargoyle= 99
+    default = -1
+
 
 
 class SmoothDeployments(Toggle):
@@ -195,6 +341,25 @@ class SmoothDeployments(Toggle):
 
     display_name = "Smooth deployments"
     default = 1
+
+class NoRandoThief(Toggle):
+    """
+    Don't randomize enemy theives
+
+    So they can steal your treasure
+    """
+    display_name = "Don't randomize enemy theives"
+    default = 1
+
+class StopBanditMounted(Toggle):
+    """
+    Stops enemys that destroy villages from being flying / mounted
+
+    Needs "Enemy Randomization Results" to not be set to "no rando"
+    """
+
+    display_name = "No enhanced movement bandits"
+    default = 0
 
 
 class EnableTower(Toggle):
@@ -215,6 +380,45 @@ class EnableRuins(Toggle):
     display_name = "Enable Lagdou Ruins checks"
     default = 0
 
+class PickMyUnits(Toggle):
+    """
+    Makes the game only have a subset of useable units
+    """
+
+    display_name = "Enable PMU mode"
+    default = 0
+
+class PickedAmount(Range):
+    """
+    Amount of units avalible in "Pick My Units Mode" once all checks are gotten.
+    Twins are included in the amount chosen automatically. 
+    """
+
+    display_name = "Amount of picked units"
+    range_start = 0
+    range_end = 31
+    default = 13
+
+class NoSethPMU(Toggle):
+    """
+    Seth can't be selected for PMU mode.
+    """
+
+    display_name = "Seth can't be picked"
+    default = 0
+
+class AmountFreePMU(Range):
+    """
+    Makes the game only have a subset of useable units.
+    the two twins do not need items and are automatically included.
+
+    Need Enable PMU mode and Unitsanity both enabled
+    """
+
+    display_name = "PMU units that do not need deployment items"
+    range_start = 0
+    range_end = 31
+    default = 0
 
 class ShuffleSkirmishTables(Toggle):
     """
@@ -313,6 +517,20 @@ class GrowthRandoMax(Range):
     default = 70
 
 
+class EnablePromotionUnlocks(Toggle):
+    """
+    Gate class promotion behind Archipelago items. Adds one "... Promotion"
+    item per promoted class (Great Lord is always available); units cannot
+    promote into a class until its item has been received. Also makes the
+    super trainee path available from the start of the game.
+
+    When disabled, promotion behaves as in the vanilla game.
+    """
+
+    display_name = "Enable promotion unlocks"
+    default = 0
+
+
 # CR-someday cam: think about how this interacts with creature campaign mode
 class Goal(Choice):
     """
@@ -343,7 +561,7 @@ class MusicRando(Choice):
       will be randomized to other battle themes, etc)
     - Chaos: Music tracks will be shuffled randomly
     """
-
+    display_name = "Random Music"
     option_Vanilla = 0
     alias_no = 0
     alias_off = 0
@@ -356,32 +574,67 @@ class MusicRando(Choice):
 # CR-someday cam: Eventually, it would be nice to be able to generate this.
 @dataclass
 class FE8Options(PerGameCommonOptions):
+    # Game Options
+    death_link: DeathLink
+    music_rando: MusicRando
+    goal: Goal
+
+    # Player Randomizer settings
     player_unit_rando: PlayerRando
     player_unit_monsters: PlayerMonsters
-    super_demon_king: SuperDemonKing
-    smooth_level_caps: SmoothLevelCapProgression
-    enable_level_caps: EnableLevelCaps
-    enable_weapon_level_caps: EnableWeaponLevelCaps
-    min_endgame_level_cap: MinimumEndgameLevelCapRange
-    required_holy_weapons: MinimumUsableHolyWeapons
-    exclude_latona: ExcludeLatona
-    easier_5x: Easier5x
-    unbreakable_regalia: UnbreakableRegalia
-    recruit_checks_enabled: EnableRecruitChecks
-    progressive_seth_deployment: ProgressiveSethDeployment
-    smooth_deployments: SmoothDeployments
-    promotion_unlocks: EnablePromotionUnlocks
-    tower_enabled: EnableTower
-    ruins_enabled: EnableRuins
-    shuffle_skirmish_tables: ShuffleSkirmishTables
+    eirika_class: EirikaClass
+    random_myrrh: RandomMyrrh
+    random_tethys: RandomTethys
+    rescue_ross: RescueRoss
+    force_healer: ForceHealer
+    force_dancer: ForceDancer
+    force_thief: ForceThief
     lockpick_usability: LockpickUsability
-    normalize_genders: NormalizeGenders
-    death_link: DeathLink
+    easier_5x: Easier5x
+    promotion_unlocks: EnablePromotionUnlocks
+
+    # Growth Rate Settings
     growth_rando: GrowthRando
     growth_rando_min: GrowthRandoMin
     growth_rando_max: GrowthRandoMax
-    music_rando: MusicRando
-    goal: Goal
+    normalize_genders: NormalizeGenders
+
+    # Enemy Randomizer Settings
+    enemy_rando: EnemyRando
+    super_demon_king: SuperDemonKing
+    no_rando_thief: NoRandoThief
+    stop_bandit_mounted: StopBanditMounted
+    remove_berserk: RemoveBerserk
+
+    # Unitsanity
+    recruit_checks_enabled: EnableRecruitChecks
+    smooth_deployments: SmoothDeployments
+    progressive_seth_deployment: ProgressiveSethDeployment
+    first_healer_deployment: FirstHealerDeployment
+    first_thief_deployment: FirstThiefDeployment
+
+    # PMU
+    pick_my_units: PickMyUnits
+    picked_amount: PickedAmount
+    amount_free_PMU: AmountFreePMU
+    no_seth_PMU: NoSethPMU
+
+
+    # Level Caps / Settings
+    enable_level_caps: EnableLevelCaps
+    smooth_level_caps: SmoothLevelCapProgression
+    min_endgame_level_cap: MinimumEndgameLevelCapRange
+
+    # Weapon Caps / Settings
+    enable_weapon_level_caps: EnableWeaponLevelCaps
+    required_holy_weapons: MinimumUsableHolyWeapons
+    exclude_latona: ExcludeLatona
+    unbreakable_regalia: UnbreakableRegalia
+
+    # Optional Fight Settings
+    tower_enabled: EnableTower
+    ruins_enabled: EnableRuins
+    shuffle_skirmish_tables: ShuffleSkirmishTables
 
     # Convenience methods for options that imply each other
 
@@ -390,3 +643,28 @@ class FE8Options(PerGameCommonOptions):
 
     def ruins_checks_enabled(self):
         return bool(self.ruins_enabled) or self.goal == Goal.option_ClearLagdou
+
+# does not determine order on the options creator / yaml templates
+# FE8Options(PerGameCommonOptions) determines setting order
+# this determines group oder
+FE8_option_groups:dict[str, List[Any]] = {
+    "Player Randomizer settings": [PlayerRando, PlayerMonsters, EirikaClass, RandomMyrrh, RandomTethys, ForceThief, 
+                                   ForceHealer, ForceDancer, RescueRoss, Easier5x, LockpickUsability, EnablePromotionUnlocks],
+
+    "Growth Rate Settings": [GrowthRando, GrowthRandoMin, GrowthRandoMax, NormalizeGenders],
+
+    "Enemy Randomizer Settings": [EnemyRando, SuperDemonKing, NoRandoThief, StopBanditMounted, RemoveBerserk], 
+
+    "Unitsanity": [EnableRecruitChecks, SmoothDeployments, ProgressiveSethDeployment, 
+                   FirstHealerDeployment, FirstThiefDeployment],
+
+    "Pick my units": [PickMyUnits, PickedAmount,NoSethPMU, AmountFreePMU],
+
+    "Level Caps / Settings": [EnableLevelCaps, SmoothLevelCapProgression, MinimumEndgameLevelCapRange],
+
+    "Weapon Caps / Settings": [EnableWeaponLevelCaps, MinimumUsableHolyWeapons, ExcludeLatona,
+                                UnbreakableRegalia],
+
+    "Optional Fight Settings": [ EnableTower, EnableRuins, ShuffleSkirmishTables]
+
+} 

@@ -42,7 +42,7 @@
             "count": 7,
             "logic": {"0": {"must_fight": true}}
         },
-        {"name": "label35", "base": 9126268, "count": 2, "logic": {}},
+        {"name": "FranzGilliam", "base": 9126268, "count": 2, "logic": {}},
         {"name": "label32", "base": 9126408, "count": 2, "logic": {}},
         {"name": "EasternReinforcements", "base": 9126328, "count": 3, "logic": {}}
     ],
@@ -54,7 +54,11 @@
             "logic": {"0": {"must_fly": true}}
         },
         {"name": "PlayerDeployment", "base": 9126604, "count": 5, "logic": {}},
-        {"name": "StartingEnemies", "base": 9126724, "count": 6, "logic": {}},
+        {"name": "StartingEnemies", "base": 9126724, "count": 6, "logic": 
+        {"1": {"Context_Ross": true, "Context_Garcia": true},
+        "2": {"Context_Ross": true, "Context_Garcia": true},
+        "5": {"Context_Ross": true, "Context_Garcia": true}}},
+
         {"name": "label28", "base": 9126924, "count": 1, "logic": {}},
         {
             "name": "RossGarcia",
@@ -82,7 +86,7 @@
             "name": "LArachelGroup",
             "base": 9129176,
             "count": 3,
-            "logic": {"must_fight": {"at_least": 2}}
+            "logic": {}
         },
         {"name": "label40", "base": 9129256, "count": 2, "logic": {}},
         {"name": "label41", "base": 9129316, "count": 3, "logic": {}},
@@ -103,7 +107,7 @@
             "name": "label44",
             "base": 9140284,
             "count": 2,
-            "logic": {"1": {"no_store": true}}
+            "logic": {}
         },
         {"name": "label45", "base": 9140364, "count": 1, "logic": {}},
         {"name": "Turn2Brigands", "base": 9132128, "count": 2, "logic": {}},
@@ -115,7 +119,7 @@
             "name": "PlayerDeployment",
             "base": 9132644,
             "count": 4,
-            "logic": {"must_fight": {"at_least": 3}}
+            "logic": {}
         },
         {"name": "label22", "base": 9132744, "count": 31, "logic": {}},
         {"name": "label23", "base": 9133384, "count": 3, "logic": {}},
@@ -277,7 +281,14 @@
     ],
     "Ch10Eir": [
         {"name": "PlayerDeployment", "base": 9143616, "count": 12, "logic": {}},
-        {"name": "StartingEnemies", "base": 9143876, "count": 34, "logic": {}},
+        {"name": "StartingEnemies", "base": 9143876, "count": 34, "logic": {
+            "16" :{"Context_Tethys": true,"Context_Gerik": true,"Context_Innes": true},
+            "17" :{"Context_Tethys": true,"Context_Gerik": true,"Context_Innes": true},
+            "18" :{"Context_Tethys": true,"Context_Gerik": true,"Context_Innes": true},
+            "19" :{"Context_Tethys": true,"Context_Gerik": true,"Context_Innes": true},
+            "20" :{"Context_Tethys": true,"Context_Gerik": true,"Context_Innes": true},
+            "21" :{"Context_Tethys": true,"Context_Gerik": true,"Context_Innes": true}
+        }},
         {"name": "InnesGroup", "base": 9144716, "count": 3, "logic": {}},
         {"name": "label53", "base": 9145156, "count": 2, "logic": {}},
         {"name": "label54", "base": 9145216, "count": 10, "logic": {}},
@@ -312,7 +323,10 @@
         {"name": "label51", "base": 9186628, "count": 1, "logic": {}},
         {"name": "label50", "base": 9186668, "count": 6, "logic": {}},
         {"name": "label60", "base": 9186808, "count": 1, "logic": {}},
-        {"name": "label45", "base": 9186848, "count": 14, "logic": {}},
+        {"name": "label45", "base": 9186848, "count": 14, "logic": {
+        "11" :{"Context_Duessel": true},
+        "12" :{"Context_Duessel": true}
+        }},
         {"name": "DuesselSquad2", "base": 9187248, "count": 4, "logic": {}},
         {
             "name": "CormagSquad2",
@@ -357,7 +371,12 @@
     ],
     "Ch11Eir": [
         {"name": "PlayerDeployment", "base": 9148564, "count": 11, "logic": {}},
-        {"name": "StartingEnemies", "base": 9148804, "count": 41, "logic": {}},
+        {"name": "StartingEnemies", "base": 9148804, "count": 41, "logic": {
+            "4":{"Context_L'Arachel": true, "Context_Dozla": true},
+            "7":{"Context_L'Arachel": true, "Context_Dozla": true},
+            "38":{"Context_L'Arachel": true, "Context_Dozla": true},
+            "39":{"Context_L'Arachel": true, "Context_Dozla": true}
+        }},
         {
             "name": "LArachelGroup",
             "base": 9149644,
@@ -389,7 +408,9 @@
     ],
     "Ch11Eph": [
         {"name": "PlayerDeployment", "base": 9190992, "count": 11, "logic": {}},
-        {"name": "label37", "base": 9191232, "count": 10, "logic": {"must_fly": true}},
+        {"name": "label37", "base": 9191232, "count": 10, "logic": {"must_fly": true,
+        "5":{"Context_L'Arachel": true, "Context_Dozla": true},
+        "8":{"Context_L'Arachel": true, "Context_Dozla": true}}},
         {
             "name": "LArachelGroup",
             "base": 9191452,
@@ -425,13 +446,13 @@
             "name": "TopRightDuo",
             "base": 9192432,
             "count": 2,
-            "logic": {"must_fly": true}
+            "logic": {"must_fly": true, "Context_L'Arachel": true, "Context_Dozla": true}
         },
         {
             "name": "BottomRightDuo",
             "base": 9192492,
             "count": 2,
-            "logic": {"must_fly": true}
+            "logic": {"must_fly": true, "Context_L'Arachel": true, "Context_Dozla": true}
         },
         {
             "name": "TopLeftDuo",
@@ -618,9 +639,13 @@
         {"name": "BottomBackup2", "base": 9196308, "count": 2, "logic": {}},
         {"name": "BottomBackup1", "base": 9196368, "count": 1, "logic": {}}
     ],
-    "Ch14Eir": [
+     "Ch14Eir": [
         {"name": "PlayerDeployment", "base": 9157544, "count": 12, "logic": {}},
         {"name": "StartingEnemies", "base": 9157804, "count": 42, "logic": {}},
+        {"name": "StartingEnemies", "base": 9157804, "count": 42, "logic": 
+        {"20": {"must_ranged": true},
+        "21": {"must_ranged": true},
+        "22": {"must_ranged": true}}},
         {"name": "label35", "base": 9158924, "count": 1, "logic": {}},
         {"name": "label38", "base": 9158964, "count": 2, "logic": {}},
         {"name": "ThroneGroup", "base": 9159024, "count": 6, "logic": {}},
@@ -637,6 +662,9 @@
         },
         {"name": "label49", "base": 9159892, "count": 5, "logic": {}},
         {"name": "StairsArcher", "base": 9158664, "count": 1, "logic": {}},
+        {"name": "StairsArcher", "base": 9158664, "count": 1, "logic": {
+            "0": {"must_ranged": true}
+        }},
         {"name": "SoutheasternCavaliers", "base": 9158844, "count": 3, "logic": {}},
         {"name": "StairsShamans", "base": 9158784, "count": 2, "logic": {}},
         {"name": "SouthwesternArmours", "base": 9158704, "count": 3, "logic": {}}
@@ -847,9 +875,9 @@
                 "11": {"no_flying": true},
                 "12": {"no_flying": true},
                 "18": {"no_flying": true},
-                "19": {"no_flying": true},
-                "20": {"no_flying": true},
-                "21": {"no_flying": true}
+                "19": {"no_flying": true, "Context_Syrene": true},
+                "20": {"no_flying": true, "Context_Syrene": true},
+                "21": {"no_flying": true,"Context_Syrene": true}
             }
         },
         {"name": "SoutheasternWarriors", "base": 9167404, "count": 2, "logic": {}},
@@ -881,9 +909,9 @@
                 "11": {"no_flying": true},
                 "12": {"no_flying": true},
                 "18": {"no_flying": true},
-                "19": {"no_flying": true},
-                "20": {"no_flying": true},
-                "21": {"no_flying": true}
+                "19": {"no_flying": true, "Context_Syrene": true},
+                "20": {"no_flying": true, "Context_Syrene": true},
+                "21": {"no_flying": true, "Context_Syrene": true}
             }
         },
         {"name": "SoutheasternWarriors", "base": 9207800, "count": 2, "logic": {}},
