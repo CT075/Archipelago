@@ -23,8 +23,10 @@ from .connector_config import (
     SUPER_DEMON_KING_OFFS,
     LOCKPICK_USABILITY_OFFS,
     DEATH_LINK_KIND_OFFS,
+    PROMOTION_UNLOCKS_OFFS,
     LEVEL_CAPS_OFFS,
     WEAPON_LEVEL_CAPS_OFFS,
+    RECRUIT_CHECKS_OFFS,
     LOCATION_INFO_OFFS,
     LOCATION_INFO_SIZE,
 )
@@ -214,10 +216,11 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
     patch.write_byte(SUPER_DEMON_KING_OFFS, int(bool(options.super_demon_king)))
     patch.write_byte(LOCKPICK_USABILITY_OFFS, int(options.lockpick_usability))
     patch.write_byte(DEATH_LINK_KIND_OFFS, int(options.death_link))
+    patch.write_byte(PROMOTION_UNLOCKS_OFFS, int(bool(options.promotion_unlocks)))
     patch.write_byte(LEVEL_CAPS_OFFS, int(bool(options.enable_level_caps)))
     patch.write_byte(
         WEAPON_LEVEL_CAPS_OFFS, int(bool(options.enable_weapon_level_caps))
     )
-  
+    patch.write_byte(RECRUIT_CHECKS_OFFS, int(bool(options.recruit_checks_enabled)))
 
     patch.write_file("token_data.bin", patch.get_token_binary())

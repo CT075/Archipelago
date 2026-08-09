@@ -3,10 +3,11 @@ Archipelago World definition for Fire Emblem: Sacred Stones
 """
 
 from typing import ClassVar, Optional, Callable, Set, Tuple, Any
+from collections import Counter
 import os
 import pkgutil
 
-# import logging
+import logging
 
 from Options import OptionError
 from worlds.AutoWorld import World, WebWorld
@@ -234,6 +235,18 @@ class FE8World(World):
                     no_deploy_item.append("Deploy " + x)
 
 
+        # Shuffle the level caps and weapon levels together. As the
+        # lowest-priority filler, these are dropped first when there are not
+        # enough locations, so they come before everything else in `other_items`
+        # (which is filled from the back).
+        self.random.shuffle(other_items)
+
+        # Deploy permits and promotion unlocks are shuffled together and placed
+        # after the level caps and weapon levels but before the holy weapons, so
+        # they are kept in preference to level caps / weapon levels but dropped
+        # before holy weapons when locations are scarce.
+        permit_promo_start = len(other_items)
+
         if self.options.recruit_checks_enabled:
             progressive_seth = bool(self.options.progressive_seth_deployment)
             # With smooth deployments, region exits and the Knoll/Myrrh recruit
@@ -260,9 +273,14 @@ class FE8World(World):
 
                 
 
-        # We shuffle here to ensure that level caps and weapon levels come before
-        # holy weapons in `other_weapons`.
-        self.random.shuffle(other_items)
+        if self.options.promotion_unlocks:
+            for name, _ in items:
+                if name.endswith(" Promotion"):
+                    register(name, ItemClassification.useful)
+
+        permit_promo = other_items[permit_promo_start:]
+        self.random.shuffle(permit_promo)
+        other_items[permit_promo_start:] = permit_promo
 
         holy_weapons = [name for name in HOLY_WEAPONS.keys()]
         self.random.shuffle(holy_weapons)
@@ -297,6 +315,19 @@ class FE8World(World):
                     self.create_item(self.random.choice(FILLER_ITEMS))
                 )
 
+        if other_items:
+            dropped = Counter(item.name for item in other_items)
+            summary = ", ".join(
+                f"{count}x {name}" for name, count in dropped.items()
+            )
+            logging.warning(
+                f"[{self.player_name}] Not enough locations to place all "
+                f"useful items; {len(other_items)} item(s) were left out of "
+                f"the pool: {summary}. Enable Tower of Valni or Lagdou Ruins "
+                f"checks to add more locations, or reduce item counts "
+                f"(level caps, weapon level caps, promo items, "
+                f"or progressive seth deployment)."
+            )
 
     def add_location_to_region(self, name: str, addr: Optional[int], region: Region):
         if addr is None:
@@ -603,6 +634,19 @@ class FE8World(World):
         )
 
     def set_rules(self) -> None:
+        # The goal option only changes which check counts as victory; it does
+        # not affect progression logic. Mirror the client's goal->flag mapping
+        # (see client.py) so the generator requires reaching that same check.
+        goal_location = {
+            Goal.option_DefeatFormortiis: "Defeat Formortiis",
+            Goal.option_ClearValni: "Complete Tower of Valni 8",
+            Goal.option_DefeatTirado: "Complete Chapter 8",
+            Goal.option_ClearLagdou: "Complete Lagdou Ruins 10",
+        }[self.options.goal.value]
+        self.multiworld.completion_condition[self.player] = (
+            lambda state: state.can_reach_location(goal_location, self.player)
+        )
+
         if not self.options.recruit_checks_enabled:
             return
         smooth_deployments = bool(self.options.smooth_deployments)

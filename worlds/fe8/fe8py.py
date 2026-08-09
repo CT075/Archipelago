@@ -968,36 +968,45 @@ class FE8Randomizer:
             wrank_base = (
                 CHARACTER_TABLE_BASE + char * CHARACTER_SIZE + CHARACTER_WRANK_OFFSET
             )
-            # Build the unit's pool of actual vanilla ranks (nonzero, highest
-            # first, keeping duplicates so the pool is distribution-weighted).
             row = self.character_wranks.get(char)
-            pool = sorted((r for r in row if r > 0), reverse=True) if row else []
-            if not pool:
-                pool = [int(WeaponRank.E)]
 
-            usable_kinds = sorted(int(kind) for kind in new_job.usable_weapons)
-            n = len(usable_kinds)
-
-            # Take the highest ranks first; once the whole pool is used, fill the
-            # remaining slots by sampling from the pool at random (with replacement).
-            if n <= len(pool):
-                ranks = pool[:n]
+            # A unit that kept its vanilla class should keep its vanilla ranks
+            # on their vanilla weapon types rather than a shuffled assignment.
+            if new_job.id == job.id:
+                for i in range(8):
+                    self.rom[wrank_base + i] = row[i] if row else 0
             else:
-                ranks = pool + [self.random.choice(pool) for _ in range(n - len(pool))]
+                # Build the unit's pool of actual vanilla ranks (nonzero, highest
+                # first, keeping duplicates so the pool is distribution-weighted).
+                pool = sorted((r for r in row if r > 0), reverse=True) if row else []
+                if not pool:
+                    pool = [int(WeaponRank.E)]
 
-            # Random rank -> weapon-type pairing.
-            self.random.shuffle(ranks)
+                usable_kinds = sorted(int(kind) for kind in new_job.usable_weapons)
+                n = len(usable_kinds)
 
-            usable_set = set(usable_kinds)
-            for i in range(8):
-                # Set unusuable weapon types to 0
-                if i not in usable_set:
-                    self.rom[wrank_base + i] = 0
-            for kind, rank in zip(usable_kinds, ranks):
-                # Dark has no E-rank weapon, so an E dark rank is unusable.
-                if kind == WeaponKind.DARK:
-                    rank = max(rank, int(WeaponRank.D))
-                self.rom[wrank_base + kind] = rank
+                # Take the highest ranks first; once the whole pool is used, fill the
+                # remaining slots by sampling from the pool at random (with replacement).
+                if n <= len(pool):
+                    ranks = pool[:n]
+                else:
+                    ranks = pool + [
+                        self.random.choice(pool) for _ in range(n - len(pool))
+                    ]
+
+                # Random rank -> weapon-type pairing.
+                self.random.shuffle(ranks)
+
+                usable_set = set(usable_kinds)
+                for i in range(8):
+                    # Set unusuable weapon types to 0
+                    if i not in usable_set:
+                        self.rom[wrank_base + i] = 0
+                for kind, rank in zip(usable_kinds, ranks):
+                    # Dark has no E-rank weapon, so an E dark rank is unusable.
+                    if kind == WeaponKind.DARK:
+                        rank = max(rank, int(WeaponRank.D))
+                    self.rom[wrank_base + kind] = rank
 
         if (
             "ai1_mod" in logic
@@ -1594,12 +1603,19 @@ class FE8Randomizer:
                 self.rom[TETHYS_EIRIKA] = tethys_weapon
             
 
-    def clear_weapon_ranks(self) -> None:
+    def restore_vanilla_weapon_ranks(self) -> None:
+        # The base patch blanks the character weapon-rank table (see
+        # BlankWeaponRanks.hs in the base-patch repo), so vanilla personal
+        # ranks must be written back from `character_wranks.json` for units in
+        # their vanilla classes to have their vanilla weapon levels.
         for ids in self.character_store.ids_by_name.values():
             for char_id in ids:
+                row = self.character_wranks.get(char_id)
+                if not row:
+                    continue
                 wrank_base = CHARACTER_TABLE_BASE + CHARACTER_SIZE * char_id + CHARACTER_WRANK_OFFSET
                 for i in range(8):
-                    self.rom[wrank_base + i] = 0
+                    self.rom[wrank_base + i] = row[i]
 
     def randomize_units(self) -> None:
 
