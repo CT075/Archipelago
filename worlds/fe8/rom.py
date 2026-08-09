@@ -125,7 +125,7 @@ class FE8MicroPatch():
         seed2 =seed + player
         random = Random(seed2)
         config = config_settings(options, player, seed)
-        mut_rom = MICRO_ROM
+        mut_rom = bytearray(MICRO_ROM)
         randomizer = FE8Randomizer(rom=mut_rom, random=random, config=config, micro=True)
             
         randomizer.allies_logic_changes()
@@ -180,7 +180,7 @@ def config_settings(options, player, multiworld) ->dict[str, Any]:
             int(options.growth_rando_max),
         ),
         "music_rando": int(options.music_rando),
-        "seed": multiworld.seed,
+        "seed": multiworld,
         "player": player,
     }
     return config_dict
@@ -190,7 +190,7 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
     player = world.player
     multiworld = world.multiworld
     options: FE8Options = world.options
-    config_dict = config_settings(options, player, multiworld)
+    config_dict = config_settings(options, player, multiworld.seed)
     patch.write_file("config.json", json.dumps(config_dict).encode("UTF-8"))
 
     # Player name

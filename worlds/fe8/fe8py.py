@@ -379,9 +379,9 @@ class CharacterStore:
         self.character_tags = dict()
         self.ids_by_name = dict()
         self.character_inventory = dict()
-        units_not_picked =[]
-        units_picked =[]
-        units_free =[]
+        self.units_not_picked =[]
+        self.units_picked =[]
+        self.units_free =[]
 
         for name, data in char_data.items():
             for i in data["ids"]:
@@ -560,7 +560,7 @@ class FE8Randomizer:
                     self.jobs_pools[job.is_promoted][JobRace.ALL][JobType.FLIER].append(
                         job
                     )
-                elif "Lockpick" in job.tags:
+                elif "lockpick" in job.tags:
                     self.jobs_pools[job.is_promoted][Race][JobType.LOCKPICK].append(job)
                     self.jobs_pools[job.is_promoted][JobRace.ALL][
                         JobType.LOCKPICK
@@ -1086,15 +1086,15 @@ class FE8Randomizer:
         # we not a ally anymore
         self.ally_pick = False
 
-        self.weapons_not_given.append(self.weapons_by_name("Restore"))
-        self.weapons_not_given.append(self.weapons_by_name("Warp"))
-        self.weapons_not_given.append(self.weapons_by_name("Rescue"))
-        self.weapons_not_given.append(self.weapons_by_name("Torch"))
-        self.weapons_not_given.append(self.weapons_by_name("Hammerne"))
-        self.weapons_not_given.append(self.weapons_by_name("Unlock"))
-        self.weapons_not_given.append(self.weapons_by_name("Barrier"))
+        self.weapons_not_given.append(self.weapons_by_name["Restore"].id)
+        self.weapons_not_given.append(self.weapons_by_name["Warp"].id)
+        self.weapons_not_given.append(self.weapons_by_name["Rescue"].id)
+        self.weapons_not_given.append(self.weapons_by_name["Torch"].id)
+        self.weapons_not_given.append(self.weapons_by_name["Hammerne"].id)
+        self.weapons_not_given.append(self.weapons_by_name["Unlock"].id)
+        self.weapons_not_given.append(self.weapons_by_name["Barrier"].id)
         if self.config["remove_berserk"]:
-            self.weapons_not_given.append(self.weapons_by_name("Berserk"))
+            self.weapons_not_given.append(self.weapons_by_name["Berserk"].id)
 
         if self.config["no_rando_thief"]:
             self.jobs_not_randomized.append (THIEF_ID)
@@ -1134,7 +1134,7 @@ class FE8Randomizer:
 
     def pick_my_units(self) -> None:
         for x in CHARACTER_ORDER:
-            self.character_store.units_not_picked.append(self.character_store.names_by_id(x))
+            self.character_store.units_not_picked.append(self.character_store.lookup_name(x))
         # units that can't be picked
         self.character_store.units_not_picked.remove("Eirika")
         self.character_store.units_picked.append("Eirika")
@@ -1142,7 +1142,7 @@ class FE8Randomizer:
         self.character_store.units_picked.append("Ephraim")
         self.character_store.units_not_picked.remove("Orson")
 
-        unit_amount = self.config[self.picked_amount] 
+        unit_amount = int(self.config["picked_amount"])
 
         if self.config["first_thief_deployment"]:
             thief = self.character_store.FindUnitTagged("lockpick")
@@ -1160,7 +1160,7 @@ class FE8Randomizer:
         if self.config["no_seth_PMU"]:
             self.character_store.units_not_picked.remove("Seth")
 
-        for unit_amount in range:
+        for x in range (unit_amount):
             picked = self.random.choice(self.character_store.units_not_picked)
             self.character_store.units_picked.append(picked)
             self.character_store.units_not_picked.remove(picked)
@@ -1168,7 +1168,7 @@ class FE8Randomizer:
         if self.config["no_seth_PMU"]:
             self.character_store.units_not_picked.append("Seth")
 
-        for self.config["amount_free_PMU"] in range:
+        for x in range (self.config["amount_free_PMU"]):
             free = self.random.choice(self.character_store.units_picked)
             self.character_store.units_free.append(free)
             # removes the deploy item for them
@@ -1654,16 +1654,25 @@ class FE8Randomizer:
         if self.config["first_thief_deployment"]:
             self.make_deploy(self.character_store.FindUnitTagged("lockpick"))
 
-        # flags units as deployable if they free
-        if self.config["recruit_checks_enabled"]:
-            for x in self.character_store.units_free:
-                self.make_deploy(x)
-        else:
-            # if only pmu is on need to make all picked units deployable
-            # and make deploy checks enables to stop the deployment of other units
-            for x in self.character_store.units_picked:
-                self.make_deploy(x)
-            self.rom.RECRUIT_CHECKS_OFFS = False
+        if self.config["pick_my_units"]:
+            # flags units as deployable if they free
+            if self.config["recruit_checks_enabled"]:
+                for x in self.character_store.units_free:
+                    self.make_deploy(x)
+            else:
+                # if only pmu is on need to make all picked units deployable
+                # and make deploy checks enables to stop the deployment of other units
+                for x in self.character_store.units_picked:
+                    self.make_deploy(x)
+                self.rom.RECRUIT_CHECKS_OFFS = False
+            with open("PMUFE8.txt", "w") as f:
+                f.write("Free units:\nEirika, Ephraim")
+                for x in self.character_store.units_free:
+                    f.write(", " + x)
+                    self.character_store.units_picked.remove(x)
+                f.write("\nUnits to find:\n")
+                for x in self.character_store.units_picked:
+                    f.write(x + ", ")
 
     def make_deploy(self, unit:str):
         '''
