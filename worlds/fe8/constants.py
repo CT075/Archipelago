@@ -272,10 +272,10 @@ DEPLOY_MID_UNITS = frozenset(
 # late tier: Myrrh, Syrene
 
 # This is a extracted character data from FE8 20 bytes from the data locations in ally_unit_blocks 
-# base = byte number
-# Eirka from FE8 byte 9124904 ->9124924
+# base = byte  number = hex location (in decimal )
+# Eirka from FE8 byte 9124904 ->9124924 / 0x8B3C28 -> 0x8B3C3C
 MICRO_ROM = b'\x01\x02\x00\x08\x48\x01\x00\x01\xF4\x3B\x8B\x08\x6C\x00\x00\x00\x00\x00\x00\x00'
-# Seth from FE8 byte 9126268 -> 9126288
+# Seth from FE8 byte 9126268 -> 9126288 / 0x8B3C28 -> 0x8B4190
 MICRO_ROM += b'\x02\x07\x00\x08\x4D\x02\x00\x06\xC4\x3B\x8B\x08\x03\x17\x6C\x00\x00\x00\x00\x00'
 # Franz
 MICRO_ROM += b'\x04\x05\x01\x08\x05\x00\x00\x01\x58\x40\x8B\x08\x01\x14\x6C\x6C\x00\x00\x00\x00'
