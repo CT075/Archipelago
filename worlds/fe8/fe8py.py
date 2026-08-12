@@ -485,7 +485,7 @@ class FE8Randomizer:
         # 3. then by tags, so is the class flying, lockpick or ranged atm but more can be added in time
         # This means there is a dedicated pool for promoted human fliers to make randomization faster
         for job in job_data:
-            if "no_rando" not in job.tags:
+            if "no_rando" not in job.tags and job.usable_weapons:
                 if "monster" in job.tags:
                     Race = JobRace.MONSTER
                 else:
@@ -1130,10 +1130,8 @@ class FE8Randomizer:
     def fix_cutscenes(self) -> None:
         # Eirika's Rapier is given in a cutscene at the start of the chapter,
         # rather than being in her inventory
-        eirika_job = self.character_store["Eirika"]
-        if eirika_job.id == EIRIKA_LORD:
-            new_rapier = self.weapons_by_name["Rapier"].id
-        else:
+        if not self.config["player_rando"]:
+            eirika_job = self.character_store["Eirika"]
             # Cap the starting weapon's rank to what she can actually use: 
             # party weapon ranks start at C when weapon level caps are enabled; 
             # otherwise her starting rank is her highest base-class rank 
@@ -1156,25 +1154,25 @@ class FE8Randomizer:
                     if int(weap.rank) <= max_rank
                 ] or [self.weapons_by_name["Heal"]]
                 new_rapier = self.random.choice(healing).id
-        self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
+            self.rom[EIRIKA_RAPIER_OFFSET] = new_rapier
+
+            # Eirika and Ephraim get automatic steels on rejoining in Ch15, which
+            # need to be adjusted if randomizing units.
+            ch15_auto_steel_sword = self.select_new_item(
+                eirika_job, self.weapons_by_name["Steel Sword"].id, {}
+            )
+            ephraim_job = self.character_store["Ephraim"]
+            ch15_auto_steel_lance = self.select_new_item(
+                ephraim_job, self.weapons_by_name["Steel Lance"].id, {}
+            )
+
+            self.rom[CH15_AUTO_STEEL_SWORD] = ch15_auto_steel_sword
+            self.rom[CH15_AUTO_STEEL_LANCE] = ch15_auto_steel_lance
 
         # While we force Vanessa to fly to give Ross a fighting chance, it's
         # very possible that she won't be able to lift him. To make it more
         # reasonable to save him, we _also_ set his starting HP.
         self.rom[ROSS_CH2_HP_OFFSET] = 15
-
-        # Eirika and Ephraim get automatic steels on rejoining in Ch15, which
-        # need to be adjusted.
-        ch15_auto_steel_sword = self.select_new_item(
-            eirika_job, self.weapons_by_name["Steel Sword"].id, {}
-        )
-        ephraim_job = self.character_store["Ephraim"]
-        ch15_auto_steel_lance = self.select_new_item(
-            ephraim_job, self.weapons_by_name["Steel Lance"].id, {}
-        )
-
-        self.rom[CH15_AUTO_STEEL_SWORD] = ch15_auto_steel_sword
-        self.rom[CH15_AUTO_STEEL_LANCE] = ch15_auto_steel_lance
 
     # TODO: logic
     #   - Flying Duessel vs enemy archers in Ephraim 10 may be unbeatable
@@ -1189,11 +1187,6 @@ class FE8Randomizer:
     def randomize_units(self) -> None:
 
         Race = JobRace.ALL
-        if self.config["enemy_rando"] == 3:
-            Race = JobRace.MONSTER
-        elif self.config["enemy_rando"] == 4:
-            Race = JobRace.HUMAN
-
         for chapter_name, chapter in self.unit_blocks.items():
             for block in chapter:
                 try:
