@@ -25,7 +25,9 @@ from .constants import (
     REDA_PTR_INDEX,
     CHARACTER_TABLE_BASE,
     CHARACTER_SIZE,
+    CHARACTER_COUNT,
     CHARACTER_WRANK_OFFSET,
+    WRANK_COUNT,
     CHARACTER_STATS_OFFSET,
     CHARACTER_GROWTHS_OFFSET,
     CHAR_ABILITY_4_OFFSET,
@@ -84,13 +86,16 @@ WEAPON_DATA = "data/weapondata.json"
 JOB_DATA = "data/jobdata.json"
 SONG_DATA = "data/songdata.json"
 CHARACTERS = "data/characters.json"
-CHARACTER_WRANKS = "data/character_wranks.json"
 CHAPTER_UNIT_BLOCKS = "data/chapter_unit_blocks.json"
 INTERNAL_RANDO_VALID_DISTRIBS = "data/internal_rando_distribs.json"
 
 
 def encode_unit_coords(x: int, y: int) -> int:
     return y << 6 | x
+
+
+def wrank_offset(char: int) -> int:
+    return CHARACTER_TABLE_BASE + CHARACTER_SIZE * char + CHARACTER_WRANK_OFFSET
 
 
 def int_if_possible(x: str) -> Union[int, str]:
@@ -435,8 +440,11 @@ class FE8Randomizer:
         unit_blocks = fetch_json(CHAPTER_UNIT_BLOCKS)
         self.config = config
 
+        # Snapshotted up front because randomizing a unit block overwrites the
+        # in-ROM rows it reads from.
         self.character_wranks: dict[int, list[int]] = {
-            int(k): v for k, v in fetch_json(CHARACTER_WRANKS).items()
+            char: list(rom[wrank_offset(char) : wrank_offset(char) + WRANK_COUNT])
+            for char in range(CHARACTER_COUNT)
         }
 
         self.unit_blocks = {
@@ -575,10 +583,9 @@ class FE8Randomizer:
     def vanilla_highest_rank(self, char: int) -> int:
         """The highest weapon rank `char` had in the vanilla game, floored to E.
 
-        The base patch zeroes the in-ROM character weapon-rank table, so these
-        can't be read back from `self.rom`; they come from `character_wranks.json`
-        (see `CHARACTER_WRANKS`). Characters with no entry (e.g. generic units)
-        fall back to E.
+        These come from `self.character_wranks`, the snapshot taken before the
+        in-ROM table was touched. Characters with no ranks at all (e.g. generic
+        units) fall back to E.
         """
         row = self.character_wranks.get(char)
         return max(max(row) if row else 0, int(WeaponRank.E))
@@ -794,9 +801,7 @@ class FE8Randomizer:
             and self.config["player_rando"]
             and not self.config["enable_weapon_level_caps"]
         ):
-            wrank_base = (
-                CHARACTER_TABLE_BASE + char * CHARACTER_SIZE + CHARACTER_WRANK_OFFSET
-            )
+            wrank_base = wrank_offset(char)
             row = self.character_wranks.get(char)
 
             # A unit that kept its vanilla class should keep its vanilla ranks
@@ -1178,31 +1183,24 @@ class FE8Randomizer:
 
     # TODO: logic
     #   - Flying Duessel vs enemy archers in Ephraim 10 may be unbeatable
-    def restore_vanilla_weapon_ranks(self) -> None:
-        # The base patch blanks the character weapon-rank table (see
-        # BlankWeaponRanks.hs in the base-patch repo), so vanilla personal
-        # ranks must be written back from `character_wranks.json` for units in
-        # their vanilla classes to have their vanilla weapon levels.
+    def clear_weapon_ranks(self) -> None:
+        # A unit's ranks are its personal ranks plus its class's, so a unit
+        # moved out of its vanilla class would otherwise carry ranks for
+        # weapon types its new class has no business using.
         for ids in self.character_store.ids_by_name.values():
             for char_id in ids:
-                row = self.character_wranks.get(char_id)
-                if not row:
-                    continue
-                wrank_base = CHARACTER_TABLE_BASE + CHARACTER_SIZE * char_id + CHARACTER_WRANK_OFFSET
-                for i in range(8):
-                    self.rom[wrank_base + i] = row[i]
+                wrank_base = wrank_offset(char_id)
+                for i in range(WRANK_COUNT):
+                    self.rom[wrank_base + i] = 0
 
     def apply_base_changes(self) -> None:
-        # The character-table ranks are already blanked in the base patch,
-        # which is what randomized classes want. When classes are NOT
-        # randomized and weapon level caps are disabled, units read their own
-        # personal ranks, so the vanilla ranks must be restored. (When caps
-        # are enabled, player units use party-wide ranks and the table is
-        # ignored.)
-        if not self.config["player_rando"] and not self.config[
-            "enable_weapon_level_caps"
-        ]:
-            self.restore_vanilla_weapon_ranks()
+        # Units keep their vanilla personal ranks unless their classes are
+        # being shuffled; `randomize_block` then writes fresh ranks for each
+        # player unit it randomizes. (Enemies just get the ranks of whatever
+        # class they land in, and under weapon level caps player units read
+        # party-wide ranks instead of the table.)
+        if self.config["player_rando"]:
+            self.clear_weapon_ranks()
         for chapter_name, chapter in self.unit_blocks.items():
             for block in chapter:
                 try:
