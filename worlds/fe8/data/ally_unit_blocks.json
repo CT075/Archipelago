@@ -1,0 +1,92 @@
+{
+    "Units": [
+        {"name": "Eirika", "base": 9124904, "count": 1, "ids": 1,"logic": {}},
+        {
+            "name": "Seth",
+            "base": 9124884,
+            "count": 1,
+            "ids": 2,
+            "logic": {"0": {"must_fight": true}}
+        },
+        {"name": "Franz", "base": 9126268, "count": 1, "ids": 4,"logic": {}},
+        {"name": "Gilliam", "base": 9126288, "count": 1, "ids": 3,"logic": {}},
+        {
+            "name": "Moulder",
+            "base": 9126684,
+            "count": 1,
+            "ids": 5,
+            "logic": {}
+        },
+        {"name": "Vanessa", "base": 9126924, "count": 1, "ids": 6,"logic": {}},
+        {
+            "name": "Ross",
+            "base": 9126964,
+            "count": 1,
+            "ids": 7,
+            "logic": {"0": {"must_fly": true}}
+        },
+                {
+            "name": "Garcia",
+            "base": 9126984,
+            "count": 1,
+            "ids": 10,
+            "logic": {"0": {"must_fight": true}}
+        },
+        {"name": "Neimi", "base": 9127404, "count": 1, "ids": 8,"logic": {}},
+        {"name": "Colm", "base": 9127704, "count": 1,"ids": 9, "logic": {}},
+        {"name": "Artur", "base": 9128916, "count": 1,"ids": 19, "logic": {}},
+        {"name": "Lute", "base": 9128956, "count": 1, "ids": 12,"logic": {}},
+        {"name": "Natasha", "base": 9132488, "count": 1,"ids": 13, "logic": {}},
+        {"name": "Joshua", "base": 9132308, "count": 1, "ids": 32,"logic": {}},
+        {
+            "name": "Ephraim",
+            "base": 9132644,
+            "count": 1,
+            "ids": 15,
+            "logic": {}
+        },
+                {
+            "name": "Forde",
+            "base": 9132664,
+            "count": 1,
+            "ids": 16,
+            "logic": {}
+        },
+                {
+            "name": "Kyle",
+            "base": 9132684,
+            "count": 1,
+            "ids": 17,
+            "logic": {}
+        },
+        {
+            "name": "Tana",
+            "base": 9143368,
+            "count": 1,
+            "ids": 34,
+            "logic": {}
+        },
+        {"name": "Amelia", "base": 9154320, "count": 1,"ids": 18, "logic": {}},
+        {"name": "Tethys", "base": 9150004, "count": 1, "ids": 21,"logic": {}},
+        {"name": "Gerik", "base": 9144736, "count": 1,"ids": 20, "logic": {}},
+        {"name": "Innes", "base": 9157100, "count": 1, "ids": 11,"logic": {}},
+        {"name": "Marisa", "base": 9193644, "count": 1, "ids": 22,"logic": {}},
+        {"name": "Dozla", "base": 9149664, "count": 1, "ids": 26,"logic": {}},
+        {"name": "L'Arachel", "base": 9142700, "count": 1,"ids": 25,  "logic": {}},
+        {"name": "Saleh", "base": 9151992, "count": 1,"ids": 23, "logic": {}},
+        {"name": "Ewan", "base": 9152112, "count": 1, "ids": 24,"logic": {}},
+        {"name": "Cormag", "base": 9148128, "count": 1, "ids": 14,"logic": {}},
+        {"name": "Rennac", "base": 9142740, "count": 1,"ids": 28, "logic": {}},
+        {"name": "Duessel", "base": 9187688, "count": 1, "ids": 29,"logic": {}},
+        {"name": "Knoll", "base": 9161428, "count": 1,"ids": 31, "logic": {}},
+        {"name": "Myrrh", "base": 9162388, "count": 1, "ids": 30,"logic": {}},
+        {"name": "Syrene", "base": 9167204, "count": 1, "ids": 33,"logic": {}},
+        {
+            "name": "Orson",
+            "base": 9132704,
+            "count": 1,
+            "ids": 36,
+            "logic": {}
+        }
+	]
+}
