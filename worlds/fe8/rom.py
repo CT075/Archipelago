@@ -52,6 +52,13 @@ class FE8PatchExtension(APPatchExtension):
         random = Random(config["seed"] + config["player"])
         mut_rom = bytearray(rom)
         randomizer = FE8Randomizer(rom=mut_rom, random=random, config=config)
+        
+        randomizer.allies_logic_changes()
+
+        randomizer.randomize_allies()
+
+        randomizer.randomize_units()
+
         randomizer.apply_base_changes()
 
         if config["shuffle_skirmish_tables"]:

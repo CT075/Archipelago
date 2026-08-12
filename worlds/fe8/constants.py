@@ -191,6 +191,9 @@ INTERNAL_RANDO_WEAPONS_MAX_CLASSES = 22
 IS_PROMOTED = True
 NOT_PROMOTED = False
 
+DANCER_ID = 77
+MANAKETE_ID = 59
+DRACO_ZOMBIE_ID = 101
 
 
 # CR-soon cam: This is stretching the definition of a "constant" and should
