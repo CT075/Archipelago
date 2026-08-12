@@ -4,7 +4,7 @@
 # randomization, stat tweaks, etc).
 import json
 from random import Random
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from worlds.Files import (
     APTokenMixin,
@@ -16,7 +16,7 @@ from settings import get_settings
 
 from .items import FE8Item
 from .locations import FE8Location
-from .constants import FE8_NAME, ROM_BASE_ADDRESS
+from .constants import FE8_NAME, ROM_BASE_ADDRESS, MICRO_ROM
 from .options import FE8Options
 from .connector_config import (
     SLOT_NAME_ADDR,
@@ -29,7 +29,7 @@ from .connector_config import (
     LOCATION_INFO_OFFS,
     LOCATION_INFO_SIZE,
 )
-from .fe8py import FE8Randomizer
+from .fe8py import FE8Randomizer, CharacterStore
 
 if TYPE_CHECKING:
     from . import FE8World
@@ -77,6 +77,24 @@ class FE8PatchExtension(APPatchExtension):
         randomizer.randomize_music(config["music_rando"])
         return bytes(mut_rom)
 
+class FE8MicroPatch():
+    '''
+    Function that goes through the first half of the randomizer for the world generator
+    works off a mirco rom that has all ally unit's in it
+    '''
+    
+    @staticmethod
+    def world_builder_changes(self, seed: int, player: int, options) ->CharacterStore:
+        config = self.config_translation(options)
+        random = Random(seed + player)
+        mut_rom = bytearray(MICRO_ROM)
+        randomizer = FE8Randomizer(rom=mut_rom, random=random, config=config, micro=True)
+            
+        randomizer.allies_logic_changes()
+
+        randomizer.randomize_allies()
+
+        return randomizer.character_store
 
 class FE8ProcedurePatch(APProcedurePatch, APTokenMixin):
     game = FE8_NAME
@@ -117,29 +135,35 @@ def rom_location(loc: FE8Location):
     return LOCATION_INFO_OFFS + loc.local_address * LOCATION_INFO_SIZE
 
 
+def config_translation(options, seed: int, player:int) -> dict[str, Any]:
+    '''
+    Translates from world generator options system to the patch file options system
+    '''
+    config_dict = {
+            "player_rando": bool(options.player_unit_rando),
+            "player_monster": bool(options.player_unit_monsters),
+            "enable_weapon_level_caps": bool(options.enable_weapon_level_caps),
+            "easier_5x": bool(options.easier_5x),
+            "unbreakable_regalia": bool(options.unbreakable_regalia),
+            "shuffle_skirmish_tables": bool(options.shuffle_skirmish_tables),
+            "normalize_genders": bool(options.normalize_genders),
+            "growth_rando": (
+                int(options.growth_rando),
+                int(options.growth_rando_min),
+                int(options.growth_rando_max),
+            ),
+            "music_rando": int(options.music_rando),
+            "seed": seed,
+            "player": player,
+        }
+    return config_dict
+
 def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
     player = world.player
     multiworld = world.multiworld
     options: FE8Options = world.options
-    config_dict = {
-        "player_rando": bool(options.player_unit_rando),
-        "player_monster": bool(options.player_unit_monsters),
-        "enable_weapon_level_caps": bool(options.enable_weapon_level_caps),
-        "easier_5x": bool(options.easier_5x),
-        "unbreakable_regalia": bool(options.unbreakable_regalia),
-        "shuffle_skirmish_tables": bool(options.shuffle_skirmish_tables),
-        "normalize_genders": bool(options.normalize_genders),
-        "growth_rando": (
-            int(options.growth_rando),
-            int(options.growth_rando_min),
-            int(options.growth_rando_max),
-        ),
-        "music_rando": int(options.music_rando),
-        "seed": multiworld.seed,
-        "player": player,
-    }
+    config_dict = config_translation (options, multiworld.seed, player)
     patch.write_file("config.json", json.dumps(config_dict).encode("UTF-8"))
-
     # Player name
     player_name = multiworld.player_name[player]
     name_bytes = player_name.encode("utf-8")

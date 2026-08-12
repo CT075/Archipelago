@@ -90,6 +90,7 @@ CHARACTERS = "data/characters.json"
 CHARACTER_WRANKS = "data/character_wranks.json"
 CHAPTER_UNIT_BLOCKS = "data/chapter_unit_blocks.json"
 ALLY_UNIT_BLOCKS = "data/ally_unit_blocks.json"
+MICRO_UNIT_BLOCKS = "data/micro_unit_blocks.json"
 INTERNAL_RANDO_VALID_DISTRIBS = "data/internal_rando_distribs.json"
 
 
@@ -434,8 +435,9 @@ class FE8Randomizer:
     random: Random
     rom: bytearray
     config: dict[str, Any]
+    micro: bool
 
-    def __init__(self, rom: bytearray, random: Random, config: dict[str, Any]):
+    def __init__(self, rom: bytearray, random: Random, config: dict[str, Any], micro:bool = False):
         self.random = random
         self.rom = rom
         valid_distribs_by_row = fetch_json(INTERNAL_RANDO_VALID_DISTRIBS)
@@ -450,6 +452,11 @@ class FE8Randomizer:
         unit_blocks = fetch_json(CHAPTER_UNIT_BLOCKS)
         ally_blocks = fetch_json(ALLY_UNIT_BLOCKS)
         self.config = config
+
+        if (self.micro):
+            ally_blocks = fetch_json(MICRO_UNIT_BLOCKS)  
+        else:
+            ally_blocks = fetch_json(ALLY_UNIT_BLOCKS)
 
         self.character_wranks: dict[int, list[int]] = {
             int(k): v for k, v in fetch_json(CHARACTER_WRANKS).items()
