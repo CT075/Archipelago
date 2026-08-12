@@ -16,6 +16,7 @@ from .connector_config import (
     locations as locations_raw,
     EXPECTED_ROM_NAME,
     FLAGS_ADDR,
+    FLAGS_SIZE,
     ARCHIPELAGO_RECEIVED_ITEM_ADDR,
     ARCHIPELAGO_NUM_RECEIVED_ITEMS_ADDR,
     ARCHIPELAGO_DEATHLINK_IN,
@@ -54,6 +55,15 @@ TOWER_CLEAR_FLAG = locations["Complete Tower of Valni 8"]
 RUINS_CLEAR_FLAG = locations["Complete Lagdou Ruins 10"]
 
 T = TypeVar("T")
+
+
+def decode_flag_ids(flag_bytes: bytes) -> Set[int]:
+    return {
+        byte_i * 8 + i
+        for byte_i, byte in enumerate(flag_bytes)
+        for i in range(8)
+        if byte & (1 << i) != 0
+    }
 
 
 DEATH_LINK_MSGS = [
@@ -267,7 +277,7 @@ class FE8Client(BizHawkClient):
             flag_bytes, deathlink_out_bytes = await bizhawk.read(
                 ctx.bizhawk_ctx,
                 [
-                    (FLAGS_ADDR, 8, "System Bus"),
+                    (FLAGS_ADDR, FLAGS_SIZE, "System Bus"),
                     (ARCHIPELAGO_DEATHLINK_OUT, 1, "System Bus"),
                 ],
             )
@@ -300,17 +310,14 @@ class FE8Client(BizHawkClient):
                     ],
                 )
 
-            for byte_i, byte in enumerate(flag_bytes):
-                for i in range(8):
-                    if byte & (1 << i) != 0:
-                        flag_id = byte_i * 8 + i
-                        location_id = flag_id + FE8_ID_PREFIX
+            for flag_id in decode_flag_ids(flag_bytes):
+                location_id = flag_id + FE8_ID_PREFIX
 
-                        if location_id in ctx.server_locations:
-                            local_checked_locations.add(location_id)
+                if location_id in ctx.server_locations:
+                    local_checked_locations.add(location_id)
 
-                        if flag_id == self.goal_flag:
-                            game_clear = True
+                if flag_id == self.goal_flag:
+                    game_clear = True
 
             if local_checked_locations != self.local_checked_locations:
                 self.local_checked_locations = local_checked_locations

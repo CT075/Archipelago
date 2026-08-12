@@ -26,6 +26,7 @@ from .connector_config import (
     PROMOTION_UNLOCKS_OFFS,
     LEVEL_CAPS_OFFS,
     WEAPON_LEVEL_CAPS_OFFS,
+    RECRUIT_CHECKS_OFFS,
     LOCATION_INFO_OFFS,
     LOCATION_INFO_SIZE,
 )
@@ -159,5 +160,6 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
     patch.write_byte(
         WEAPON_LEVEL_CAPS_OFFS, int(bool(options.enable_weapon_level_caps))
     )
+    patch.write_byte(RECRUIT_CHECKS_OFFS, int(bool(options.recruit_checks_enabled)))
 
     patch.write_file("token_data.bin", patch.get_token_binary())
