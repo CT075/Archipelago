@@ -36,7 +36,7 @@ from .locations import FE8Location
 from .items import FE8Item
 from .connector_config import locations, items
 
-from .rom import FE8ProcedurePatch, write_tokens
+from .rom import FE8MicroPatch, FE8ProcedurePatch, write_tokens
 
 # We need to import FE8Client to register it properly, so we use it to disable
 # the unused import warning
@@ -206,6 +206,15 @@ class FE8World(World):
                             else ItemClassification.useful
                         ),
                     )
+
+        # un comment this out to use contexutal settings
+        # returns "character_store" from FE*py.py so you can see what classes all units are in
+        # 
+
+        #if(class_context):
+        #    micro = FE8MicroPatch
+        #    units=micro.world_builder_changes(micro, self.multiworld.seed, self.player, self.options)
+        
 
         # Shuffle the level caps and weapon levels together. As the
         # lowest-priority filler, these are dropped first when there are not
