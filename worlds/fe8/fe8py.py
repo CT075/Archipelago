@@ -487,26 +487,26 @@ class FE8Randomizer:
         for job in job_data:
             if "no_rando" not in job.tags and job.usable_weapons:
                 if "monster" in job.tags:
-                    Race = JobRace.MONSTER
+                    race = JobRace.MONSTER
                 else:
-                    Race = JobRace.HUMAN
+                    race = JobRace.HUMAN
                 if "flying" in job.tags:
-                    self.jobs_pools[job.is_promoted][Race][JobType.FLIER].append(job)
+                    self.jobs_pools[job.is_promoted][race][JobType.FLIER].append(job)
                     self.jobs_pools[job.is_promoted][JobRace.ALL][JobType.FLIER].append(
                         job
                     )
                 elif "Lockpick" in job.tags:
-                    self.jobs_pools[job.is_promoted][Race][JobType.LOCKPICK].append(job)
+                    self.jobs_pools[job.is_promoted][race][JobType.LOCKPICK].append(job)
                     self.jobs_pools[job.is_promoted][JobRace.ALL][
                         JobType.LOCKPICK
                     ].append(job)
                 if "ranged" in job.tags:
-                    self.jobs_pools[job.is_promoted][Race][JobType.RANGED].append(job)
+                    self.jobs_pools[job.is_promoted][race][JobType.RANGED].append(job)
                     self.jobs_pools[job.is_promoted][JobRace.ALL][
                         JobType.RANGED
                     ].append(job)
                 self.jobs_pools[job.is_promoted][JobRace.ALL][JobType.ANY].append(job)
-                self.jobs_pools[job.is_promoted][Race][JobType.ANY].append(job)
+                self.jobs_pools[job.is_promoted][race][JobType.ANY].append(job)
 
         self.weapons_by_kind_rank = defaultdict(list)
         for kind in WeaponKind:
@@ -1204,13 +1204,13 @@ class FE8Randomizer:
         '''
         # Checks to see if monsters are in logic or if it should just use humans
         if not self.config["player_monster"]:
-            Race = JobRace.HUMAN
+            race = JobRace.HUMAN
         else:
-            Race = JobRace.ALL
+            race = JobRace.ALL
         for chapter_name, chapter in self.ally_blocks.items():
             for block in chapter:
                 try:
-                    self.randomize_block(block, Race)
+                    self.randomize_block(block, race)
                 except (ValueError, IndexError) as e:
                     logging.error("crash dump:")
                     logging.error(f"  block_data: {chapter_name}, {block.name}")
