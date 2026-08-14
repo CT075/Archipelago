@@ -12,6 +12,7 @@ import logging
 from typing import Any, Union, Optional, Callable, Iterable, Tuple
 
 from .util import fetch_json, write_short_le, read_short_le, read_word_le, write_word_le
+from .logic import Logic, Nudges, JsonValue
 
 # XXX: most python lsps can't handle `from .constants import *`, so we have to
 # specify these manually...
@@ -113,10 +114,15 @@ class UnitBlock:
     # Currently, the names of blocks in `chapter_unit_blocks.json` are mostly
     # automatically generated from chapter event disassembly and are tagged
     # with any relevant information about the block.
-    logic: defaultdict[Union[int, str], dict[str, Any]]
+    #
+    # Values here are raw, not-yet-parsed JSON: string keys map to a default
+    # to apply to (some of) the block's units, int keys map to a per-unit
+    # override dict. `randomize_block` merges the two into a `Logic` object
+    # per unit.
+    logic: defaultdict[Union[int, str], JsonValue]
 
     def __init__(
-        self, name: str, base: int, count: int, logic: dict[str, dict[str, Any]]
+        self, name: str, base: int, count: int, logic: dict[str, JsonValue]
     ):
         self.name = name
         self.base = base
@@ -403,7 +409,7 @@ class CharacterStore:
 
 # CR cam: Eirika and Ephraim should be able to use their respective weapons if
 # they get randomized into the right class.
-def weapon_usable(weapon: WeaponData, job: JobData, logic: dict[str, Any]) -> bool:
+def weapon_usable(weapon: WeaponData, job: JobData, logic: Logic) -> bool:
     if any(lock not in job.tags for lock in weapon.locks):
         return False
 
@@ -559,20 +565,16 @@ class FE8Randomizer:
         for song in songdata:
             self.songs[song["category"]][int(song["id"], 16)] = song["name"]
 
-    def job_valid(self, job: JobData, char: int, logic: dict[str, Any]) -> bool:
+    def job_valid(self, job: JobData, char: int, logic: Logic) -> bool:
         # get list of tags that make the job invalid (notags)
         # the "no_" prefix adds the tag to the invalid tag list
         # "no_flying" makes any job with "flying" tag invalid
-        notags = set()
-
-        for x in logic:
-            if x.startswith("no_") and logic[x]:
-                notags.add(x.removeprefix("no_"))
+        notags = logic.no_tags()
         # job is invalid if it has any of the tags in notags
         if notags and notags & job.tags:
             return False
 
-        if "must_fight" in logic and logic["must_fight"]:
+        if logic.must_fight:
             if "cannot_fight" in job.tags:
                 return False
             if all(not wtype.damaging() for wtype in job.usable_weapons):
@@ -590,7 +592,7 @@ class FE8Randomizer:
         row = self.character_wranks.get(char)
         return max(max(row) if row else 0, int(WeaponRank.E))
 
-    def select_new_item(self, job: JobData, item_id: int, logic: dict[str, Any]) -> int:
+    def select_new_item(self, job: JobData, item_id: int, logic: Logic) -> int:
         if item_id == LOCKPICK:
             if "Lockpick" in job.tags:
                 return LOCKPICK
@@ -617,19 +619,17 @@ class FE8Randomizer:
         choices = [weap for weap in useable if weapon_usable(weap, job, logic)]
 
         if not choices:
-            import json
-
             logging.warning("LOGIC ERROR: no viable weapons, defaulting to E rank")
             logging.warning(f"  job: {job.name}")
             logging.warning(f"  rank: {weapon_attrs.rank}")
-            logging.warning(f"  logic: {json.dumps(logic, indent=2)}")
+            logging.warning(f"  logic: {logic}")
 
             # gets the first type of equipable weapon
             first_type = next(iter(job.usable_weapons))
             choices = [
                 weap
                 for weap in self.weapons_by_kind_rank[WeaponRank.E][first_type]
-                if weapon_usable(weap, job, dict())
+                if weapon_usable(weap, job, Logic())
             ]
 
             if not choices:
@@ -641,7 +641,7 @@ class FE8Randomizer:
         return self.random.choice(choices).id
 
     def select_new_inventory(
-        self, job: JobData, items: bytes, logic: dict[str, Any]
+        self, job: JobData, items: bytes, logic: Logic
     ) -> list[int]:
         return [self.select_new_item(job, item_id, logic) for item_id in items]
 
@@ -653,7 +653,7 @@ class FE8Randomizer:
         candidates = [
             weap
             for weap in self.weapons_by_id.values()
-            if weap.kind in job.usable_weapons and weapon_usable(weap, job, {})
+            if weap.kind in job.usable_weapons and weapon_usable(weap, job, Logic())
         ]
         if not candidates:
             return self.weapons_by_name["Iron Sword"].id
@@ -676,9 +676,9 @@ class FE8Randomizer:
         new_coords = encode_unit_coords(x, y)
         write_short_le(self.rom, offset, new_coords | flags)
 
-    def apply_nudges(self, data_offset: int, nudges: dict[str, list[int]]) -> None:
-        if "start" in nudges:
-            x, y = nudges["start"]
+    def apply_nudges(self, data_offset: int, nudges: Nudges) -> None:
+        if nudges.start is not None:
+            x, y = nudges.start
             start_offs = data_offset + COORDS_INDEX
             self.rewrite_coords(start_offs, x, y)
 
@@ -687,8 +687,8 @@ class FE8Randomizer:
         redas_offs = redas_addr - ROM_BASE_ADDRESS
 
         for i in range(reda_count):
-            if str(i) in nudges:
-                x, y = nudges[str(i)]
+            if i in nudges.by_index:
+                x, y = nudges.by_index[i]
                 reda_offs = redas_offs + 8 * i
                 self.rewrite_coords(reda_offs, x, y)
 
@@ -705,7 +705,7 @@ class FE8Randomizer:
             return job
         return self.random.choice(choices)
 
-    def randomize_chapter_unit(self, data_offset: int, logic: dict[str, Any]) -> None:
+    def randomize_chapter_unit(self, data_offset: int, logic: Logic) -> None:
         # We *could* read the full struct, but we only need a few individual
         # bytes, so we may as well extract them ad-hoc.
         unit = self.rom[data_offset : data_offset + CHAPTER_UNIT_SIZE]
@@ -728,13 +728,12 @@ class FE8Randomizer:
         if not ctags:
             ctags = set()
         for t in ctags:
-            if t not in logic:
-                logic[t] = True
+            logic.set_default(t)
 
-        no_store = "no_store" in logic and logic["no_store"]
+        no_store = logic.no_store
 
         # config option for disabling player unit randomization
-        if not self.config["player_rando"] and "player" in logic and logic["player"]:
+        if not self.config["player_rando"] and logic.player:
             if char not in self.character_store and not no_store:
                 self.character_store[char] = job
             return
@@ -757,11 +756,7 @@ class FE8Randomizer:
                 new_inventory = self.select_new_inventory(new_job, inventory, logic)
         else:
             # Checks to see if monsters are in logic or if it should just use humans
-            if (
-                "player" in logic
-                and logic["player"]
-                and not self.config["player_monster"]
-            ):
+            if logic.player and not self.config["player_monster"]:
                 Race = JobRace.HUMAN
             else:
                 Race = JobRace.ALL
@@ -769,7 +764,7 @@ class FE8Randomizer:
             # Add other checks here for other pools added in later as a else if
             # could make pool intersections if you want to do like ranged fliers
             # but should never need to
-            if "must_fly" in logic and logic["must_fly"]:
+            if logic.must_fly:
                 Rules = JobType.FLIER
             else:
                 Rules = JobType.ANY
@@ -843,10 +838,10 @@ class FE8Randomizer:
                     self.rom[wrank_base + kind] = rank
 
         if (
-            "ai1_mod" in logic
-            and self.rom[data_offset + AI1_INDEX] == logic["ai1_mod"]["from"]
+            logic.ai1_mod is not None
+            and self.rom[data_offset + AI1_INDEX] == logic.ai1_mod.from_id
         ):
-            self.rom[data_offset + AI1_INDEX] = logic["ai1_mod"]["to"]
+            self.rom[data_offset + AI1_INDEX] = logic.ai1_mod.to_id
 
         # If an NPC isn't autoleveled, it's probably a boss or important NPC of
         # some kind, so we should force its weapon levels in the character
@@ -874,19 +869,24 @@ class FE8Randomizer:
                 affected = list(range(block.count))
 
             for i in affected:
-                block.logic[i][k] = v
+                # An explicit per-unit override (from an int-keyed entry in
+                # the source JSON) takes precedence over a block-wide
+                # default for the same key.
+                block.logic[i].setdefault(k, v)
 
         for i in range(block.count):
             offset = block.base + i * CHAPTER_UNIT_SIZE
-            logic = block.logic[i]
+            raw_logic = block.logic[i]
+            assert isinstance(raw_logic, dict)
+            logic = Logic.of_object(raw_logic)
 
-            if "nudges" in logic:
-                self.apply_nudges(offset, logic["nudges"])
-            if "ignore" in logic and logic["ignore"]:
+            if logic.nudges is not None:
+                self.apply_nudges(offset, logic.nudges)
+            if logic.ignore:
                 continue
             # If this unit is tagged as a monster, its class gets selected by
             # the in-game randomizer, meaning we don't have to touch it.
-            if "monster" in logic and logic["monster"]:
+            if logic.monster:
                 continue
             self.randomize_chapter_unit(offset, logic)
 
@@ -1171,11 +1171,11 @@ class FE8Randomizer:
         # Eirika and Ephraim get automatic steels on rejoining in Ch15, which
         # need to be adjusted.
         ch15_auto_steel_sword = self.select_new_item(
-            eirika_job, self.weapons_by_name["Steel Sword"].id, {}
+            eirika_job, self.weapons_by_name["Steel Sword"].id, Logic()
         )
         ephraim_job = self.character_store["Ephraim"]
         ch15_auto_steel_lance = self.select_new_item(
-            ephraim_job, self.weapons_by_name["Steel Lance"].id, {}
+            ephraim_job, self.weapons_by_name["Steel Lance"].id, Logic()
         )
 
         self.rom[CH15_AUTO_STEEL_SWORD] = ch15_auto_steel_sword
