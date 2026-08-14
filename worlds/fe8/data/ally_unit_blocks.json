@@ -5,7 +5,7 @@
         "name": "Seth",
         "base": 9124884,
         "count": 1,
-        "logic": {"0": {"must_fight": true}}
+        "logic": {"must_fight": true}
     },
     {"name": "Franz", "base": 9126268, "count": 1,"logic": {}},
     {"name": "Gilliam", "base": 9126288, "count": 1,"logic": {}},
@@ -20,13 +20,13 @@
         "name": "Ross",
         "base": 9126964,
         "count": 1,
-        "logic": {"0": {"must_fly": true}}
+        "logic": {}
     },
     {
         "name": "Garcia",
         "base": 9126984,
         "count": 1,
-        "logic": {"0": {"must_fight": true}}
+        "logic": {"must_fight": true}
     },
     {"name": "Neimi", "base": 9127404, "count": 1, "logic": {}},
     {"name": "Colm", "base": 9127704, "count": 1, "logic": {}},

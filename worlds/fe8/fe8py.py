@@ -705,7 +705,7 @@ class FE8Randomizer:
             return job
         return self.random.choice(choices)
 
-    def randomize_chapter_unit(self, data_offset: int, logic: dict[str, Any], Race: JobRace) -> None:
+    def randomize_chapter_unit(self, data_offset: int, logic: dict[str, Any], race: JobRace) -> None:
         # We *could* read the full struct, but we only need a few individual
         # bytes, so we may as well extract them ad-hoc.
         unit = self.rom[data_offset : data_offset + CHAPTER_UNIT_SIZE]
@@ -771,7 +771,7 @@ class FE8Randomizer:
 
             new_job = self.select_new_job(
                 job,
-                job_pool=self.jobs_pools[job.is_promoted][Race][Rules],
+                job_pool=self.jobs_pools[job.is_promoted][race][Rules],
                 job_valid=lambda job: self.job_valid(job, char, logic),
             )
             new_inventory = self.select_new_inventory(new_job, inventory, logic)
@@ -848,7 +848,7 @@ class FE8Randomizer:
                 rank = self.rom[boss_wrank_offs]
                 self.rom[boss_wrank_offs] = max(rank, weapon.rank)
 
-    def randomize_block(self, block: UnitBlock, Race: JobRace):
+    def randomize_block(self, block: UnitBlock, race: JobRace):
 
         for i in range(block.count):
             offset = block.base + i * CHAPTER_UNIT_SIZE
@@ -862,7 +862,7 @@ class FE8Randomizer:
             # the in-game randomizer, meaning we don't have to touch it.
             if "monster" in logic and logic["monster"]:
                 continue
-            self.randomize_chapter_unit(offset, logic, Race)
+            self.randomize_chapter_unit(offset, logic, race)
 
     def allies_logic_changes(self) -> None:
         '''
@@ -873,14 +873,14 @@ class FE8Randomizer:
         ephraim_group = [14, 15, 16, 33]
         for x in range(3):
             chosen = self.random.choice(ephraim_group)
-            self.ally_blocks["Units"][chosen].logic[0]["must_fight"] = True
+            self.ally_blocks["Allys"][chosen].logic["must_fight"] = True
             ephraim_group.remove(chosen)
 
         # l'arachel's group gets the same thing but its mainly so Dozla can protect her
         larachel_group = [23, 24, 28]
         for x in range(2):
             chosen = self.random.choice(larachel_group)
-            self.ally_blocks["Units"][chosen].logic[0]["must_fight"] = True
+            self.ally_blocks["Allys"][chosen].logic["must_fight"] = True
             larachel_group.remove(chosen)
 
 
@@ -1186,11 +1186,11 @@ class FE8Randomizer:
 
     def randomize_units(self) -> None:
 
-        Race = JobRace.ALL
+        race = JobRace.ALL
         for chapter_name, chapter in self.unit_blocks.items():
             for block in chapter:
                 try:
-                    self.randomize_block(block, Race)
+                    self.randomize_block(block, race)
                 except (ValueError, IndexError) as e:
                     logging.error("crash dump:")
                     logging.error(f"  block_data: {chapter_name}, {block.name}")
@@ -1209,8 +1209,8 @@ class FE8Randomizer:
             race = JobRace.ALL
         for chapter_name, chapter in self.ally_blocks.items():
             for block in chapter:
-                try:
-                    self.randomize_block(block, race)
+                try:     
+                    self.randomize_chapter_unit(block.base, block.logic, race)
                 except (ValueError, IndexError) as e:
                     logging.error("crash dump:")
                     logging.error(f"  block_data: {chapter_name}, {block.name}")
