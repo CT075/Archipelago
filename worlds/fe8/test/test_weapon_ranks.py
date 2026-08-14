@@ -72,7 +72,9 @@ def make_randomizer(
         "player_rando": player_rando,
         "enable_weapon_level_caps": enable_weapon_level_caps,
     }
-    return FE8Randomizer(rom=rom, random=Random(BASE_CONFIG["seed"]), config=config)
+    seed = BASE_CONFIG["seed"]
+    assert isinstance(seed, int)
+    return FE8Randomizer(rom=rom, random=Random(seed), config=config)
 
 
 def wranks(randomizer: FE8Randomizer, char: int) -> bytes:

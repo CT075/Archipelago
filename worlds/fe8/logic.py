@@ -15,10 +15,12 @@ class Nudges:
 
     @classmethod
     def of_object(cls, obj: dict[str, JsonValue]) -> "Nudges":
-        start = None
+        start: Optional[tuple[int, int]] = None
         by_index: dict[int, tuple[int, int]] = {}
         for k, v in obj.items():
+            assert isinstance(v, list) and len(v) == 2
             x, y = v
+            assert isinstance(x, int) and isinstance(y, int)
             if k == "start":
                 start = (x, y)
             else:
@@ -33,7 +35,9 @@ class AI1Mod:
 
     @classmethod
     def of_object(cls, obj: dict[str, JsonValue]) -> "AI1Mod":
-        return cls(from_id=obj["from"], to_id=obj["to"])
+        from_id, to_id = obj["from"], obj["to"]
+        assert isinstance(from_id, int) and isinstance(to_id, int)
+        return cls(from_id=from_id, to_id=to_id)
 
 
 @dataclass
@@ -57,14 +61,16 @@ class Logic:
     def of_object(cls, obj: dict[str, JsonValue]) -> "Logic":
         logic = cls()
         for k, v in obj.items():
-            logic.set(k, v)
+            logic.assign(k, v)
         return logic
 
-    def set(self, key: str, value: JsonValue) -> None:
+    def assign(self, key: str, value: JsonValue) -> None:
         self._explicit.add(key)
         if key == "nudges":
+            assert isinstance(value, dict)
             self.nudges = Nudges.of_object(value)
         elif key == "ai1_mod":
+            assert isinstance(value, dict)
             self.ai1_mod = AI1Mod.of_object(value)
         elif key == "comment":
             return
@@ -77,7 +83,7 @@ class Logic:
         """Set `key` to a truthy default, unless it's already been explicitly
         assigned (e.g. by a per-unit override in the source JSON)."""
         if key not in self:
-            self.set(key, True)
+            self.assign(key, True)
 
     def __contains__(self, key: str) -> bool:
         return key in self._explicit or key in self.tags

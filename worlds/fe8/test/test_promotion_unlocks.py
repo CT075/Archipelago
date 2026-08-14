@@ -26,7 +26,7 @@ class TestPromotionUnlocksEnabled(FE8TestBase):
         # With default options there are more useful items than locations, so
         # not every promotion item is guaranteed a slot; but the ones placed
         # must be useful and unique.
-        seen = set()
+        seen: set[str] = set()
         for item in self.multiworld.itempool:
             if item.name in PROMOTION_ITEMS:
                 self.assertEqual(item.classification, ItemClassification.useful)

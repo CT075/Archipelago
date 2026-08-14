@@ -357,7 +357,7 @@ class CharacterStore:
         return self.names_by_id[char_id]
 
     # these two could likely do the saftey checks faster / better but its still a improvement
-    def set_inventory(self, char_id: int, invin: bytes) -> list[int]:
+    def set_inventory(self, char_id: int, invin: list[int]) -> Optional[list[int]]:
         if char_id not in self.names_by_id:
             return None
         name = self.names_by_id[char_id]
@@ -479,9 +479,9 @@ class FE8Randomizer:
         self.weapons_by_name = {item.name: item for item in item_data}
         self.jobs_by_id = {job.id: job for job in job_data}
 
-        self.jobs_pools = defaultdict(list)
+        self.jobs_pools = {}
         for promo in [IS_PROMOTED, NOT_PROMOTED]:
-            self.jobs_pools[promo] = defaultdict(list)
+            self.jobs_pools[promo] = {}
             for race in JobRace:
                 self.jobs_pools[promo][race] = defaultdict(list)
 
@@ -514,7 +514,7 @@ class FE8Randomizer:
                 self.jobs_pools[job.is_promoted][JobRace.ALL][JobType.ANY].append(job)
                 self.jobs_pools[job.is_promoted][Race][JobType.ANY].append(job)
 
-        self.weapons_by_kind_rank = defaultdict(list)
+        self.weapons_by_kind_rank = {}
         for kind in WeaponKind:
             self.weapons_by_kind_rank[kind] = defaultdict(list)
 
@@ -628,7 +628,7 @@ class FE8Randomizer:
             first_type = next(iter(job.usable_weapons))
             choices = [
                 weap
-                for weap in self.weapons_by_kind_rank[WeaponRank.E][first_type]
+                for weap in self.weapons_by_kind_rank[first_type][WeaponRank.E]
                 if weapon_usable(weap, job, Logic())
             ]
 
@@ -641,7 +641,7 @@ class FE8Randomizer:
         return self.random.choice(choices).id
 
     def select_new_inventory(
-        self, job: JobData, items: bytes, logic: Logic
+        self, job: JobData, items: Union[bytes, bytearray], logic: Logic
     ) -> list[int]:
         return [self.select_new_item(job, item_id, logic) for item_id in items]
 
@@ -864,7 +864,9 @@ class FE8Randomizer:
             assert isinstance(k, str)
 
             if isinstance(v, dict) and "at_least" in v:
-                affected = self.random.sample(range(block.count), v["at_least"])
+                at_least = v["at_least"]
+                assert isinstance(at_least, int)
+                affected = self.random.sample(range(block.count), at_least)
             else:
                 affected = list(range(block.count))
 
@@ -872,7 +874,9 @@ class FE8Randomizer:
                 # An explicit per-unit override (from an int-keyed entry in
                 # the source JSON) takes precedence over a block-wide
                 # default for the same key.
-                block.logic[i].setdefault(k, v)
+                per_unit = block.logic[i]
+                assert isinstance(per_unit, dict)
+                per_unit.setdefault(k, v)
 
         for i in range(block.count):
             offset = block.base + i * CHAPTER_UNIT_SIZE

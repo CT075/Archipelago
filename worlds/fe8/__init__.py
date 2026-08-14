@@ -13,6 +13,7 @@ from Options import OptionError
 from worlds.AutoWorld import World, WebWorld
 from BaseClasses import (
     Region,
+    Item,
     ItemClassification,
     CollectionState,
     Tutorial,
@@ -617,20 +618,30 @@ class FE8World(World):
         if not self.options.recruit_checks_enabled:
             return
         smooth_deployments = bool(self.options.smooth_deployments)
+        player = self.player
+
+        def not_deploy_item(n: str) -> Callable[[Item], bool]:
+            def wrapped(item: Item) -> bool:
+                return not (item.player == player and item.name == n)
+
+            return wrapped
+
+        def has_deploy_permit(n: str) -> Callable[[CollectionState], bool]:
+            def wrapped(state: CollectionState) -> bool:
+                return state.has(n, player)
+
+            return wrapped
+
         for unit in ("Knoll", "Myrrh"):
             loc = self.multiworld.get_location(f"{unit} Recruited", self.player)
             deploy_name = f"Deploy {unit}"
-            loc.item_rule = lambda item, n=deploy_name: not (
-                item.player == self.player and item.name == n
-            )
+            loc.item_rule = not_deploy_item(deploy_name)
             if smooth_deployments:
                 # These units must be deployed to be recruited. Without smooth
                 # deployments the permits aren't progression, so fill logic
                 # couldn't satisfy this rule; the item_rule above is the best
                 # we can do there.
-                loc.access_rule = lambda state, n=deploy_name: state.has(
-                    n, self.player
-                )
+                loc.access_rule = has_deploy_permit(deploy_name)
 
     def fill_slot_data(self) -> dict[str, Any]:
         slot_data = self.options.as_dict("goal")
