@@ -2,6 +2,12 @@ from dataclasses import dataclass
 
 from Options import Choice, Range, Toggle, PerGameCommonOptions
 
+from .constants import (
+    ALL_RECRUITS,
+    EARLY_UNITS,
+    MID_UNITS,
+)
+
 
 def round_up_to(x, mod):
     return ((x + mod - 1) // mod) * mod
@@ -145,9 +151,12 @@ class UnbreakableRegalia(Toggle):
 
 class EnableRecruitChecks(Toggle):
     """
-    Make each character recruitment a check. Adds 31 locations (one per
+    Make each character recruitment a check. Adds up to 31 locations (one per
     recruitable unit) and adds deploy permit items to the item pool, so
     units must be unlocked before they can be deployed on the prep screen.
+
+    Goals that end before the last chapter leave out the units they can't
+    reach; those units are freely deployable instead.
     """
 
     display_name = "Enable recruit checks"
@@ -189,8 +198,8 @@ class SmoothDeployments(Toggle):
 
     Deploy permits become progression items and can be placed anywhere in the
     multiworld. Logic expects 8 deploy permits for early units (recruited by
-    Chapter 7) before advancing past Chapter 8, and 11 deploy permits for
-    early/mid units before advancing past Chapter 15.
+    Chapter 8) before advancing past Chapter 8, and 11 deploy permits for
+    early/mid units before advancing past Chapter 16.
     """
 
     display_name = "Smooth deployments"
@@ -316,16 +325,21 @@ class GrowthRandoMax(Range):
 # CR-someday cam: think about how this interacts with creature campaign mode
 class Goal(Choice):
     """
-    Set the goal of the game.
+    Set the goal of the game, listed here shortest first.
 
-    - Defeat Fomortiis: Defeat the usual final boss, which can take a long time.
-    - Clear Valni: Clear the 8th floor of the Tower of Valni. Implies Enable Tower.
-      Recommended for short- to medium-length games.
     - Defeat Tirado: Clear Chapter 8. Recommended for short games.
+    - Defeat Orson: Clear Chapter 16, the first chapter after the routes merge.
+      Recommended for short- to medium-length games.
+    - Clear Valni: Clear the 8th floor of the Tower of Valni. Implies Enable Tower.
+      Recommended for medium-length games.
+    - Defeat Fomortiis: Defeat the usual final boss, which can take a long time.
     - Clear Lagdou: Clear the 10th floor of the Lagdou Ruins. Implies Enable Ruins.
+      The Ruins only exist in the Creature Campaign, so this goal requires
+      defeating Formortiis first, making it the longest goal of all.
 
-    Note that this option only change which check is considered the goal and
-    does not affect progression logic at all.
+    This option does not otherwise affect progression logic, but goals that end
+    early leave out the recruit checks and deploy permits for units you would
+    never meet.
     """
 
     display_name = "Goal"
@@ -333,6 +347,29 @@ class Goal(Choice):
     option_ClearValni = 1
     option_DefeatTirado = 2
     option_ClearLagdou = 3
+    option_DefeatOrson = 4
+
+
+# The check that counts as victory for each goal. Used by both the generator
+# (completion_condition) and the client (goal flag).
+GOAL_LOCATIONS: dict[int, str] = {
+    Goal.option_DefeatTirado: "Complete Chapter 8",
+    Goal.option_DefeatOrson: "Complete Chapter 16",
+    Goal.option_ClearValni: "Complete Tower of Valni 8",
+    Goal.option_DefeatFormortiis: "Defeat Formortiis",
+    Goal.option_ClearLagdou: "Complete Lagdou Ruins 10",
+}
+
+# Units each goal is able to recruit before it ends the run. Lagdou Ruins only
+# exist in the Creature Campaign, which unlocks once Formortiis is dead, so that
+# goal sits past the end of the story and reaches everyone.
+GOAL_RECRUITS: dict[int, frozenset[str]] = {
+    Goal.option_DefeatTirado: EARLY_UNITS,
+    Goal.option_DefeatOrson: EARLY_UNITS | MID_UNITS,
+    Goal.option_ClearValni: EARLY_UNITS | MID_UNITS,
+    Goal.option_DefeatFormortiis: ALL_RECRUITS,
+    Goal.option_ClearLagdou: ALL_RECRUITS,
+}
 
 
 class MusicRando(Choice):
@@ -390,3 +427,17 @@ class FE8Options(PerGameCommonOptions):
 
     def ruins_checks_enabled(self):
         return bool(self.ruins_enabled) or self.goal == Goal.option_ClearLagdou
+
+    def available_recruits(self) -> frozenset[str]:
+        """Units recruitable before the goal ends the run."""
+        return GOAL_RECRUITS[self.goal.value]
+
+    def excluded_recruits(self) -> frozenset[str]:
+        """Units the goal can never reach, so they get no check and no permit.
+
+        With recruit checks off there are no permits at all and the ROM lets
+        everyone deploy, so nothing needs excluding.
+        """
+        if not self.recruit_checks_enabled:
+            return frozenset()
+        return ALL_RECRUITS - self.available_recruits()

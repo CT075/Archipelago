@@ -232,7 +232,7 @@ INTERNAL_RANDO_WEAPON_TABLE_ROWS = [
     ("MonsterDark", 3),
 ]
 
-DEPLOY_EARLY_UNITS = frozenset(
+EARLY_UNITS = frozenset(
     {
         "Seth",
         "Franz",
@@ -249,7 +249,7 @@ DEPLOY_EARLY_UNITS = frozenset(
         "Joshua",
     }
 )
-DEPLOY_MID_UNITS = frozenset(
+MID_UNITS = frozenset(
     {
         "Forde",
         "Kyle",
@@ -267,6 +267,10 @@ DEPLOY_MID_UNITS = frozenset(
         "Rennac",
         "Duessel",
         "Knoll",
+        "Myrrh",
     }
 )
-# late tier: Myrrh, Syrene
+# Syrene joins in ch17, after every goal but the two that finish the story.
+LATE_UNITS = frozenset({"Syrene"})
+
+ALL_RECRUITS = EARLY_UNITS | MID_UNITS | LATE_UNITS
