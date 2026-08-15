@@ -216,6 +216,20 @@ class EnableRuins(Toggle):
     default = 0
 
 
+class EnableSkirmishes(Toggle):
+    """
+    Make the first skirmish you win at each world map location a check.
+
+    While this is on, skirmishes prefer to spawn at locations you haven't
+    cleared yet, so you won't be left waiting on one specific spot. The Melkaen
+    Coast check is only added if Lagdou Ruins checks are on, since that is the
+    only place a skirmish can spawn there.
+    """
+
+    display_name = "Enable skirmish checks"
+    default = 0
+
+
 class ShuffleSkirmishTables(Toggle):
     """
     Shuffle enemy spawn tables for the Tower, Ruins and skirmishes.
@@ -373,6 +387,7 @@ class FE8Options(PerGameCommonOptions):
     promotion_unlocks: EnablePromotionUnlocks
     tower_enabled: EnableTower
     ruins_enabled: EnableRuins
+    skirmishes_enabled: EnableSkirmishes
     shuffle_skirmish_tables: ShuffleSkirmishTables
     lockpick_usability: LockpickUsability
     normalize_genders: NormalizeGenders
@@ -390,3 +405,11 @@ class FE8Options(PerGameCommonOptions):
 
     def ruins_checks_enabled(self):
         return bool(self.ruins_enabled) or self.goal == Goal.option_ClearLagdou
+
+    def skirmish_checks_enabled(self):
+        return bool(self.skirmishes_enabled)
+
+    # Melkaen Coast skirmishes only spawn in the Creature Campaign, which is
+    # also the only place Lagdou Ruins is reachable.
+    def melkaen_check_enabled(self):
+        return self.skirmish_checks_enabled() and self.ruins_checks_enabled()

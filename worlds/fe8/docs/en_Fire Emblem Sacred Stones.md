@@ -14,8 +14,14 @@ collecting checks.
 
 ## How do I collect checks?
 
-Currently, checks are awarded for clearing story chapters and receiving holy
-weapons in cutscenes.
+Checks are awarded for clearing story chapters and receiving holy weapons in
+cutscenes. Several optional check sets can be turned on in your YAML:
+
+- **Recruit checks**, awarded the first time each character joins your party.
+- **Tower of Valni** and **Lagdou Ruins**, awarded for each floor cleared.
+- **Skirmishes**, awarded the first time you win a skirmish at each world map
+  location. With these on, skirmishes prefer to spawn where you haven't cleared
+  one yet.
 
 ## What other non-randomized changes are there from vanilla FE8?
 
