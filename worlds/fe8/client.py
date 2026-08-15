@@ -11,7 +11,7 @@ import struct
 
 from NetUtils import ClientStatus
 
-from .options import Goal
+from .options import GOAL_LOCATIONS
 from .connector_config import (
     locations as locations_raw,
     EXPECTED_ROM_NAME,
@@ -50,9 +50,6 @@ else:
 locations = dict(locations_raw)
 
 FOMORTIIS_FLAG = locations["Defeat Formortiis"]
-TIRADO_FLAG = locations["Complete Chapter 8"]
-TOWER_CLEAR_FLAG = locations["Complete Tower of Valni 8"]
-RUINS_CLEAR_FLAG = locations["Complete Lagdou Ruins 10"]
 
 T = TypeVar("T")
 
@@ -258,15 +255,7 @@ class FE8Client(BizHawkClient):
 
     async def game_watcher(self, ctx: BizHawkClientContext) -> None:
         if ctx.slot_data is not None:
-            match ctx.slot_data["goal"]:
-                case Goal.option_DefeatFormortiis:
-                    self.goal_flag = FOMORTIIS_FLAG
-                case Goal.option_ClearValni:
-                    self.goal_flag = TOWER_CLEAR_FLAG
-                case Goal.option_DefeatTirado:
-                    self.goal_flag = TIRADO_FLAG
-                case Goal.option_ClearLagdou:
-                    self.goal_flag = RUINS_CLEAR_FLAG
+            self.goal_flag = locations[GOAL_LOCATIONS[ctx.slot_data["goal"]]]
 
         try:
             await self.update_game_state(ctx)

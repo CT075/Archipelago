@@ -29,6 +29,7 @@ from .connector_config import (
     RECRUIT_CHECKS_OFFS,
     LOCATION_INFO_OFFS,
     LOCATION_INFO_SIZE,
+    FREE_UNIT_LOC,
 )
 from .fe8py import FE8Randomizer, Config
 
@@ -150,5 +151,13 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
         WEAPON_LEVEL_CAPS_OFFS, int(bool(options.enable_weapon_level_caps))
     )
     patch.write_byte(RECRUIT_CHECKS_OFFS, int(bool(options.recruit_checks_enabled)))
+
+    # Units the goal can't reach have no permit in the pool, so mark them
+    # deployable without one. `canDeployUnit` in the base patch ORs this flag
+    # with the permit bit, so this is equivalent to starting with the bit set.
+    # These are plain ROM offsets like the option bytes above, not full
+    # addresses, so they need no ROM_BASE_ADDRESS adjustment.
+    for unit in options.excluded_recruits():
+        patch.write_byte(FREE_UNIT_LOC[unit], 1)
 
     patch.write_file("token_data.bin", patch.get_token_binary())

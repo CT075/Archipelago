@@ -21,7 +21,7 @@ from BaseClasses import (
 import settings
 
 from .client import FE8Client
-from .options import FE8Options, Goal
+from .options import FE8Options, GOAL_LOCATIONS
 from .constants import (
     FE8_NAME,
     FE8_ID_PREFIX,
@@ -30,8 +30,8 @@ from .constants import (
     NUM_WEAPON_LEVELS,
     HOLY_WEAPONS,
     FILLER_ITEMS,
-    DEPLOY_EARLY_UNITS,
-    DEPLOY_MID_UNITS,
+    EARLY_UNITS,
+    MID_UNITS,
 )
 from .locations import FE8Location
 from .items import FE8Item
@@ -105,6 +105,7 @@ class FE8World(World):
         tower_checks_enabled = self.options.tower_checks_enabled()
         ruins_checks_enabled = self.options.ruins_checks_enabled()
         recruit_checks_enabled = bool(self.options.recruit_checks_enabled)
+        available_recruits = self.options.available_recruits()
 
         def is_included(loc: Tuple[str, int]):
             name = loc[0]
@@ -112,8 +113,10 @@ class FE8World(World):
                 return False
             if "Lagdou" in name and not ruins_checks_enabled:
                 return False
-            if "Recruited" in name and not recruit_checks_enabled:
-                return False
+            if "Recruited" in name:
+                if not recruit_checks_enabled:
+                    return False
+                return name.replace(" Recruited", "") in available_recruits
             return True
 
         return len([loc for loc in locations if is_included(loc)])
@@ -230,6 +233,10 @@ class FE8World(World):
                 if self.options.smooth_deployments
                 else ItemClassification.useful
             )
+            # Units the goal can't reach have no recruit check, so their permit
+            # would be a dead item; `rom.py` marks them freely deployable in the
+            # ROM instead.
+            available_recruits = self.options.available_recruits()
             for name, _ in items:
                 if name == "Deploy Seth":
                     if not progressive_seth:
@@ -239,7 +246,8 @@ class FE8World(World):
                         for _ in range(4):
                             register(name, deploy_classification)
                 elif "Deploy" in name:
-                    register(name, deploy_classification)
+                    if name.replace("Deploy ", "") in available_recruits:
+                        register(name, deploy_classification)
 
         if self.options.promotion_unlocks:
             for name, _ in items:
@@ -338,6 +346,8 @@ class FE8World(World):
         ) -> Callable[[CollectionState], bool]:
             player = self.player
             progressive_seth = bool(self.options.progressive_seth_deployment)
+            units &= self.options.available_recruits()
+            n = min(n, len(units))
             permits = [f"Deploy {unit}" for unit in units if unit != "Seth"]
 
             def wrapped(state: CollectionState) -> bool:
@@ -412,12 +422,12 @@ class FE8World(World):
             self.add_location_to_region("Complete Chapter 13", None, route_split)
             self.add_location_to_region("Complete Chapter 14", None, route_split)
             self.add_location_to_region("Complete Chapter 15", None, route_split)
+            self.add_location_to_region("Complete Chapter 16", None, route_split)
             self.add_location_to_region("Garm Received", None, route_split)
             self.add_location_to_region("Gleipnir Received", None, route_split)
             self.add_location_to_region("Audhulma Received", None, route_split)
             self.add_location_to_region("Excalibur Received", None, route_split)
 
-            self.add_location_to_region("Complete Chapter 16", None, lategame)
             self.add_location_to_region("Complete Chapter 17", None, lategame)
             self.add_location_to_region("Complete Chapter 18", None, lategame)
             self.add_location_to_region("Complete Chapter 19", None, lategame)
@@ -431,21 +441,27 @@ class FE8World(World):
             self.add_location_to_region("Latona Received", None, lategame)
 
             if self.options.recruit_checks_enabled:
+                available_recruits = self.options.available_recruits()
                 if smooth_deployments:
                     for name, _ in locations:
                         if "Recruited" not in name:
                             continue
                         unit = name.replace(" Recruited", "")
-                        if unit in DEPLOY_EARLY_UNITS:
+                        if unit not in available_recruits:
+                            continue
+                        if unit in EARLY_UNITS:
                             self.add_location_to_region(name, None, prologue)
-                        elif unit in DEPLOY_MID_UNITS:
+                        elif unit in MID_UNITS:
                             self.add_location_to_region(name, None, route_split)
                         else:
                             self.add_location_to_region(name, None, lategame)
                 else:
                     for name, _ in locations:
-                        if "Recruited" in name:
-                            self.add_location_to_region(name, None, prologue)
+                        if "Recruited" not in name:
+                            continue
+                        if name.replace(" Recruited", "") not in available_recruits:
+                            continue
+                        self.add_location_to_region(name, None, prologue)
 
             menu.connect(prologue, "Start Game")
 
@@ -459,11 +475,11 @@ class FE8World(World):
                 routesplit_rules.append(level_cap_at_least(15))
                 post_routesplit_rules.append(level_cap_at_least(25))
             if deploy_gates:
-                # Chapter 8 has 9 deploy slots (1 forced), chapter 15 has 12
+                # Chapter 8 has 9 deploy slots (1 forced), chapter 16 has 12
                 # (1 forced); logic expects a full roster for each.
-                routesplit_rules.append(deployable_at_least(8, DEPLOY_EARLY_UNITS))
+                routesplit_rules.append(deployable_at_least(8, EARLY_UNITS))
                 post_routesplit_rules.append(
-                    deployable_at_least(11, DEPLOY_EARLY_UNITS | DEPLOY_MID_UNITS)
+                    deployable_at_least(11, EARLY_UNITS | MID_UNITS)
                 )
 
             routesplit_rule = combine_rules(routesplit_rules)
@@ -474,7 +490,7 @@ class FE8World(World):
                 {"Routesplit": routesplit_rule} if routesplit_rule else None,
             )
             route_split.add_exits(
-                {"Post-routesplit": "Clear chapter 15"},
+                {"Post-routesplit": "Clear chapter 16"},
                 (
                     {"Post-routesplit": post_routesplit_rule}
                     if post_routesplit_rule
@@ -541,12 +557,16 @@ class FE8World(World):
             campaign = Region("Campaign", self.player, self.multiworld)
 
             recruit_checks_enabled = bool(self.options.recruit_checks_enabled)
+            available_recruits = self.options.available_recruits()
             for name, lid in locations:
                 # TODO (cam): do this better
                 if any(item in name for item in ("Formortiis", "Valni", "Lagdou")):
                     continue
-                if "Recruited" in name and not recruit_checks_enabled:
-                    continue
+                if "Recruited" in name:
+                    if not recruit_checks_enabled:
+                        continue
+                    if name.replace(" Recruited", "") not in available_recruits:
+                        continue
                 self.add_location_to_region(name, lid, campaign)
 
             menu.connect(campaign, "Start Game")
@@ -591,26 +611,11 @@ class FE8World(World):
                 campaign.add_exits({"Lagdou Ruins": "Complete Chapter 19"})
                 ruins.add_exits({"Campaign": "Complete Lagdou Ruins 10"})
 
-        goal_location = {
-            Goal.option_DefeatFormortiis: "Defeat Formortiis",
-            Goal.option_ClearValni: "Complete Tower of Valni 8",
-            Goal.option_DefeatTirado: "Complete Chapter 8",
-            Goal.option_ClearLagdou: "Complete Lagdou Ruins 10",
-        }[self.options.goal.value]
-        self.multiworld.completion_condition[self.player] = (
-            lambda state: state.can_reach_location(goal_location, self.player)
-        )
 
     def set_rules(self) -> None:
-        # The goal option only changes which check counts as victory; it does
-        # not affect progression logic. Mirror the client's goal->flag mapping
-        # (see client.py) so the generator requires reaching that same check.
-        goal_location = {
-            Goal.option_DefeatFormortiis: "Defeat Formortiis",
-            Goal.option_ClearValni: "Complete Tower of Valni 8",
-            Goal.option_DefeatTirado: "Complete Chapter 8",
-            Goal.option_ClearLagdou: "Complete Lagdou Ruins 10",
-        }[self.options.goal.value]
+        # Mirror the client's goal->flag mapping (see client.py) so the
+        # generator requires reaching that same check.
+        goal_location = GOAL_LOCATIONS[self.options.goal.value]
         self.multiworld.completion_condition[self.player] = (
             lambda state: state.can_reach_location(goal_location, self.player)
         )
@@ -632,7 +637,10 @@ class FE8World(World):
 
             return wrapped
 
+        available_recruits = self.options.available_recruits()
         for unit in ("Knoll", "Myrrh"):
+            if unit not in available_recruits:
+                continue
             loc = self.multiworld.get_location(f"{unit} Recruited", self.player)
             deploy_name = f"Deploy {unit}"
             loc.item_rule = not_deploy_item(deploy_name)
