@@ -30,7 +30,7 @@ from .connector_config import (
     LOCATION_INFO_OFFS,
     LOCATION_INFO_SIZE,
 )
-from .fe8py import FE8Randomizer
+from .fe8py import FE8Randomizer, Config
 
 if TYPE_CHECKING:
     from . import FE8World
@@ -49,26 +49,30 @@ class FE8PatchExtension(APPatchExtension):
 
     @staticmethod
     def apply_gameplay_changes(caller: APProcedurePatch, rom: bytes) -> bytes:
-        config = json.loads(caller.get_file("config.json").decode("UTF-8"))
-        random = Random(config["seed"] + config["player"])
+        config = Config.of_object(
+            json.loads(caller.get_file("config.json").decode("UTF-8"))
+        )
+        random = Random(config.seed + config.player)
         mut_rom = bytearray(rom)
         randomizer = FE8Randomizer(rom=mut_rom, random=random, config=config)
         randomizer.apply_base_changes()
 
-        if config["shuffle_skirmish_tables"]:
+        if config.shuffle_skirmish_tables:
             randomizer.randomize_monster_gen()
 
-        if config["easier_5x"]:
+        if config.easier_5x:
             randomizer.apply_5x_buffs()
 
-        if config["unbreakable_regalia"]:
+        if config.unbreakable_regalia:
             randomizer.apply_infinite_holy_weapons()
 
-        if config["normalize_genders"]:
+        if config.normalize_genders:
             randomizer.normalize_genders()
 
-        randomizer.randomize_growths(*config["growth_rando"])
-        randomizer.randomize_music(config["music_rando"])
+        randomizer.randomize_growths(
+            config.growth_rando_kind, config.growth_rando_min, config.growth_rando_max
+        )
+        randomizer.randomize_music(config.music_rando)
         return bytes(mut_rom)
 
 
@@ -115,24 +119,9 @@ def write_tokens(world: "FE8World", patch: FE8ProcedurePatch):
     player = world.player
     multiworld = world.multiworld
     options: FE8Options = world.options
-    config_dict = {
-        "player_rando": bool(options.player_unit_rando),
-        "player_monster": bool(options.player_unit_monsters),
-        "enable_weapon_level_caps": bool(options.enable_weapon_level_caps),
-        "easier_5x": bool(options.easier_5x),
-        "unbreakable_regalia": bool(options.unbreakable_regalia),
-        "shuffle_skirmish_tables": bool(options.shuffle_skirmish_tables),
-        "normalize_genders": bool(options.normalize_genders),
-        "growth_rando": (
-            int(options.growth_rando),
-            int(options.growth_rando_min),
-            int(options.growth_rando_max),
-        ),
-        "music_rando": int(options.music_rando),
-        "seed": multiworld.seed,
-        "player": player,
-    }
-    patch.write_file("config.json", json.dumps(config_dict).encode("UTF-8"))
+    assert multiworld.seed is not None
+    config = Config.from_options(options, seed=multiworld.seed, player=player)
+    patch.write_file("config.json", json.dumps(config.to_json()).encode("UTF-8"))
 
     # Player name
     player_name = multiworld.player_name[player]

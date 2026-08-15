@@ -13,6 +13,7 @@ from typing import Any, Union, Optional, Callable, Iterable, Tuple
 
 from .util import fetch_json, write_short_le, read_short_le, read_word_le, write_word_le
 from .logic import Logic, Nudges, JsonValue
+from .options import FE8Options
 
 # XXX: most python lsps can't handle `from .constants import *`, so we have to
 # specify these manually...
@@ -145,6 +146,89 @@ class MusicRandoKind(IntEnum):
     CHAOS = 2
 
 
+@dataclass
+class Config:
+    player_rando: bool
+    player_monster: bool
+    enable_weapon_level_caps: bool
+    easier_5x: bool
+    unbreakable_regalia: bool
+    shuffle_skirmish_tables: bool
+    normalize_genders: bool
+    growth_rando_kind: GrowthRandoKind
+    growth_rando_min: int
+    growth_rando_max: int
+    music_rando: MusicRandoKind
+    seed: int
+    player: int
+
+    @classmethod
+    def of_object(cls, obj: dict[str, JsonValue]) -> "Config":
+        growth_rando = obj["growth_rando"]
+        assert isinstance(growth_rando, list) and len(growth_rando) == 3
+        kind, grmin, grmax = growth_rando
+        assert isinstance(kind, int) and isinstance(grmin, int) and isinstance(grmax, int)
+
+        music_rando = obj["music_rando"]
+        seed = obj["seed"]
+        player = obj["player"]
+        assert isinstance(music_rando, int)
+        assert isinstance(seed, int) and isinstance(player, int)
+
+        return cls(
+            player_rando=bool(obj["player_rando"]),
+            player_monster=bool(obj["player_monster"]),
+            enable_weapon_level_caps=bool(obj["enable_weapon_level_caps"]),
+            easier_5x=bool(obj["easier_5x"]),
+            unbreakable_regalia=bool(obj["unbreakable_regalia"]),
+            shuffle_skirmish_tables=bool(obj["shuffle_skirmish_tables"]),
+            normalize_genders=bool(obj["normalize_genders"]),
+            growth_rando_kind=GrowthRandoKind(kind),
+            growth_rando_min=grmin,
+            growth_rando_max=grmax,
+            music_rando=MusicRandoKind(music_rando),
+            seed=seed,
+            player=player,
+        )
+
+    @classmethod
+    def from_options(cls, options: FE8Options, seed: int, player: int) -> "Config":
+        return cls(
+            player_rando=bool(options.player_unit_rando),
+            player_monster=bool(options.player_unit_monsters),
+            enable_weapon_level_caps=bool(options.enable_weapon_level_caps),
+            easier_5x=bool(options.easier_5x),
+            unbreakable_regalia=bool(options.unbreakable_regalia),
+            shuffle_skirmish_tables=bool(options.shuffle_skirmish_tables),
+            normalize_genders=bool(options.normalize_genders),
+            growth_rando_kind=GrowthRandoKind(int(options.growth_rando)),
+            growth_rando_min=int(options.growth_rando_min),
+            growth_rando_max=int(options.growth_rando_max),
+            music_rando=MusicRandoKind(int(options.music_rando)),
+            seed=seed,
+            player=player,
+        )
+
+    def to_json(self) -> dict[str, JsonValue]:
+        return {
+            "player_rando": self.player_rando,
+            "player_monster": self.player_monster,
+            "enable_weapon_level_caps": self.enable_weapon_level_caps,
+            "easier_5x": self.easier_5x,
+            "unbreakable_regalia": self.unbreakable_regalia,
+            "shuffle_skirmish_tables": self.shuffle_skirmish_tables,
+            "normalize_genders": self.normalize_genders,
+            "growth_rando": [
+                int(self.growth_rando_kind),
+                self.growth_rando_min,
+                self.growth_rando_max,
+            ],
+            "music_rando": int(self.music_rando),
+            "seed": self.seed,
+            "player": self.player,
+        }
+
+
 class WeaponKind(IntEnum):
     SWORD = 0x00
     LANCE = 0x01
@@ -231,7 +315,6 @@ class WeaponKind(IntEnum):
                 return False
             case WeaponKind.DRAGONSTONE:
                 return True
-        raise ValueError
 
 
 class WeaponRank(IntEnum):
@@ -438,9 +521,9 @@ class FE8Randomizer:
     songs: dict[str, dict[int, str]]
     random: Random
     rom: bytearray
-    config: dict[str, Any]
+    config: Config
 
-    def __init__(self, rom: bytearray, random: Random, config: dict[str, Any]):
+    def __init__(self, rom: bytearray, random: Random, config: Config):
         self.random = random
         self.rom = rom
         unit_blocks = fetch_json(CHAPTER_UNIT_BLOCKS)
@@ -601,7 +684,7 @@ class FE8Randomizer:
 
         if item_id == self.weapons_by_name["Reginleif"].id:
             # Ensure Ephraim gets a usable weapon to replace reginleif
-            if self.config["enable_weapon_level_caps"]:
+            if self.config.enable_weapon_level_caps:
                 max_rank = int(WeaponRank.C)
             else:
                 max_rank = self.vanilla_highest_rank(EPHRAIM)
@@ -733,7 +816,7 @@ class FE8Randomizer:
         no_store = logic.no_store
 
         # config option for disabling player unit randomization
-        if not self.config["player_rando"] and logic.player:
+        if not self.config.player_rando and logic.player:
             if char not in self.character_store and not no_store:
                 self.character_store[char] = job
             return
@@ -756,7 +839,7 @@ class FE8Randomizer:
                 new_inventory = self.select_new_inventory(new_job, inventory, logic)
         else:
             # Checks to see if monsters are in logic or if it should just use humans
-            if logic.player and not self.config["player_monster"]:
+            if logic.player and not self.config.player_monster:
                 Race = JobRace.HUMAN
             else:
                 Race = JobRace.ALL
@@ -793,8 +876,8 @@ class FE8Randomizer:
         # would otherwise keep ranks for its base class's weapon types
         if (
             is_player
-            and self.config["player_rando"]
-            and not self.config["enable_weapon_level_caps"]
+            and self.config.player_rando
+            and not self.config.enable_weapon_level_caps
         ):
             wrank_base = wrank_offset(char)
             row = self.character_wranks.get(char)
@@ -1147,7 +1230,7 @@ class FE8Randomizer:
             # party weapon ranks start at C when weapon level caps are enabled; 
             # otherwise her starting rank is her highest base-class rank 
             # (written into the character table during randomization).
-            if self.config["enable_weapon_level_caps"]:
+            if self.config.enable_weapon_level_caps:
                 max_rank = int(WeaponRank.C)
             else:
                 max_rank = self.vanilla_highest_rank(EIRIKA)
@@ -1203,7 +1286,7 @@ class FE8Randomizer:
         # player unit it randomizes. (Enemies just get the ranks of whatever
         # class they land in, and under weapon level caps player units read
         # party-wide ranks instead of the table.)
-        if self.config["player_rando"]:
+        if self.config.player_rando:
             self.clear_weapon_ranks()
         for chapter_name, chapter in self.unit_blocks.items():
             for block in chapter:

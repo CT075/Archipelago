@@ -4,7 +4,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from ..constants import CHARACTER_COUNT, INVENTORY_INDEX, WRANK_COUNT
-from ..fe8py import FE8Randomizer, UnitBlock, WeaponKind, WeaponRank, wrank_offset
+from ..fe8py import Config, FE8Randomizer, UnitBlock, WeaponKind, WeaponRank, wrank_offset
 
 # We can't ship a base ROM, so these run against a blank one of the right size
 # with only the tables under test filled in.
@@ -21,7 +21,7 @@ BASE_CONFIG = {
     "unbreakable_regalia": False,
     "shuffle_skirmish_tables": False,
     "normalize_genders": False,
-    "growth_rando": (0, 10, 70),
+    "growth_rando": [0, 10, 70],
     "music_rando": 0,
     "seed": 0,
     "player": 1,
@@ -67,11 +67,13 @@ def make_randomizer(
         offset = wrank_offset(char)
         rom[offset : offset + WRANK_COUNT] = row
 
-    config = {
-        **BASE_CONFIG,
-        "player_rando": player_rando,
-        "enable_weapon_level_caps": enable_weapon_level_caps,
-    }
+    config = Config.of_object(
+        {
+            **BASE_CONFIG,
+            "player_rando": player_rando,
+            "enable_weapon_level_caps": enable_weapon_level_caps,
+        }
+    )
     seed = BASE_CONFIG["seed"]
     assert isinstance(seed, int)
     return FE8Randomizer(rom=rom, random=Random(seed), config=config)
