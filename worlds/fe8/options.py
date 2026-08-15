@@ -223,7 +223,8 @@ class EnableSkirmishes(Toggle):
     While this is on, skirmishes prefer to spawn at locations you haven't
     cleared yet, so you won't be left waiting on one specific spot. The Melkaen
     Coast check is only added if Lagdou Ruins checks are on, since that is the
-    only place a skirmish can spawn there.
+    only place a skirmish can spawn there. No skirmish checks are added if the
+    goal is Defeat Tirado, since the game ends before any skirmish can spawn.
     """
 
     display_name = "Enable skirmish checks"
@@ -406,8 +407,13 @@ class FE8Options(PerGameCommonOptions):
     def ruins_checks_enabled(self):
         return bool(self.ruins_enabled) or self.goal == Goal.option_ClearLagdou
 
+    # Skirmishes can't spawn until the world map opens up after the route
+    # split, so a Chapter 8 goal can never reach one.
     def skirmish_checks_enabled(self):
-        return bool(self.skirmishes_enabled)
+        return (
+            bool(self.skirmishes_enabled)
+            and self.goal != Goal.option_DefeatTirado
+        )
 
     # Melkaen Coast skirmishes only spawn in the Creature Campaign, which is
     # also the only place Lagdou Ruins is reachable.

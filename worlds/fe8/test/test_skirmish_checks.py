@@ -69,6 +69,30 @@ class TestSkirmishChecksWithRuins(FE8TestBase):
         )
 
 
+class TestSkirmishChecksWithTiradoGoal(FE8TestBase):
+    """Skirmishes only spawn after the route split, so a Chapter 8 goal has none."""
+
+    options = {
+        "skirmishes_enabled": True,
+        "ruins_enabled": True,
+        "goal": "DefeatTirado",
+    }
+
+    def test_no_skirmish_locations(self) -> None:
+        for location in self.multiworld.get_locations(self.player):
+            self.assertNotIn(
+                "Skirmish",
+                location.name,
+                f"{location.name} should not exist with a Chapter 8 goal",
+            )
+
+    def test_location_count_matches(self) -> None:
+        self.assertEqual(
+            self.world.total_locations(),
+            len(self.multiworld.get_locations(self.player)),
+        )
+
+
 class TestSkirmishChecksViaLagdouGoal(FE8TestBase):
     """The Lagdou goal implies ruins checks, which should pull Melkaen in too."""
 
