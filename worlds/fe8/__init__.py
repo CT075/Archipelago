@@ -32,6 +32,9 @@ from .constants import (
     FILLER_ITEMS,
     DEPLOY_EARLY_UNITS,
     DEPLOY_MID_UNITS,
+    SKIRMISH_EARLY,
+    SKIRMISH_LATE,
+    MELKAEN_SKIRMISH,
 )
 from .locations import FE8Location
 from .items import FE8Item
@@ -105,9 +108,15 @@ class FE8World(World):
         tower_checks_enabled = self.options.tower_checks_enabled()
         ruins_checks_enabled = self.options.ruins_checks_enabled()
         recruit_checks_enabled = bool(self.options.recruit_checks_enabled)
+        skirmish_checks_enabled = self.options.skirmish_checks_enabled()
+        melkaen_enabled = self.options.melkaen_check_enabled()
 
         def is_included(loc: Tuple[str, int]):
             name = loc[0]
+            if "Skirmish" in name:
+                if name == MELKAEN_SKIRMISH:
+                    return melkaen_enabled
+                return skirmish_checks_enabled
             if "Valni" in name and not tower_checks_enabled:
                 return False
             if "Lagdou" in name and not ruins_checks_enabled:
@@ -291,8 +300,8 @@ class FE8World(World):
             logging.warning(
                 f"[{self.player_name}] Not enough locations to place all "
                 f"useful items; {len(other_items)} item(s) were left out of "
-                f"the pool: {summary}. Enable Tower of Valni or Lagdou Ruins "
-                f"checks to add more locations, or reduce item counts "
+                f"the pool: {summary}. Enable Tower of Valni, Lagdou Ruins or "
+                f"skirmish checks to add more locations, or reduce item counts "
                 f"(level caps, weapon level caps, promo items, "
                 f"or progressive seth deployment)."
             )
@@ -487,6 +496,12 @@ class FE8World(World):
                 {"FinalBoss": finalboss_rule},
             )
 
+            if self.options.skirmish_checks_enabled():
+                for name in SKIRMISH_EARLY:
+                    self.add_location_to_region(name, None, route_split)
+                for name in SKIRMISH_LATE:
+                    self.add_location_to_region(name, None, lategame)
+
             if self.options.tower_checks_enabled():
                 tower = Region("Tower of Valni", self.player, self.multiworld)
                 self.multiworld.regions.append(tower)
@@ -537,13 +552,19 @@ class FE8World(World):
                     lategame.add_exits({"Lagdou Ruins": "Complete Chapter 19"})
                 ruins.add_exits({"Post-routesplit": "Complete Lagdou Ruins 10"})
 
+                if self.options.skirmish_checks_enabled():
+                    self.add_location_to_region(MELKAEN_SKIRMISH, None, ruins)
+
         else:
             campaign = Region("Campaign", self.player, self.multiworld)
 
             recruit_checks_enabled = bool(self.options.recruit_checks_enabled)
             for name, lid in locations:
                 # TODO (cam): do this better
-                if any(item in name for item in ("Formortiis", "Valni", "Lagdou")):
+                if any(
+                    item in name
+                    for item in ("Formortiis", "Valni", "Lagdou", "Skirmish")
+                ):
                     continue
                 if "Recruited" in name and not recruit_checks_enabled:
                     continue
@@ -556,6 +577,10 @@ class FE8World(World):
             )
 
             self.multiworld.regions.append(campaign)
+
+            if self.options.skirmish_checks_enabled():
+                for name in SKIRMISH_EARLY + SKIRMISH_LATE:
+                    self.add_location_to_region(name, None, campaign)
 
             if self.options.tower_checks_enabled():
                 tower = Region("Tower of Valni", self.player, self.multiworld)
@@ -590,6 +615,9 @@ class FE8World(World):
 
                 campaign.add_exits({"Lagdou Ruins": "Complete Chapter 19"})
                 ruins.add_exits({"Campaign": "Complete Lagdou Ruins 10"})
+
+                if self.options.skirmish_checks_enabled():
+                    self.add_location_to_region(MELKAEN_SKIRMISH, None, ruins)
 
         goal_location = {
             Goal.option_DefeatFormortiis: "Defeat Formortiis",

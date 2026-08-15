@@ -270,3 +270,23 @@ DEPLOY_MID_UNITS = frozenset(
     }
 )
 # late tier: Myrrh, Syrene
+
+# World map skirmish sites, split by when a skirmish can spawn there on *both*
+# routes (WmMonsterGenerateRates_{Eirika,Ephraim}Mode). The four route-specific
+# sites only open up for both routes once the routes merge, so they sit with the
+# late group rather than where their own route first reaches them.
+SKIRMISH_EARLY = (
+    "Za'ha Woods Skirmish",
+    "Adlas Plains Skirmish",
+)
+SKIRMISH_LATE = (
+    "Teras Plateau Skirmish",
+    "Hamill Canyon Skirmish",
+    "Bethroen Skirmish",
+    "Za'albul Marsh Skirmish",
+    "Narube River Skirmish",
+    "Neleras Peak Skirmish",
+)
+# Melkaen Coast only spawns monsters in the Creature Campaign, so it is only a
+# location when Lagdou Ruins checks are on too.
+MELKAEN_SKIRMISH = "Melkaen Coast Skirmish"
